@@ -1,0 +1,11 @@
+services:
+  - type: worker
+    name: trading-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: PAPER_TRADING
+        value: true
+      - key: EMAIL_CHECK_INTERVAL
+        value: 60
