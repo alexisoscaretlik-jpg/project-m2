@@ -21,7 +21,12 @@ last_date = datetime.now().date()
 SKIP = {"NEW", "BUY", "SELL", "THE", "AND", "FOR", "TRADE", "ALERT", "SMART", "MONEY", "LONG",
         "SHORT", "ENTRY", "STOP", "TARGET", "LOSS", "PROFIT", "TAKE", "EXIT", "CLOSE",
         "CLOSING", "SOLD", "BOUGHT", "OPTIONS", "OPTION", "CALL", "PUT", "STRIKE",
-        "ADDED", "ADDING", "UPDATE", "POSITION", "ETF", "STOCK", "TIONS"}
+        "ADDED", "ADDING", "ADD", "UPDATE", "POSITION", "ETF", "STOCK", "TIONS",
+        "TO", "AT", "ON", "IN", "IS", "IT", "OF", "OR", "AS", "BE", "AN", "A", "I",
+        "DAILY", "WEEKLY", "MONTHLY", "HTTPS", "HTTP", "WWW", "COM", "NET", "ORG",
+        "AM", "PM", "EST", "PST", "EDT", "PDT", "CT", "MT", "ET", "UTC",
+        "USD", "EUR", "GBP", "US", "EU", "UK", "INC", "LLC", "CO", "LTD",
+        "RE", "FW", "FWD", "IMPORTANT", "URGENT", "ALL", "ANY", "PER", "NOW", "YOUR"}
 
 
 def reset_counter():
@@ -36,9 +41,6 @@ def get_ticker(text):
     m = re.search(r'\$([A-Z]{1,5})\b', text)
     if m and m.group(1) not in SKIP:
         return m.group(1)
-    for w in re.findall(r'\b([A-Z]{1,5})\b', text):
-        if w not in SKIP and len(w) >= 2:
-            return w
     return None
 
 
@@ -74,20 +76,13 @@ def parse_alert(subject, body):
         m = re.search(r'(\d{1,2}[/-]\d{1,2}[/-]?\d{0,4})', text)
         if m:
             alert["expiry"] = m.group(1)
-    prices = re.findall(r'\$?(\d+\.\d{1,2})', text)
-    if prices:
-        alert["entry"] = float(prices[0])
-        if len(prices) >= 2:
-            alert["stop"] = float(prices[1])
-        if len(prices) >= 3:
-            alert["target"] = float(prices[2])
-    m = re.search(r'(?:ENTRY|BOUGHT?\s*(?:AT)?|ENTER)\s*\$?(\d+\.\d{1,2})', text)
+    m = re.search(r'(?:ENTRY|BOUGHT\s*AT|BUY\s*AT|ENTER(?:\s*AT)?)\s*[:=@]?\s*\$?(\d+(?:\.\d{1,2})?)', text)
     if m:
         alert["entry"] = float(m.group(1))
-    m = re.search(r'(?:STOP|STOP.?LOSS|SL)\s*\$?(\d+\.\d{1,2})', text)
+    m = re.search(r'(?:STOP[\s\-]?LOSS|STOP|SL)\s*[:=@]?\s*\$?(\d+(?:\.\d{1,2})?)', text)
     if m:
         alert["stop"] = float(m.group(1))
-    m = re.search(r'(?:TARGET|TP|TAKE.?PROFIT|PT)\s*\$?(\d+\.\d{1,2})', text)
+    m = re.search(r'(?:TARGET|TAKE[\s\-]?PROFIT|TP|PT)\s*[:=@]?\s*\$?(\d+(?:\.\d{1,2})?)', text)
     if m:
         alert["target"] = float(m.group(1))
     if alert["ticker"] and alert["direction"] and alert["entry"]:
@@ -197,7 +192,11 @@ def check_email():
                                            "TARGET", "CALL", "PUT", "OPTION"]):
                 alert = parse_alert(subject, body)
                 alerts.append(alert)
-                log.info("Alert: %s", subject[:60])
+                log.info("Alert: %s", subject[:80])
+                if not alert["parsed"]:
+                    log.info("Unparsed alert. ticker=%s direction=%s entry=%s | body: %s",
+                             alert["ticker"], alert["direction"], alert["entry"],
+                             body[:300].replace("\n", " "))
             seen.add(mid_str)
         mail.logout()
     except Exception as e:
