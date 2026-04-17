@@ -45,13 +45,14 @@ def get_ticker(text):
 
 
 def parse_alert(subject, body):
-    text = (subject + " " + body).upper()
-    is_option = any(w in text for w in ["CALL", "PUT", "OPTION", "STRIKE", "EXPIR"])
+    text = subject + " " + body
+    upper = text.upper()
+    is_option = any(w in upper for w in ["CALL", "PUT", "OPTION", "STRIKE", "EXPIR"])
     alert = {
         "type": "option" if is_option else "stock",
         "timestamp": datetime.now().isoformat(),
         "subject": subject,
-        "ticker": get_ticker(text),
+        "ticker": None,
         "direction": None,
         "entry": None,
         "stop": None,
@@ -59,32 +60,67 @@ def parse_alert(subject, body):
         "option_type": None,
         "strike": None,
         "expiry": None,
-        "parsed": False
+        "shares": None,
+        "parsed": False,
     }
-    if any(w in text for w in ["BUY", "LONG", "BOUGHT", "BUYING", "ADDED"]):
-        alert["direction"] = "BUY"
-    elif any(w in text for w in ["SELL", "SHORT", "SOLD", "SELLING", "CLOSED", "EXIT"]):
-        alert["direction"] = "SELL"
+
+    m = re.search(
+        r'\b(LONG|SHORT|BUY|SELL|CLOSE|CLOSING)'
+        r'(?:\s+(?:TO\s+)?(?:OPEN|CLOSE|CLOSING))?'
+        r'\s*[:\-]\s*([A-Z]{1,5})\b',
+        upper,
+    )
+    if m and m.group(2) not in SKIP:
+        alert["ticker"] = m.group(2)
+        action = m.group(1)
+        if action in ("LONG", "BUY"):
+            alert["direction"] = "BUY"
+        elif action in ("SHORT", "SELL"):
+            alert["direction"] = "SELL"
+        else:
+            alert["direction"] = "CLOSE"
+
+    if not alert["ticker"]:
+        m = re.search(r'\$([A-Z]{1,5})\b', text)
+        if m and m.group(1) not in SKIP:
+            alert["ticker"] = m.group(1)
+
+    if not alert["direction"]:
+        m = re.search(r'\bSIDE\s*[:=]\s*(LONG|SHORT|BUY|SELL)\b', upper)
+        if m:
+            alert["direction"] = "BUY" if m.group(1) in ("LONG", "BUY") else "SELL"
+
+    if not alert["direction"]:
+        if re.search(r'\b(BUY|LONG|BOUGHT|BUYING|ADDED)\b', upper):
+            alert["direction"] = "BUY"
+        elif re.search(r'\b(SELL|SHORT|SOLD|SELLING|CLOSED|EXIT)\b', upper):
+            alert["direction"] = "SELL"
+
     if is_option:
-        if "CALL" in text:
+        if "CALL" in upper:
             alert["option_type"] = "CALL"
-        elif "PUT" in text:
+        elif "PUT" in upper:
             alert["option_type"] = "PUT"
-        m = re.search(r'(\d+\.?\d*)\s*(?:CALL|PUT|STRIKE)', text)
+        m = re.search(r'(\d+\.?\d*)\s*(?:CALL|PUT|STRIKE)', upper)
         if m:
             alert["strike"] = float(m.group(1))
-        m = re.search(r'(\d{1,2}[/-]\d{1,2}[/-]?\d{0,4})', text)
+        m = re.search(r'(\d{1,2}[/-]\d{1,2}[/-]?\d{0,4})', upper)
         if m:
             alert["expiry"] = m.group(1)
-    m = re.search(r'(?:ENTRY|BOUGHT\s*AT|BUY\s*AT|ENTER(?:\s*AT)?)\s*[:=@]?\s*\$?(\d+(?:\.\d{1,2})?)', text)
+
+    m = re.search(r'\b(?:PRICE|ENTRY|BOUGHT\s*AT|BUY\s*AT|ENTER(?:\s*AT)?)\s*[:=@]?\s*\$?(\d+(?:\.\d{1,2})?)', upper)
     if m:
         alert["entry"] = float(m.group(1))
-    m = re.search(r'(?:STOP[\s\-]?LOSS|STOP|SL)\s*[:=@]?\s*\$?(\d+(?:\.\d{1,2})?)', text)
+    m = re.search(r'\b(?:STOP[\s\-]?LOSS|STOP|SL)\b\s*[:=@]?\s*\$?(\d+(?:\.\d{1,2})?)', upper)
     if m:
         alert["stop"] = float(m.group(1))
-    m = re.search(r'(?:TARGET|TAKE[\s\-]?PROFIT|TP|PT)\s*[:=@]?\s*\$?(\d+(?:\.\d{1,2})?)', text)
+    m = re.search(r'\b(?:TARGET|TAKE[\s\-]?PROFIT|TP|PT)\b\s*[:=@]?\s*\$?(\d+(?:\.\d{1,2})?)', upper)
     if m:
         alert["target"] = float(m.group(1))
+    m = re.search(r'\bSHARES?\s*[:=]?\s*(\d+)', upper)
+    if m:
+        alert["shares"] = int(m.group(1))
+
     if alert["ticker"] and alert["direction"] and alert["entry"]:
         alert["parsed"] = True
     return alert
@@ -125,7 +161,7 @@ def log_trade(info):
 
 def execute(alert):
     global trades_today
-    size = position_size(alert["entry"], alert["type"])
+    size = alert.get("shares") or position_size(alert["entry"], alert["type"])
     info = {
         "timestamp": datetime.now().isoformat(),
         "ticker": alert["ticker"],
@@ -188,8 +224,9 @@ def check_email():
             else:
                 body = msg.get_payload(decode=True).decode("utf-8", errors="ignore")
             combined = (subject + body).upper()
-            if any(w in combined for w in ["ALERT", "TRADE", "BUY", "SELL", "ENTRY", "STOP",
-                                           "TARGET", "CALL", "PUT", "OPTION"]):
+            if any(w in combined for w in ["ALERT", "TRADE", "BUY", "SELL", "LONG", "SHORT",
+                                           "OPEN", "CLOSE", "ENTRY", "STOP", "TARGET",
+                                           "PRICE", "SHARES", "CALL", "PUT", "OPTION"]):
                 alert = parse_alert(subject, body)
                 alerts.append(alert)
                 log.info("Alert: %s", subject[:80])
