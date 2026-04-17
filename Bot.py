@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-“””
-Verified Investing ? Interactive Brokers Automated Trading Bot
-Monitors email for Gareth Soloway alerts and places bracket orders on IBKR.
-“””
+
+# Verified Investing ? Interactive Brokers Automated Trading Bot
+
+# Monitors email for Gareth Soloway alerts and places bracket orders on IBKR.
 
 import imaplib
 import email
@@ -61,12 +61,12 @@ last_trade_date = today
 # ??? Alert Parser ????????????????????????????????????????????????
 
 class AlertParser:
-“”“Parses Verified Investing email alerts from Gareth Soloway.”””
+# Parses Verified Investing email alerts from Gareth Soloway.
 
 ```
 @staticmethod
 def parse_stock_alert(subject, body):
-    """Parse Smart Money: Stocks & ETFs alerts."""
+    # Parse Smart Money: Stocks & ETFs alerts.
     alert = {
         "type": "stock",
         "timestamp": datetime.now().isoformat(),
@@ -137,7 +137,7 @@ def parse_stock_alert(subject, body):
 
 @staticmethod
 def parse_options_alert(subject, body):
-    """Parse Smart Money: Options alerts."""
+    # Parse Smart Money: Options alerts.
     alert = {
         "type": "option",
         "timestamp": datetime.now().isoformat(),
@@ -220,7 +220,7 @@ def parse_options_alert(subject, body):
 
 @staticmethod
 def classify_and_parse(subject, body):
-    """Determine alert type and parse accordingly."""
+    # Determine alert type and parse accordingly.
     text = f"{subject} {body}".upper()
     if any(word in text for word in ["CALL", "PUT", "OPTION", "STRIKE", "EXPIR"]):
         return AlertParser.parse_options_alert(subject, body)
@@ -230,7 +230,7 @@ def classify_and_parse(subject, body):
 # ??? Position Sizer ??????????????????????????????????????????????
 
 def calculate_position_size(entry_price, alert_type=“stock”):
-“”“Calculate number of shares/contracts based on EUR budget.”””
+# Calculate number of shares/contracts based on EUR budget.
 usd_budget = EUR_BUDGET_PER_TRADE * EUR_TO_USD_RATE
 if alert_type == “option”:
 # Options: price is per share, 1 contract = 100 shares
@@ -243,7 +243,7 @@ return max(shares, 1)
 # ??? Safety Checks ???????????????????????????????????????????????
 
 def safety_check(alert):
-“”“Run safety checks before placing an order.”””
+# Run safety checks before placing an order.
 issues = []
 
 ```
@@ -271,7 +271,7 @@ return issues
 # ??? IBKR Order Placer ???????????????????????????????????????????
 
 class IBKRTrader:
-“”“Places orders on Interactive Brokers via TWS API.”””
+# Places orders on Interactive Brokers via TWS API.
 
 ```
 def __init__(self):
@@ -279,7 +279,7 @@ def __init__(self):
     self.ib = None
 
 def connect(self):
-    """Connect to IBKR TWS/Gateway."""
+    # Connect to IBKR TWS/Gateway.
     try:
         from ib_insync import IB
         self.ib = IB()
@@ -294,7 +294,7 @@ def connect(self):
         self.connected = False
 
 def place_bracket_order(self, alert):
-    """Place a bracket order (entry + stop + target)."""
+    # Place a bracket order (entry + stop + target).
     global trades_today
 
     size = calculate_position_size(
@@ -378,7 +378,7 @@ def place_bracket_order(self, alert):
 # ??? Trade Logger ????????????????????????????????????????????????
 
 def log_trade(order_info):
-“”“Log trade to CSV file.”””
+# Log trade to CSV file.
 file_exists = os.path.exists(LOG_FILE)
 with open(LOG_FILE, “a”, newline=””) as f:
 writer = csv.DictWriter(f, fieldnames=[
@@ -392,7 +392,7 @@ row = {k: order_info.get(k, “”) for k in writer.fieldnames}
 writer.writerow(row)
 
 def log_alert(alert):
-“”“Log raw alert to JSON file.”””
+# Log raw alert to JSON file.
 alerts = []
 if os.path.exists(ALERT_LOG_FILE):
 with open(ALERT_LOG_FILE, “r”) as f:
@@ -407,7 +407,7 @@ json.dump(alerts, f, indent=2)
 # ??? Email Monitor ???????????????????????????????????????????????
 
 class EmailMonitor:
-“”“Monitors Gmail for Verified Investing alerts.”””
+# Monitors Gmail for Verified Investing alerts.
 
 ```
 def __init__(self):
@@ -415,7 +415,7 @@ def __init__(self):
     self.load_seen_ids()
 
 def load_seen_ids(self):
-    """Load previously seen email IDs."""
+    # Load previously seen email IDs.
     try:
         if os.path.exists("seen_emails.json"):
             with open("seen_emails.json", "r") as f:
@@ -424,12 +424,12 @@ def load_seen_ids(self):
         self.seen_ids = set()
 
 def save_seen_ids(self):
-    """Save seen email IDs."""
+    # Save seen email IDs.
     with open("seen_emails.json", "w") as f:
         json.dump(list(self.seen_ids), f)
 
 def check_for_alerts(self):
-    """Check email for new Verified Investing alerts."""
+    # Check email for new Verified Investing alerts.
     alerts = []
 
     if not EMAIL_USERNAME or not EMAIL_PASSWORD:
@@ -513,7 +513,7 @@ def check_for_alerts(self):
 # ??? Main Loop ???????????????????????????????????????????????????
 
 def main():
-“”“Main bot loop.”””
+# Main bot loop.
 log.info(”=” * 60)
 log.info(“Verified Investing ? IBKR Trading Bot”)
 log.info(f”Paper Trading: {PAPER_TRADING}”)
