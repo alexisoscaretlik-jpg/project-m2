@@ -65,20 +65,30 @@ def parse_alert(subject, body):
     }
 
     m = re.search(
-        r'\b(LONG|SHORT|BUY|SELL|CLOSE|CLOSING)'
-        r'(?:\s+(?:TO\s+)?(?:OPEN|CLOSE|CLOSING))?'
-        r'\s*[:\-]\s*([A-Z]{1,5})\b',
+        r'\b(?:ADD|TRIM|OPEN|CLOSE|CLOSING)\s*\(\s*(LONG|SHORT|BUY|SELL)\s*\)\s*:\s*([A-Z]{1,5})\b',
         upper,
     )
     if m and m.group(2) not in SKIP:
         alert["ticker"] = m.group(2)
         action = m.group(1)
-        if action in ("LONG", "BUY"):
-            alert["direction"] = "BUY"
-        elif action in ("SHORT", "SELL"):
-            alert["direction"] = "SELL"
-        else:
-            alert["direction"] = "CLOSE"
+        alert["direction"] = "BUY" if action in ("LONG", "BUY") else "SELL"
+
+    if not alert["ticker"]:
+        m = re.search(
+            r'\b(LONG|SHORT|BUY|SELL|CLOSE|CLOSING)'
+            r'(?:\s+(?:TO\s+)?(?:OPEN|CLOSE|CLOSING))?'
+            r'\s*[:\-]\s*([A-Z]{1,5})\b',
+            upper,
+        )
+        if m and m.group(2) not in SKIP:
+            alert["ticker"] = m.group(2)
+            action = m.group(1)
+            if action in ("LONG", "BUY"):
+                alert["direction"] = "BUY"
+            elif action in ("SHORT", "SELL"):
+                alert["direction"] = "SELL"
+            else:
+                alert["direction"] = "CLOSE"
 
     if not alert["ticker"]:
         m = re.search(r'\$([A-Z]{1,5})\b', text)
