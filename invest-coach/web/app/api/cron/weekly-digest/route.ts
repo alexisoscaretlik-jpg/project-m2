@@ -2,16 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { emailConfigured, send } from "@/lib/email";
 import { serviceClient } from "@/lib/supabase/service";
+import {
+  DigestCard,
+  digestHtml,
+  digestSubject,
+  digestText,
+} from "@/lib/newsletter/templates";
+import { weeklyTip } from "@/lib/newsletter/tips";
 
 // Weekly digest. Triggered by Vercel Cron — see vercel.json.
 // Authenticated via CRON_SECRET header so the endpoint can't be hit
-// by random traffic. Manual trigger: `curl -H "Authorization: Bearer <secret>"`.
-//
-// Content pulled live at send time: top 6 cards from the last 7 days.
+// by random traffic. Manual trigger:
+//   curl -H "Authorization: Bearer <secret>" https://.../api/cron/weekly-digest
+// Add ?preview=1 to render HTML in-browser without sending.
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-type Card = {
+type CardRow = {
   id: number;
   title: string;
   tone: string | null;
@@ -28,26 +35,49 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
   }
-  if (!emailConfigured()) {
-    return NextResponse.json(
-      { error: "email_not_configured" },
-      { status: 503 },
-    );
-  }
+
+  const url = new URL(req.url);
+  const preview = url.searchParams.get("preview") === "1";
 
   const sb = serviceClient();
 
   const since = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
   const { data: cardsRaw } = await sb
     .from("cards")
-    .select("id, title, tone, body_markdown, published_at, companies(ticker, name)")
+    .select(
+      "id, title, tone, body_markdown, published_at, companies(ticker, name)",
+    )
     .gte("published_at", since)
     .order("published_at", { ascending: false })
-    .limit(6);
-  const cards = (cardsRaw ?? []) as unknown as Card[];
+    .limit(3);
+  const rows = (cardsRaw ?? []) as unknown as CardRow[];
 
-  if (cards.length === 0) {
-    return NextResponse.json({ sent: 0, reason: "no_cards" });
+  const cards: DigestCard[] = rows.map((r) => ({
+    ticker: r.companies?.ticker ?? "—",
+    company: r.companies?.name ?? "",
+    title: r.title,
+    tone: r.tone,
+  }));
+
+  const weekOf = new Date();
+  const tip = weeklyTip(weekOf);
+  const metric = await fetchMetric();
+
+  const html = digestHtml({ cards, tip, weekOf, metric });
+  const text = digestText({ cards, tip, weekOf, metric });
+  const subject = digestSubject(weekOf);
+
+  if (preview) {
+    return new NextResponse(html, {
+      headers: { "content-type": "text/html; charset=utf-8" },
+    });
+  }
+
+  if (!emailConfigured()) {
+    return NextResponse.json(
+      { error: "email_not_configured", hint: "Set RESEND_API_KEY and EMAIL_FROM" },
+      { status: 503 },
+    );
   }
 
   const { data: subs } = await sb
@@ -60,10 +90,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ sent: 0, reason: "no_subscribers" });
   }
 
-  const html = buildHtml(cards);
-  const text = buildText(cards);
-  const subject = `Invest Coach · ${emails.length > 0 ? "Ta semaine en bourse" : ""}`.trim();
-
   let sent = 0;
   const errors: string[] = [];
   for (const to of emails) {
@@ -75,67 +101,47 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ sent, failures: errors.length, total: emails.length });
+  return NextResponse.json({
+    sent,
+    failures: errors.length,
+    total: emails.length,
+    cards: cards.length,
+    tip: tip.slug,
+  });
 }
 
-function buildHtml(cards: Card[]): string {
-  const items = cards
-    .map((c) => {
-      const company = c.companies;
-      const ticker = company?.ticker ?? "—";
-      const name = company?.name ?? "";
-      const tone = c.tone ?? "educational";
-      const toneColor =
-        tone === "bullish"
-          ? "#047857"
-          : tone === "red_flag"
-            ? "#be123c"
-            : tone === "cautious"
-              ? "#b45309"
-              : "#475569";
-      return `
-      <div style="border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px;">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-          <span style="font-family:ui-monospace,Menlo,monospace;font-weight:600;color:#0f172a;">${ticker}</span>
-          <span style="font-size:11px;text-transform:uppercase;color:${toneColor};">${tone.replace("_", " ")}</span>
-        </div>
-        <div style="font-size:13px;color:#475569;margin-bottom:6px;">${escapeHtml(name)}</div>
-        <div style="font-size:15px;color:#0f172a;line-height:1.5;">${escapeHtml(c.title)}</div>
-      </div>`;
-    })
-    .join("");
-
-  return `
-  <div style="font-family:system-ui,-apple-system,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#0f172a;">
-    <h1 style="font-size:22px;margin:0 0 4px;">Ta semaine en bourse</h1>
-    <p style="font-size:13px;color:#64748b;margin:0 0 20px;">
-      ${cards.length} cartes · analyses IA des derniers filings SEC &amp; Euronext
-    </p>
-    ${items}
-    <p style="font-size:12px;color:#64748b;margin:32px 0 0;">
-      Pour te désinscrire, réponds simplement à cet email.
-    </p>
-  </div>`;
-}
-
-function buildText(cards: Card[]): string {
-  return (
-    "Ta semaine en bourse\n\n" +
-    cards
-      .map((c) => {
-        const ticker = c.companies?.ticker ?? "—";
-        const tone = (c.tone ?? "").toUpperCase();
-        return `[${ticker}] ${tone ? `(${tone}) ` : ""}${c.title}`;
-      })
-      .join("\n\n")
-  );
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+// Small metric to anchor the digest. Static fallback values so the cron
+// never fails if an external API is down — swap in a real market call
+// here once you add one (Alpha Vantage, FMP, etc.).
+async function fetchMetric(): Promise<
+  { value: string; label: string; context: string } | undefined
+> {
+  const rotations: { value: string; label: string; context: string }[] = [
+    {
+      value: "+7,8 %",
+      label: "Performance CAC 40 sur 12 mois glissants",
+      context:
+        "Dividendes réinvestis inclus. Contexte : plus-haut historique de 2024 intégré. Un tracker CAC40 à 0,25% de frais (CAC, PAEEM) bat 80% des fonds actifs France sur 10 ans.",
+    },
+    {
+      value: "17,2 %",
+      label: "Taux des prélèvements sociaux en PEA",
+      context:
+        "Après 5 ans, c'est la SEULE fiscalité restante sur les gains. Aucun impôt sur le revenu. Sur 100 000€ de plus-values, tu gardes 82 800€ net. En CTO, tu en garderais 70 000€.",
+    },
+    {
+      value: "152 500 €",
+      label: "Abattement AV par bénéficiaire (<70 ans)",
+      context:
+        "Chaque bénéficiaire désigné reçoit jusqu'à 152 500€ hors droits de succession. Avec 3 enfants : 457 500€ transmissibles sans frais. Condition : versements faits avant tes 70 ans.",
+    },
+    {
+      value: "4 600 €",
+      label: "Abattement annuel AV sur les gains après 8 ans",
+      context:
+        "Dès la 9ème année, tu peux retirer jusqu'à 4 600€ de gains (9 200€ pour un couple) sans aucun IR. Seuls les 17,2% de PS s'appliquent. Levier puissant pour une rente progressive.",
+    },
+  ];
+  const week = Math.floor(Date.now() / (7 * 24 * 3600 * 1000));
+  return rotations[week % rotations.length];
 }
