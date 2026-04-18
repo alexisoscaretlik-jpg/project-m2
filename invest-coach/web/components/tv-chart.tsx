@@ -4,24 +4,30 @@ import { useEffect, useRef } from "react";
 
 export function TvChart({
   symbol,
-  height = 500,
+  height = 520,
 }: {
   symbol: string;
   height?: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const container = ref.current;
+    const container = containerRef.current;
     if (!container) return;
-    container.innerHTML = "";
+
+    // TradingView's embed script expects a specific DOM layout: the
+    // <script> tag sits as a sibling of .tradingview-widget-container__widget
+    // inside the outer .tradingview-widget-container, and the widget JSON is
+    // placed in the script's text content.
+    container.innerHTML =
+      '<div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>';
 
     const script = document.createElement("script");
     script.src =
       "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
     script.async = true;
     script.type = "text/javascript";
-    script.innerHTML = JSON.stringify({
+    script.text = JSON.stringify({
       autosize: true,
       symbol,
       interval: "D",
@@ -29,9 +35,13 @@ export function TvChart({
       theme: "light",
       style: "1",
       locale: "fr",
-      hide_side_toolbar: false,
-      allow_symbol_change: true,
+      toolbar_bg: "#f8fafc",
+      enable_publishing: false,
+      hide_top_toolbar: false,
+      hide_legend: false,
+      save_image: false,
       withdateranges: true,
+      allow_symbol_change: true,
       details: true,
       studies: ["MASimple@tv-basicstudies"],
       support_host: "https://www.tradingview.com",
@@ -45,10 +55,9 @@ export function TvChart({
 
   return (
     <div
+      ref={containerRef}
       className="tradingview-widget-container overflow-hidden rounded-xl border border-slate-200 bg-white"
       style={{ height }}
-    >
-      <div ref={ref} className="tradingview-widget-container__widget h-full" />
-    </div>
+    />
   );
 }

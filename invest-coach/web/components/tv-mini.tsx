@@ -2,43 +2,57 @@
 
 import { useEffect, useRef } from "react";
 
-export function TvMini({ symbol }: { symbol: string }) {
-  const ref = useRef<HTMLDivElement>(null);
+export function TvMini({
+  symbol,
+  height = 96,
+  dateRange = "3M",
+}: {
+  symbol: string;
+  height?: number;
+  dateRange?: "1D" | "1M" | "3M" | "12M" | "60M" | "ALL";
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const container = ref.current;
+    const container = containerRef.current;
     if (!container) return;
-    container.innerHTML = "";
+
+    container.innerHTML =
+      '<div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>';
 
     const script = document.createElement("script");
     script.src =
       "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
     script.async = true;
     script.type = "text/javascript";
-    script.innerHTML = JSON.stringify({
+    script.text = JSON.stringify({
       symbol,
       width: "100%",
-      height: 80,
+      height: "100%",
       locale: "fr",
-      dateRange: "3M",
+      dateRange,
       colorTheme: "light",
       isTransparent: true,
-      autosize: false,
+      autosize: true,
       largeChartUrl: "",
       noTimeScale: true,
+      chartOnly: false,
       trendLineColor: "rgba(37, 99, 235, 1)",
-      underLineColor: "rgba(37, 99, 235, 0.1)",
+      underLineColor: "rgba(37, 99, 235, 0.12)",
+      underLineBottomColor: "rgba(37, 99, 235, 0)",
     });
     container.appendChild(script);
 
     return () => {
       container.innerHTML = "";
     };
-  }, [symbol]);
+  }, [symbol, dateRange]);
 
   return (
-    <div className="tradingview-widget-container" style={{ height: 80 }}>
-      <div ref={ref} className="tradingview-widget-container__widget" />
-    </div>
+    <div
+      ref={containerRef}
+      className="tradingview-widget-container"
+      style={{ height }}
+    />
   );
 }

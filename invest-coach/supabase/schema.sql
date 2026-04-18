@@ -234,4 +234,18 @@ create index if not exists idx_newsletter_active
   where unsubscribed = false;
 
 alter table newsletter_subscribers enable row level security;
--- No policies — only service_role touches this table.
+-- Allow both anon (logged-out landing visitors) and authenticated users
+-- to subscribe. Reads stay restricted to service_role.
+drop policy if exists "anyone insert newsletter" on newsletter_subscribers;
+drop policy if exists "anyone upsert newsletter" on newsletter_subscribers;
+create policy "anyone insert newsletter"
+  on newsletter_subscribers
+  for insert
+  to anon, authenticated
+  with check (true);
+create policy "anyone upsert newsletter"
+  on newsletter_subscribers
+  for update
+  to anon, authenticated
+  using (true)
+  with check (true);

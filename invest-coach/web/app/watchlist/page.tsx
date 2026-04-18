@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Nav } from "@/components/nav";
 import { TvMini } from "@/components/tv-mini";
+import { TvTickerTape } from "@/components/tv-ticker-tape";
 import { createClient } from "@/lib/supabase/server";
 import { toTvSymbol } from "@/lib/tradingview";
 
@@ -69,20 +70,30 @@ export default async function WatchlistPage() {
   return (
     <main className="min-h-screen bg-slate-50">
       <Nav active="/watchlist" />
+      <TvTickerTape
+        symbols={
+          watched.length > 0
+            ? watched.map((c) => ({
+                proName: toTvSymbol(c.ticker),
+                title: c.name,
+              }))
+            : undefined
+        }
+      />
 
       <div className="mx-auto max-w-2xl px-4 py-6">
-        <h1 className="text-xl font-bold text-slate-900">Your watchlist</h1>
+        <h1 className="text-xl font-bold text-slate-900">Ta watchlist</h1>
         <p className="text-xs text-slate-500">
-          Cards from companies you follow show up here first.
+          Les cartes des entreprises que tu suis apparaissent ici en priorité.
         </p>
 
         <section className="mt-6">
           <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Following ({watched.length})
+            Tu suis ({watched.length})
           </h2>
           {watched.length === 0 ? (
             <p className="text-sm text-slate-500">
-              You&apos;re not following anyone yet. Add a ticker below.
+              Tu ne suis encore personne. Ajoute un ticker ci-dessous.
             </p>
           ) : (
             <ul className="space-y-2">
@@ -107,7 +118,7 @@ export default async function WatchlistPage() {
                         type="submit"
                         className="text-xs text-slate-500 hover:text-rose-600"
                       >
-                        Remove
+                        Retirer
                       </button>
                     </form>
                   </div>
@@ -123,7 +134,7 @@ export default async function WatchlistPage() {
         {addable.length > 0 ? (
           <section className="mt-8">
             <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">
-              Add a ticker
+              Ajouter un ticker
             </h2>
             <ul className="flex flex-wrap gap-2">
               {addable.map((c) => (
@@ -149,7 +160,7 @@ export default async function WatchlistPage() {
         {feed.length > 0 ? (
           <section className="mt-10">
             <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">
-              Your feed
+              Ton fil
             </h2>
             <ul className="space-y-3">
               {feed.map((card) => {

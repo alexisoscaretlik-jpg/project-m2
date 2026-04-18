@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Nav } from "@/components/nav";
 import { SubscribeForm } from "@/app/newsletter/subscribe-form";
+import { TvTickerTape } from "@/components/tv-ticker-tape";
 import { createClient } from "@/lib/supabase/server";
 import { supabase } from "@/lib/supabase";
 
@@ -69,6 +70,7 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-slate-50">
       <Nav active="/" />
+      <TvTickerTape />
       <div className="mx-auto max-w-2xl px-4 py-6">
         <div className="mb-4 flex items-baseline justify-between">
           <p className="text-xs text-slate-500">
