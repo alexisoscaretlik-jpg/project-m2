@@ -173,6 +173,13 @@ function Landing() {
           <Link href="/login" className="font-medium text-blue-700 underline">
             Connecte-toi
           </Link>
+          {" · "}
+          <Link
+            href="/simulation"
+            className="font-medium text-blue-700 underline"
+          >
+            Teste le simulateur
+          </Link>
         </p>
       </section>
 
