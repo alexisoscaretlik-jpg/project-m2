@@ -18,6 +18,7 @@ IBKR_CLIENT_ID = int(os.getenv("IBKR_CLIENT_ID", "7"))
 ALPACA_API_KEY = os.getenv("ALPACA_API_KEY", "")
 ALPACA_SECRET_KEY = os.getenv("ALPACA_SECRET_KEY", "")
 ALPACA_PAPER = os.getenv("ALPACA_PAPER", "true").lower() == "true"
+STARTUP_TEST_ORDER = os.getenv("STARTUP_TEST_ORDER", "")
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger("bot")
@@ -423,6 +424,19 @@ def main():
         get_ib()
     elif BROKER == "alpaca":
         get_alpaca()
+    if STARTUP_TEST_ORDER:
+        try:
+            side, ticker, qty = STARTUP_TEST_ORDER.strip().upper().split(":")
+            qty = int(qty)
+            log.info("STARTUP_TEST_ORDER: %s %s x %s", side, qty, ticker)
+            if BROKER == "alpaca":
+                oid, status = place_alpaca_order(ticker, side, qty, None, None)
+                log.info("[ALPACA-TEST] %s %s x %s | status=%s order=%s",
+                         side, qty, ticker, status, oid)
+            else:
+                log.warning("STARTUP_TEST_ORDER ignored, BROKER=%s not supported here", BROKER)
+        except Exception as e:
+            log.error("STARTUP_TEST_ORDER parse/exec failed: %s", e)
     while True:
         try:
             reset_counter()
