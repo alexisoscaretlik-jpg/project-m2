@@ -111,9 +111,8 @@ Keeps the site fresh — new SEC filings become cards automatically.
 1. https://render.com → sign in with GitHub → **New +** → **Blueprint**
 2. Connect the `trading-bot-2` repo → pick the feature branch
    `claude/plan-web-investment-platform-4CNxD`
-3. Render reads `render.yaml` and proposes services — keep the
-   `invest-coach-worker` cron (the old `trading-bot` worker is there
-   too; keep or delete based on whether you still use it)
+3. Render reads `render.yaml` and proposes one service:
+   `invest-coach-worker` (cron, free tier)
 4. On the cron's page → **Environment** → paste env vars (same values
    as local `.env`):
    - `SEC_USER_AGENT`

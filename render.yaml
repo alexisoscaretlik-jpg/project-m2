@@ -1,23 +1,4 @@
 services:
-  - type: worker
-    name: trading-bot
-    runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python bot_simple.py
-    envVars:
-      - key: PAPER_TRADING
-        value: true
-      - key: EMAIL_CHECK_INTERVAL
-        value: 60
-      - key: BROKER
-        value: alpaca
-      - key: ALPACA_PAPER
-        value: true
-      - key: ALPACA_API_KEY
-        sync: false
-      - key: ALPACA_SECRET_KEY
-        sync: false
-
   - type: cron
     name: invest-coach-worker
     runtime: python
