@@ -175,6 +175,138 @@ friction.
 - **Jamais de timing.** "J'attends que ça baisse" = moyenne de 10
   ans à attendre, selon les périodes.`,
   },
+  {
+    slug: "petrole-detroit-hormuz-2026",
+    title: "Pétrole : Hormuz fermé, que fait un investisseur posé ?",
+    teaser:
+      "L'Iran a bloqué le détroit d'Hormuz début avril. Le Brent s'envole, les médias paniquent. Voici ce que disent les chiffres et l'histoire.",
+    readMinutes: 6,
+    updated: "2026-04-18",
+    body: `## Le résumé en 30 secondes
+
+Début avril 2026, l'Iran a fermé le détroit d'Hormuz à tout
+trafic maritime. Le **Brent** (pétrole de référence mer du Nord,
+benchmark européen) est passé de ~78 USD/bbl à 120-160 USD/bbl
+selon les séances. Le **WTI** (West Texas Intermediate, benchmark
+américain) suit avec 4-6 USD de décote.
+
+Historiquement, **chaque choc pétrolier géopolitique majeur s'est
+résorbé en 6 à 18 mois**. Ton plan d'investissement long terme
+n'a pas de raison de changer. Ce qu'il faut éviter : le stock
+picking émotionnel et le market timing.
+
+## Pourquoi Hormuz est un tel verrou
+
+Le détroit d'Hormuz relie le Golfe persique à l'océan Indien. Il
+mesure 33 km dans sa partie la plus étroite. **~20% du pétrole
+mondial et ~25% du GNL** (gaz naturel liquéfié) y transitent
+chaque jour — soit l'équivalent de 17-18 millions de barils.
+
+Il n'existe **aucune route de contournement à cette échelle**.
+Les pipelines saoudien (Petroline) et émirati (Habshan-Fujairah)
+peuvent détourner 6-7 mbj au total, soit un tiers du flux
+bloqué. Le reste est immobilisé.
+
+Une fermeture totale et prolongée est **sans précédent historique
+à cette échelle**. Les épisodes antérieurs (guerre Iran-Irak
+1980-88, incidents 2019) étaient partiels et brefs.
+
+## Ce que dit l'histoire des chocs pétroliers
+
+**Yom Kippur, octobre 1973.** Embargo arabe sur les pays alliés
+d'Israël. Le baril passe de 3 à 12 USD en 5 mois (×4). L'inflation
+US monte à 12% en 1974. Le baril se stabilise ensuite autour de
+13-14 USD pendant 5 ans · la réversion immédiate n'a PAS eu lieu
+(choc structurel + fin de Bretton Woods), mais la panique initiale
+s'est calmée en ~12 mois.
+
+**Invasion du Koweït, août 1990.** Le Brent passe de 17 à 41 USD
+en 3 mois (×2,4). Puis **redescend à 20 USD en 6 mois** après le
+déclenchement de Desert Storm en janvier 1991. Réversion rapide.
+
+**Guerre en Ukraine, février 2022.** Le Brent passe de 78 à
+127 USD en 4 mois (×1,6). Retour à 78 USD **12 mois plus tard**,
+malgré des sanctions toujours actives sur le brut russe. Le
+marché s'adapte · les flux se redirigent (Inde, Chine).
+
+**La leçon :** les spikes géopolitiques du pétrole reviennent vers
+la moyenne en 6 à 18 mois. Parier sur la durée du choc, c'est
+parier contre l'adaptation des marchés · et c'est historiquement
+un mauvais pari.
+
+## L'impact concret sur ton portefeuille
+
+Si tu détiens un **ETF monde** (MSCI World, S&P 500) dans ton AV
+ou un **ETF Europe** (MSCI Europe, Euro Stoxx 600) dans ton PEA,
+tu as déjà une exposition équilibrée :
+
+- **Secteur énergie** (TotalEnergies, Shell, BP, Exxon) : ~4-5%
+  d'un ETF monde. Bénéficiaire direct d'un baril cher.
+- **Secteurs sensibles au baril cher** : transport aérien (Air
+  France-KLM, IAG), chimie (BASF, Arkema), automobile. Typiquement
+  10-15% d'un indice large.
+- **Secteurs défensifs** : santé, consommation de base, utilities.
+  Amortissent la hausse.
+
+L'inflation française, qui tournait à ~2,1% en mars 2026, peut
+remonter à 3,5-4,5% si le baril reste au-dessus de 120 USD plus
+de 3 mois. La BCE a déjà signalé qu'elle ne réagirait pas à un
+choc d'offre temporaire · donc pas de remontée de taux
+mécanique à court terme.
+
+## Ce qu'on ne fait PAS
+
+- **Acheter TotalEnergies en panique.** La hausse du secteur
+  énergie est déjà pricée en 48h. Acheter après +15% c'est payer
+  le scénario "Hormuz fermé 6 mois" à plein prix.
+- **Vendre ses ETF monde pour "attendre que ça se calme".** Tu
+  réalises une moins-value, tu paies peut-être la flat tax (PFU,
+  30%) si tu es hors enveloppe, et tu rates le rebond qui se joue
+  typiquement sur 5-10 séances.
+- **Basculer 100% sur un ETF pétrole.** Les ETF sur futures
+  pétrole souffrent du **contango** (structure où les contrats à
+  échéance lointaine valent plus cher que le spot) : tu perds
+  2-8%/an juste en roulant les contrats. Instrument court-terme,
+  pas un placement.
+- **Faire du market timing.** "Je rentre quand le VIX retombe" :
+  dans 70% des cas, le marché a déjà rebondi avant que la peur
+  retombe.
+
+## Ce qu'on peut raisonnablement faire
+
+**1. Continuer son DCA comme prévu.** Si tu as un versement
+mensuel automatique sur ton PEA ou ton AV, ne le coupe pas. Les
+séances de panique sont statistiquement les meilleurs points
+d'entrée · mais tu ne sauras lequel qu'après coup.
+
+**2. Vérifier son allocation, pas la bouleverser.** Si ton
+portefeuille est 100% tech US et que tu découvres que tu n'as
+aucune exposition énergie/défensif, c'est un signal d'équilibrage
+long terme. Pas une urgence de la semaine.
+
+**3. Profiter d'un décrochage pour un apport exceptionnel, si tu
+as du cash.** Si tu as une prime ou un bonus qui dormait, un
+marché -8 à -12% est un point d'entrée raisonnable. Étale sur
+3-4 versements pour ne pas tout mettre sur un plus-bas
+hypothétique.
+
+**4. Garder ton épargne de précaution intacte.** C'est justement
+dans ces moments qu'elle prouve son utilité : tu n'es pas forcé
+de vendre tes ETF pour couvrir un imprévu.
+
+**5. Couper les notifications.** Le flux d'actualité pétrole
+24h/24 est conçu pour le trader, pas pour l'investisseur long
+terme. Rouvrir son portefeuille une fois par trimestre suffit.
+
+## Le mot de la fin
+
+Un choc pétrolier est **un événement macro, pas un événement de
+portefeuille**. Ton PEA ouvert pour 20 ans ne change pas de
+nature parce que le Brent fait ±40% sur 3 mois. L'histoire montre
+que ceux qui ont vendu en octobre 1973, en août 1990 ou en mars
+2022 ont sous-performé ceux qui n'ont rien fait · souvent de
+plusieurs dizaines de points sur 5 ans.`,
+  },
 ];
 
 export function findArticle(slug: string): Article | null {
