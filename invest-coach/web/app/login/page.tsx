@@ -14,20 +14,24 @@ export default async function LoginPage({
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
           <Link href="/" className="text-sm text-blue-600 hover:underline">
-            &larr; Feed
+            &larr; Accueil
           </Link>
+          <span className="text-sm font-semibold text-slate-900">
+            Invest Coach
+          </span>
         </div>
       </header>
 
-      <div className="mx-auto max-w-md px-4 py-12">
-        <h1 className="text-2xl font-bold text-slate-900">Sign in</h1>
+      <div className="mx-auto max-w-md px-4 py-16">
+        <h1 className="text-2xl font-bold text-slate-900">Connexion</h1>
         <p className="mt-2 text-sm text-slate-600">
-          Get a magic link by email. No password.
+          On t&apos;envoie un lien magique par email. Aucun mot de passe à retenir.
         </p>
 
         {sent ? (
           <div className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-            Check your inbox — we sent you a sign-in link.
+            Lien envoyé. Ouvre l&apos;email pour te connecter — pense à
+            vérifier tes spams.
           </div>
         ) : (
           <div className="mt-6">
@@ -37,6 +41,11 @@ export default async function LoginPage({
             ) : null}
           </div>
         )}
+
+        <p className="mt-8 text-xs text-slate-500">
+          En continuant, tu acceptes que tes données soient stockées sur
+          Supabase (UE). Aucune revente à des tiers.
+        </p>
       </div>
     </main>
   );

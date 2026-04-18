@@ -37,7 +37,7 @@ export function LoginForm({ next }: { next: string }) {
         type="email"
         required
         autoFocus
-        placeholder="you@example.com"
+        placeholder="ton@email.fr"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -47,7 +47,7 @@ export function LoginForm({ next }: { next: string }) {
         disabled={pending}
         className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
       >
-        {pending ? "Sending…" : "Send magic link"}
+        {pending ? "Envoi…" : "Recevoir le lien magique"}
       </button>
       {error ? <p className="text-sm text-rose-600">{error}</p> : null}
     </form>

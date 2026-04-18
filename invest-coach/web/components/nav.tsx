@@ -7,6 +7,7 @@ const TABS = [
   { href: "/", label: "Coaching" },
   { href: "/watchlist", label: "Watchlist" },
   { href: "/simulation", label: "Simulateur" },
+  { href: "/articles", label: "Guides" },
   { href: "/tax", label: "Fiscalité" },
   { href: "/bank", label: "Banque" },
   { href: "/subscription", label: "Abonnement" },

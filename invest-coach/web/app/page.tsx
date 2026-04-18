@@ -40,22 +40,31 @@ function relativeDate(iso: string): string {
 }
 
 export default async function Home() {
-  const sb = await createClient();
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
+  let user = null;
+  try {
+    const sb = await createClient();
+    const res = await sb.auth.getUser();
+    user = res.data.user;
+  } catch {
+    // If Supabase is unreachable or cookies are malformed, show the
+    // public landing rather than crashing the root route.
+  }
 
   if (!user) return <Landing />;
 
-  const { data: cards } = await supabase
-    .from("cards")
-    .select(
-      "id, title, tone, published_at, companies(ticker, name), extractions(the_one_thing)",
-    )
-    .order("published_at", { ascending: false })
-    .limit(20);
-
-  const feed = (cards ?? []) as FeedCard[];
+  let feed: FeedCard[] = [];
+  try {
+    const { data: cards } = await supabase
+      .from("cards")
+      .select(
+        "id, title, tone, published_at, companies(ticker, name), extractions(the_one_thing)",
+      )
+      .order("published_at", { ascending: false })
+      .limit(20);
+    feed = (cards ?? []) as FeedCard[];
+  } catch {
+    feed = [];
+  }
 
   return (
     <main className="min-h-screen bg-slate-50">
