@@ -1,6 +1,7 @@
 "use server";
 
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
+
 import { emailConfigured, send } from "@/lib/email";
 
 export type SubscribeResult =
@@ -10,58 +11,77 @@ export type SubscribeResult =
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function subscribe(formData: FormData): Promise<SubscribeResult> {
-  const raw = String(formData.get("email") ?? "").trim().toLowerCase();
-  const source = String(formData.get("source") ?? "landing");
+  try {
+    const raw = String(formData.get("email") ?? "").trim().toLowerCase();
+    const source = String(formData.get("source") ?? "landing");
 
-  if (!EMAIL_RE.test(raw)) {
-    return { ok: false, message: "Email invalide." };
-  }
+    if (!EMAIL_RE.test(raw)) {
+      return { ok: false, message: "Email invalide." };
+    }
 
-  // Use the anon client — the table has a permissive insert policy
-  // so anonymous visitors can subscribe without server credentials.
-  const { error } = await supabase
-    .from("newsletter_subscribers")
-    .upsert(
-      { email: raw, source, unsubscribed: false },
-      { onConflict: "email" },
-    );
-
-  if (error) {
-    console.error("newsletter subscribe error", error);
-    // 42P01 = undefined_table — schema migration hasn't been applied yet.
-    if (error.code === "42P01") {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !anon) {
+      console.error("newsletter: missing NEXT_PUBLIC_SUPABASE_* env");
       return {
         ok: false,
-        message:
-          "Newsletter pas encore active. On a noté — retente dans quelques minutes.",
+        message: "Config serveur incomplète. Réessaie plus tard.",
       };
     }
+
+    // Build a one-shot client here so a module-level crash can't take
+    // out the whole server action.
+    const sb = createClient(url, anon, { auth: { persistSession: false } });
+
+    const { error } = await sb
+      .from("newsletter_subscribers")
+      .upsert(
+        { email: raw, source, unsubscribed: false },
+        { onConflict: "email" },
+      );
+
+    if (error) {
+      console.error("newsletter subscribe error", error);
+      if (error.code === "42P01") {
+        return {
+          ok: false,
+          message:
+            "Newsletter pas encore active. On a noté — retente dans quelques minutes.",
+        };
+      }
+      return {
+        ok: false,
+        message: error.message || "Erreur. Réessaie dans un instant.",
+      };
+    }
+
+    // Welcome email — best-effort.
+    if (emailConfigured()) {
+      try {
+        await send({
+          to: raw,
+          subject: "Bienvenue chez Invest Coach",
+          html: WELCOME_HTML,
+          text: WELCOME_TEXT,
+        });
+      } catch (err) {
+        console.error("welcome email failed", err);
+      }
+    }
+
+    return {
+      ok: true,
+      message: emailConfigured()
+        ? "Inscrit — surveille ta boîte mail."
+        : "Inscrit. On t'écrira bientôt.",
+    };
+  } catch (err) {
+    console.error("newsletter subscribe threw", err);
     return {
       ok: false,
-      message: error.message || "Erreur. Réessaie dans un instant.",
+      message: "Erreur inattendue. Réessaie dans un instant.",
     };
   }
-
-  // Welcome email — best-effort.
-  if (emailConfigured()) {
-    try {
-      await send({
-        to: raw,
-        subject: "Bienvenue chez Invest Coach",
-        html: WELCOME_HTML,
-        text: WELCOME_TEXT,
-      });
-    } catch (err) {
-      console.error("welcome email failed", err);
-    }
-  }
-
-  return {
-    ok: true,
-    message: emailConfigured()
-      ? "Inscrit — surveille ta boîte mail."
-      : "Inscrit. On t'écrira bientôt.",
-  };
 }
 
 const WELCOME_HTML = `
