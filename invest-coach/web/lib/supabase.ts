@@ -5,6 +5,6 @@ import { createClient } from "@supabase/supabase-js";
 // signed-in user. For anything auth-gated, use lib/supabase/server.ts
 // instead (it reads the user session from cookies).
 export const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!,
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 );
