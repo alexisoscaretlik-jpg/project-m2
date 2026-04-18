@@ -19,10 +19,20 @@ export async function subscribe(formData: FormData): Promise<SubscribeResult> {
       return { ok: false, message: "Email invalide." };
     }
 
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const url =
+      process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+    const anon =
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+      process.env.SUPABASE_ANON_KEY ||
+      process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!url || !anon) {
-      console.error("newsletter: missing NEXT_PUBLIC_SUPABASE_* env");
+      console.error("newsletter: missing supabase env", {
+        hasPublicUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+        hasUrl: !!process.env.SUPABASE_URL,
+        hasPublicAnon: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        hasAnon: !!process.env.SUPABASE_ANON_KEY,
+        hasService: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      });
       return {
         ok: false,
         message: "Config serveur incomplète. Réessaie plus tard.",
