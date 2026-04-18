@@ -1,7 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 
-// Server-only client. Uses non-prefixed vars — safe because this module
-// is never imported by client components.
+// Public server client — no cookies, no auth. Use only for reading
+// public-RLS tables like cards/companies from RSCs that don't need the
+// signed-in user. For anything auth-gated, use lib/supabase/server.ts
+// instead (it reads the user session from cookies).
 export const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_ANON_KEY!,

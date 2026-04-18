@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Nav } from "@/components/nav";
 import { supabase } from "@/lib/supabase";
 
 type Company = {
@@ -101,8 +102,10 @@ export default async function TickerPage({
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
+      <Nav active="/" />
+
+      <div className="mx-auto max-w-2xl px-4 py-6">
+        <div className="mb-4 flex items-center justify-between">
           <Link href="/" className="text-sm text-blue-600 hover:underline">
             &larr; Feed
           </Link>
@@ -110,12 +113,9 @@ export default async function TickerPage({
             href="/companies"
             className="text-sm text-blue-600 hover:underline"
           >
-            Companies
+            All companies
           </Link>
         </div>
-      </header>
-
-      <div className="mx-auto max-w-2xl px-4 py-6">
         <div className="mb-6">
           <div className="flex items-baseline gap-3">
             <h1 className="font-mono text-3xl font-bold text-slate-900">

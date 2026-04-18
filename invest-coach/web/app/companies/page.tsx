@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Nav } from "@/components/nav";
 import { supabase } from "@/lib/supabase";
 
 type Company = {
@@ -44,21 +45,15 @@ export default async function CompaniesPage() {
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
-          <div>
-            <Link href="/" className="text-sm text-blue-600 hover:underline">
-              &larr; Feed
-            </Link>
-            <h1 className="mt-1 text-xl font-bold text-slate-900">Companies</h1>
-            <p className="text-xs text-slate-500">
-              {companies?.length ?? 0} tickers tracked
-            </p>
-          </div>
-        </div>
-      </header>
+      <Nav active="/" />
 
       <div className="mx-auto max-w-2xl px-4 py-6">
+        <div className="mb-4">
+          <h1 className="text-xl font-bold text-slate-900">Companies</h1>
+          <p className="text-xs text-slate-500">
+            {companies?.length ?? 0} tickers tracked
+          </p>
+        </div>
         <ul className="space-y-2">
           {companies?.map((c: Company) => {
             const latestAt = latestByCompany.get(c.id);

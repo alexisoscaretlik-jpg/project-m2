@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Nav } from "@/components/nav";
 import { supabase } from "@/lib/supabase";
 
 type CompanyRef = {
@@ -65,24 +66,20 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
-          <div>
-            <h1 className="text-xl font-bold text-slate-900">Invest Coach</h1>
-            <p className="text-xs text-slate-500">
-              30-second reads from SEC filings
-            </p>
-          </div>
-          <Link
-            href="/companies"
-            className="text-sm text-blue-600 hover:underline"
-          >
-            Companies
-          </Link>
-        </div>
-      </header>
+      <Nav active="/" />
 
       <div className="mx-auto max-w-2xl px-4 py-6">
+        <div className="mb-4 flex items-baseline justify-between">
+          <p className="text-xs text-slate-500">
+            30-second reads from SEC filings
+          </p>
+          <Link
+            href="/companies"
+            className="text-xs text-blue-600 hover:underline"
+          >
+            All companies &rarr;
+          </Link>
+        </div>
         {feed.length === 0 ? (
           <p className="text-center text-slate-500">No cards yet.</p>
         ) : (
