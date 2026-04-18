@@ -10,8 +10,10 @@ services:
       - key: EMAIL_CHECK_INTERVAL
         value: 60
       - key: BROKER
-        value: ibkr
-      - key: IBKR_HOST
-        value: 127.0.0.1
-      - key: IBKR_PORT
-        value: 4002
+        value: alpaca
+      - key: ALPACA_PAPER
+        value: true
+      - key: ALPACA_API_KEY
+        sync: false
+      - key: ALPACA_SECRET_KEY
+        sync: false

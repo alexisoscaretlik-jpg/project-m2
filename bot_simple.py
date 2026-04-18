@@ -15,6 +15,9 @@ BROKER = os.getenv("BROKER", "paper").lower()
 IBKR_HOST = os.getenv("IBKR_HOST", "127.0.0.1")
 IBKR_PORT = int(os.getenv("IBKR_PORT", "7497"))
 IBKR_CLIENT_ID = int(os.getenv("IBKR_CLIENT_ID", "7"))
+ALPACA_API_KEY = os.getenv("ALPACA_API_KEY", "")
+ALPACA_SECRET_KEY = os.getenv("ALPACA_SECRET_KEY", "")
+ALPACA_PAPER = os.getenv("ALPACA_PAPER", "true").lower() == "true"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger("bot")
@@ -229,11 +232,77 @@ def place_ibkr_order(ticker, direction, size, stop, target):
         return None, "IBKR_ERROR"
 
 
+_alpaca = None
+
+
+def get_alpaca():
+    global _alpaca
+    if BROKER != "alpaca":
+        return None
+    if _alpaca is not None:
+        return _alpaca
+    if not ALPACA_API_KEY or not ALPACA_SECRET_KEY:
+        log.error("ALPACA_API_KEY/ALPACA_SECRET_KEY not set")
+        return None
+    try:
+        from alpaca.trading.client import TradingClient
+    except ImportError:
+        log.error("alpaca-py not installed; add it to requirements.txt")
+        return None
+    try:
+        _alpaca = TradingClient(ALPACA_API_KEY, ALPACA_SECRET_KEY, paper=ALPACA_PAPER)
+        acct = _alpaca.get_account()
+        log.info("Connected to Alpaca (%s) account=%s equity=%s",
+                 "paper" if ALPACA_PAPER else "live", acct.account_number, acct.equity)
+    except Exception as e:
+        log.error("Alpaca connect failed: %s", e)
+        _alpaca = None
+    return _alpaca
+
+
+def place_alpaca_order(ticker, direction, size, stop, target):
+    from alpaca.trading.requests import (
+        MarketOrderRequest, TakeProfitRequest, StopLossRequest,
+    )
+    from alpaca.trading.enums import OrderSide, TimeInForce, OrderClass
+    client = get_alpaca()
+    if client is None:
+        return None, "ALPACA_DISCONNECTED"
+    try:
+        side = OrderSide.BUY if direction == "BUY" else OrderSide.SELL
+        kwargs = dict(
+            symbol=ticker,
+            qty=size,
+            side=side,
+            time_in_force=TimeInForce.GTC,
+        )
+        if stop and target:
+            kwargs["order_class"] = OrderClass.BRACKET
+            kwargs["take_profit"] = TakeProfitRequest(limit_price=float(target))
+            kwargs["stop_loss"] = StopLossRequest(stop_price=float(stop))
+        req = MarketOrderRequest(**kwargs)
+        order = client.submit_order(req)
+        return str(order.id), str(order.status)
+    except Exception as e:
+        log.error("Alpaca order failed for %s: %s", ticker, e)
+        return None, "ALPACA_ERROR"
+
+
 def execute(alert):
     global trades_today
     size = alert.get("shares") or position_size(alert["entry"], alert["type"])
     order_id = None
-    if BROKER == "ibkr" and alert["type"] == "stock":
+    if BROKER == "alpaca" and alert["type"] == "stock":
+        order_id, status = place_alpaca_order(
+            alert["ticker"], alert["direction"], size,
+            alert["stop"], alert["target"],
+        )
+        prefix = "[ALPACA]"
+    elif BROKER == "alpaca":
+        status = "ALPACA_SKIPPED_OPTION"
+        prefix = "[ALPACA]"
+        log.warning("Alpaca does not support options in this bot; skipping %s", alert["ticker"])
+    elif BROKER == "ibkr" and alert["type"] == "stock":
         order_id, status = place_ibkr_order(
             alert["ticker"], alert["direction"], size,
             alert["stop"], alert["target"],
@@ -332,12 +401,16 @@ def main():
     log.info("Broker: %s", BROKER)
     if BROKER == "ibkr":
         log.info("IBKR: %s:%s clientId=%s", IBKR_HOST, IBKR_PORT, IBKR_CLIENT_ID)
+    elif BROKER == "alpaca":
+        log.info("Alpaca: %s", "paper" if ALPACA_PAPER else "LIVE")
     log.info("Paper Trading: %s", PAPER_TRADING)
     log.info("Budget: EUR %.0f", EUR_BUDGET)
     log.info("Max trades/day: %d", MAX_TRADES)
     log.info("=" * 50)
     if BROKER == "ibkr":
         get_ib()
+    elif BROKER == "alpaca":
+        get_alpaca()
     while True:
         try:
             reset_counter()
