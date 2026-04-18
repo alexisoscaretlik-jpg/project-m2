@@ -5,7 +5,7 @@ services:
     schedule: "0 6 * * *"
     rootDir: invest-coach/worker
     buildCommand: pip install -r requirements.txt
-    startCommand: python run.py
+    startCommand: python run.py && python eu_filings.py
     envVars:
       - key: SEC_USER_AGENT
         sync: false

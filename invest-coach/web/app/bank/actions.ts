@@ -1,5 +1,6 @@
 "use server";
 
+import { createHash } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -7,6 +8,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { serviceClient } from "@/lib/supabase/service";
 import { categorize, TxIn } from "@/lib/bank/categorize";
+import { parseCsv } from "@/lib/bank/parse-csv";
 import {
   createRequisition,
   getAccountDetails,
@@ -180,6 +182,114 @@ export async function resyncAllAccounts() {
     await syncTransactions(a.id, a.gc_account_id);
   }
   revalidatePath("/bank");
+}
+
+// Manual CSV import — no PSD2 / regulator needed. User exports a CSV
+// from their bank, Claude parses and categorizes in one call, we store
+// under a synthetic "manual" connection keyed to the user.
+export async function uploadCsv(formData: FormData) {
+  const file = formData.get("csv");
+  const bankName = String(formData.get("bank_name") ?? "Manual").trim() || "Manual";
+  if (!(file instanceof File) || file.size === 0) return { error: "No file" };
+  if (file.size > 1_000_000) return { error: "CSV too large (max 1 MB)" };
+
+  const sb = await createClient();
+  const {
+    data: { user },
+  } = await sb.auth.getUser();
+  if (!user) return { error: "Not signed in" };
+
+  const text = await file.text();
+
+  let parsed;
+  try {
+    parsed = await parseCsv(text);
+  } catch (e) {
+    return { error: `Parse failed: ${(e as Error).message}` };
+  }
+  if (parsed.length === 0) return { error: "No transactions found in CSV" };
+
+  const svc = serviceClient();
+
+  // One "manual" connection per user — reused across uploads.
+  let { data: conn } = await svc
+    .from("bank_connections")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("status", "manual")
+    .maybeSingle();
+  if (!conn) {
+    const { data: newConn } = await svc
+      .from("bank_connections")
+      .insert({
+        user_id: user.id,
+        status: "manual",
+        institution_name: "Manual imports",
+      })
+      .select("id")
+      .single();
+    conn = newConn;
+  }
+  if (!conn) return { error: "Could not create connection" };
+
+  // One account per bank name within that connection.
+  let { data: acct } = await svc
+    .from("bank_accounts")
+    .select("id")
+    .eq("connection_id", conn.id)
+    .eq("display_name", bankName)
+    .maybeSingle();
+  if (!acct) {
+    const { data: newAcct } = await svc
+      .from("bank_accounts")
+      .insert({
+        connection_id: conn.id,
+        gc_account_id: `manual:${user.id}:${bankName}`,
+        display_name: bankName,
+        currency: "EUR",
+      })
+      .select("id")
+      .single();
+    acct = newAcct;
+  }
+  if (!acct) return { error: "Could not create account" };
+
+  const rows = parsed.map((t) => {
+    const fingerprint = createHash("sha1")
+      .update(`${t.date}|${t.amount}|${t.description}`)
+      .digest("hex")
+      .slice(0, 16);
+    return {
+      account_id: acct!.id,
+      gc_transaction_id: `manual-${fingerprint}`,
+      booking_date: t.date,
+      value_date: t.date,
+      amount: t.amount,
+      currency: "EUR",
+      counterparty: t.counterparty,
+      description: t.description,
+      category: t.category,
+      raw: { source: "csv_upload", bank: bankName },
+    };
+  });
+
+  const { error: insErr } = await svc
+    .from("bank_transactions")
+    .upsert(rows, {
+      onConflict: "account_id,gc_transaction_id",
+      ignoreDuplicates: true,
+    });
+  if (insErr) return { error: `Insert failed: ${insErr.message}` };
+
+  // Update account balance as sum of amounts.
+  const total = rows.reduce((sum, r) => sum + r.amount, 0);
+  await svc
+    .from("bank_accounts")
+    .update({ balance: total, balance_at: new Date().toISOString() })
+    .eq("id", acct.id);
+
+  revalidatePath("/bank");
+  return { ok: true, count: rows.length };
 }
 
 export async function disconnectBank(formData: FormData) {

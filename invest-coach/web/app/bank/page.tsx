@@ -8,6 +8,7 @@ import {
   resyncAllAccounts,
   startConnection,
 } from "./actions";
+import { CsvUploadForm } from "./upload-form";
 
 type Account = {
   id: number;
@@ -111,7 +112,9 @@ export default async function BankPage({
 
   let institutions: Institution[] = [];
   let instError: string | null = null;
-  if (!hasBank) {
+  const gcConfigured =
+    !!process.env.GOCARDLESS_SECRET_ID && !!process.env.GOCARDLESS_SECRET_KEY;
+  if (gcConfigured) {
     try {
       institutions = await listInstitutions("fr");
     } catch (e) {
@@ -258,20 +261,35 @@ export default async function BankPage({
               </ul>
             </section>
           </>
-        ) : (
+        ) : null}
+
+        {/* CSV upload — always available, no SIRET / regulator needed. */}
+        <section className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-900">
+            {hasBank ? "Importer plus de transactions" : "Importer un CSV"}
+          </h2>
+          <p className="mt-2 text-sm text-slate-600">
+            Exporte le relevé CSV depuis ta banque — Claude détecte le
+            format et catégorise automatiquement.
+          </p>
+          <div className="mt-4">
+            <CsvUploadForm />
+          </div>
+        </section>
+
+        {!hasBank && gcConfigured ? (
           <section className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-slate-900">
-              Connect a bank
+              Ou connecte en direct (PSD2)
             </h2>
             <p className="mt-2 text-sm text-slate-600">
-              Pick your bank. You&apos;ll sign in on their site — we never see
-              your credentials.
+              Connexion bancaire temps réel via GoCardless. Tu te connectes
+              chez ta banque — on ne voit jamais ton mot de passe.
             </p>
 
             {instError ? (
               <p className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
-                GoCardless credentials not configured yet — ask the admin to
-                set GOCARDLESS_SECRET_ID and GOCARDLESS_SECRET_KEY.
+                GoCardless indisponible: {instError}
               </p>
             ) : (
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
