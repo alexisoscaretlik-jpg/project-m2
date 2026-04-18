@@ -104,11 +104,36 @@ In Vercel dashboard:
 - Environment Variables → add all `NEXT_PUBLIC_*` vars from `.env`
 - Redeploy
 
-## 7. Next milestones (in order)
+## 7. Render nightly cron
 
-- [ ] Worker writes extractions to Supabase (not just prints)
-- [ ] Web: `/ticker/[symbol]` page with latest card
-- [ ] Render cron: nightly run of worker on all seeded tickers
+Keeps the site fresh — new SEC filings become cards automatically.
+
+1. https://render.com → sign in with GitHub → **New +** → **Blueprint**
+2. Connect the `trading-bot-2` repo → pick the feature branch
+   `claude/plan-web-investment-platform-4CNxD`
+3. Render reads `render.yaml` and proposes services — keep the
+   `invest-coach-worker` cron (the old `trading-bot` worker is there
+   too; keep or delete based on whether you still use it)
+4. On the cron's page → **Environment** → paste env vars (same values
+   as local `.env`):
+   - `SEC_USER_AGENT`
+   - `ANTHROPIC_API_KEY`
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+5. Save → Render runs `python run.py` on schedule `0 6 * * *` (06:00
+   UTC daily). Use **Trigger Run** to test immediately.
+
+Default tickers are `AAPL MSFT NVDA BRK.B`. To change, edit
+`DEFAULT_TICKERS` in `run.py` or pass args via `startCommand` in
+`render.yaml` (e.g. `python run.py AAPL MSFT --forms 10-K`).
+
+## 8. Next milestones (in order)
+
+- [x] Worker writes extractions to Supabase
+- [x] Web: `/ticker/[symbol]` page with latest card
+- [x] 10-K extraction alongside 8-K
+- [x] Render cron: nightly run
+- [ ] EU / AMF filings fetcher (LVMH, Hermès, TotalEnergies…)
 - [ ] Auth (Supabase email magic link) + watchlist
 - [ ] Newsletter digest (Resend)
 - [ ] Layer 2: alerts on 8-K / tone shifts
