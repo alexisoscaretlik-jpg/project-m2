@@ -2,7 +2,14 @@ import Anthropic from "@anthropic-ai/sdk";
 
 import { CATEGORIES } from "./categorize";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+let _client: Anthropic | null = null;
+function client(): Anthropic {
+  if (_client) return _client;
+  const key = process.env.ANTHROPIC_API_KEY;
+  if (!key) throw new Error("ANTHROPIC_API_KEY not set");
+  _client = new Anthropic({ apiKey: key });
+  return _client;
+}
 const MODEL = "claude-haiku-4-5";
 
 export type ParsedTx = {
@@ -51,7 +58,7 @@ export async function parseCsv(csv: string): Promise<ParsedTx[]> {
   // infinite. Typical 6-month CSV is <100 KB.
   const trimmed = csv.length > MAX_CSV_BYTES ? csv.slice(0, MAX_CSV_BYTES) : csv;
 
-  const msg = await client.messages.create({
+  const msg = await client().messages.create({
     model: MODEL,
     max_tokens: 8000,
     messages: [

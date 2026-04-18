@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 
-import { priceToTier, stripe } from "@/lib/stripe";
+import { getStripe, priceToTier } from "@/lib/stripe";
 import { serviceClient } from "@/lib/supabase/service";
 
 export const runtime = "nodejs";
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
   const raw = await request.text();
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       raw,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET!,
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       if (session.subscription) {
-        const sub = await stripe.subscriptions.retrieve(
+        const sub = await getStripe().subscriptions.retrieve(
           session.subscription as string,
         );
         await applySubscription(sub);
