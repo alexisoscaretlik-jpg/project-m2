@@ -209,7 +209,7 @@ def tone_8k(signals: dict) -> str:
 def tone_10k(signals: dict) -> str:
     if signals.get("red_flags"):
         return "red_flag"
-    cash = (signals.get("cash_quality") or {}).get("flag", "").lower()
+    cash = ((signals.get("cash_quality") or {}).get("flag") or "").lower()
     if cash == "red":
         return "red_flag"
     mda = (signals.get("mda_tone_shift") or "").lower()
@@ -351,6 +351,20 @@ BODY_RENDERERS = {"8-K": body_8k, "10-K": body_10k}
 TONE_CLASSIFIERS = {"8-K": tone_8k, "10-K": tone_10k}
 
 
+def _write_card(sb, company, form, filing_id, extraction_id, signals, url, filed_at, accession):
+    ticker = company["ticker"]
+    sb.table("cards").insert(
+        {
+            "slug": f"{ticker.lower()}-{form.lower()}-{filed_at}-{accession[-6:]}",
+            "company_id": company["id"],
+            "extraction_id": extraction_id,
+            "title": f"{company['name']} {form} · {filed_at}",
+            "body_markdown": BODY_RENDERERS[form](signals, url, filed_at),
+            "tone": TONE_CLASSIFIERS[form](signals),
+        }
+    ).execute()
+
+
 def run_for_ticker_form(sb, company: dict, form: str) -> None:
     ticker = company["ticker"]
     cfg = FORM_CONFIG[form]
@@ -362,7 +376,7 @@ def run_for_ticker_form(sb, company: dict, form: str) -> None:
         return
     print(f"[{ticker}:{form}]   filed {doc['filed_at']} · {len(doc['text'])} chars")
 
-    existing = (
+    existing_filing = (
         sb.table("filings")
         .select("id")
         .eq("source", "edgar")
@@ -370,8 +384,33 @@ def run_for_ticker_form(sb, company: dict, form: str) -> None:
         .execute()
         .data
     )
-    if existing:
-        print(f"[{ticker}:{form}] already in db — skip")
+
+    if existing_filing:
+        filing_id = existing_filing[0]["id"]
+        existing_card = (
+            sb.table("cards").select("id").eq("company_id", company["id"])
+            .ilike("slug", f"{ticker.lower()}-{form.lower()}-{doc['filed_at']}-%")
+            .execute().data
+        )
+        if existing_card:
+            print(f"[{ticker}:{form}] card exists — skip")
+            return
+        # Filing + extraction already exist, card missing. Rebuild card
+        # from stored signals (no re-fetch, no re-Haiku call).
+        extraction = (
+            sb.table("extractions").select("id, signals")
+            .eq("filing_id", filing_id)
+            .order("created_at", desc=True).limit(1).execute().data
+        )
+        if not extraction:
+            print(f"[{ticker}:{form}] filing exists but no extraction — skip (manual)")
+            return
+        print(f"[{ticker}:{form}] repairing card from stored extraction…")
+        _write_card(
+            sb, company, form, filing_id, extraction[0]["id"],
+            extraction[0]["signals"], doc["url"], doc["filed_at"], doc["accession"],
+        )
+        print(f"[{ticker}:{form}] ✓ card repaired")
         return
 
     print(f"[{ticker}:{form}] extracting with {MODEL}…")
@@ -411,17 +450,10 @@ def run_for_ticker_form(sb, company: dict, form: str) -> None:
         .data[0]
     )
 
-    sb.table("cards").insert(
-        {
-            "slug": f"{ticker.lower()}-{form.lower()}-{doc['filed_at']}-{doc['accession'][-6:]}",
-            "company_id": company["id"],
-            "extraction_id": extraction["id"],
-            "title": f"{company['name']} {form} · {doc['filed_at']}",
-            "body_markdown": BODY_RENDERERS[form](signals, doc["url"], doc["filed_at"]),
-            "tone": TONE_CLASSIFIERS[form](signals),
-        }
-    ).execute()
-
+    _write_card(
+        sb, company, form, filing["id"], extraction["id"],
+        signals, doc["url"], doc["filed_at"], doc["accession"],
+    )
     print(f"[{ticker}:{form}] ✓ card written")
 
 
