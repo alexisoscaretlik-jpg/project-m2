@@ -1,7 +1,9 @@
 import Link from "next/link";
 
 import { Nav } from "@/components/nav";
+import { TvMini } from "@/components/tv-mini";
 import { createClient } from "@/lib/supabase/server";
+import { toTvSymbol } from "@/lib/tradingview";
 
 import { addToWatchlist, removeFromWatchlist } from "./actions";
 
@@ -87,26 +89,31 @@ export default async function WatchlistPage() {
               {watched.map((c) => (
                 <li
                   key={c.id}
-                  className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-3"
+                  className="rounded-lg border border-slate-200 bg-white p-3"
                 >
-                  <Link
-                    href={`/ticker/${encodeURIComponent(c.ticker)}`}
-                    className="flex items-baseline gap-2 hover:underline"
-                  >
-                    <span className="font-mono text-sm font-semibold text-slate-900">
-                      {c.ticker}
-                    </span>
-                    <span className="text-sm text-slate-700">{c.name}</span>
-                  </Link>
-                  <form action={removeFromWatchlist}>
-                    <input type="hidden" name="company_id" value={c.id} />
-                    <button
-                      type="submit"
-                      className="text-xs text-slate-500 hover:text-rose-600"
+                  <div className="flex items-center justify-between">
+                    <Link
+                      href={`/ticker/${encodeURIComponent(c.ticker)}`}
+                      className="flex items-baseline gap-2 hover:underline"
                     >
-                      Remove
-                    </button>
-                  </form>
+                      <span className="font-mono text-sm font-semibold text-slate-900">
+                        {c.ticker}
+                      </span>
+                      <span className="text-sm text-slate-700">{c.name}</span>
+                    </Link>
+                    <form action={removeFromWatchlist}>
+                      <input type="hidden" name="company_id" value={c.id} />
+                      <button
+                        type="submit"
+                        className="text-xs text-slate-500 hover:text-rose-600"
+                      >
+                        Remove
+                      </button>
+                    </form>
+                  </div>
+                  <div className="mt-2">
+                    <TvMini symbol={toTvSymbol(c.ticker)} />
+                  </div>
                 </li>
               ))}
             </ul>

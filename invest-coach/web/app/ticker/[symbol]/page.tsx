@@ -2,7 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Nav } from "@/components/nav";
+import { TvChart } from "@/components/tv-chart";
 import { supabase } from "@/lib/supabase";
+import { toTvSymbol } from "@/lib/tradingview";
 
 type Company = {
   id: number;
@@ -126,6 +128,10 @@ export default async function TickerPage({
           <p className="mt-1 text-sm text-slate-500">
             {company.country} · {company.exchange}
           </p>
+        </div>
+
+        <div className="mb-6">
+          <TvChart symbol={toTvSymbol(company.ticker)} />
         </div>
 
         {latest ? (
