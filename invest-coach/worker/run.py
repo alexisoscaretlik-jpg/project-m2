@@ -1,14 +1,18 @@
 """
-Worker: fetch the most recent 8-K and 10-K for a given ticker, run
-extraction, write filing + extraction + card rows to Supabase.
+Worker: fetch most recent SEC filings for a ticker, run extraction,
+write filing + extraction + card rows to Supabase.
+
+Supported forms: 8-K, 10-K (US domestic) + 6-K, 20-F (foreign
+private issuers like ASML, Sanofi, TotalEnergies).
 
 Usage (from invest-coach/worker/ with venv active):
-    python run.py                      # default: AAPL MSFT NVDA BRK.B
+    python run.py                         # default tickers × all forms
     python run.py AAPL
-    python run.py AAPL --forms 8-K     # only 8-K
-    python run.py AAPL --forms 10-K    # only 10-K
+    python run.py AAPL --forms 8-K        # only 8-K
+    python run.py ASML.AS --forms 20-F    # only 20-F
 
-Requires a CIK on the companies row — US tickers only.
+Requires a CIK on the companies row. For EU ADRs, run
+`python resolve_ciks.py` once to populate them.
 """
 import json
 import os
@@ -30,7 +34,13 @@ SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_SERVICE_ROLE_KEY = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
 
 MODEL = "claude-haiku-4-5"
-DEFAULT_TICKERS = ["AAPL", "MSFT", "NVDA", "BRK.B"]
+DEFAULT_TICKERS = [
+    # US
+    "AAPL", "MSFT", "NVDA", "BRK.B",
+    # EU with SEC filings (foreign private issuers)
+    "ASML.AS", "SAN.PA", "TTE.PA",
+]
+DEFAULT_FORMS = ["8-K", "10-K", "6-K", "20-F"]
 
 # Per-form configuration. Each form has its own prompt, schema, body
 # renderer and tone classifier.
@@ -127,12 +137,32 @@ FORM_CONFIG = {
         "prompt_version": "8k_v1",
         "text_cap": 15000,
         "max_tokens": 1500,
+        "schema": "event",
     },
     "10-K": {
         "prompt": PROMPT_10K,
         "prompt_version": "10k_v2",
         "text_cap": 40000,
         "max_tokens": 2500,
+        "schema": "annual",
+    },
+    # 6-K = current/interim report from foreign private issuers.
+    # Reuse 8-K schema — same shape of "what just happened" signal.
+    "6-K": {
+        "prompt": PROMPT_8K,
+        "prompt_version": "8k_v1",
+        "text_cap": 20000,
+        "max_tokens": 1500,
+        "schema": "event",
+    },
+    # 20-F = annual report from foreign private issuers. Reuse 10-K
+    # schema. 20-Fs are bigger than 10-Ks so cap higher.
+    "20-F": {
+        "prompt": PROMPT_10K,
+        "prompt_version": "10k_v2",
+        "text_cap": 60000,
+        "max_tokens": 2500,
+        "schema": "annual",
     },
 }
 
@@ -347,8 +377,16 @@ def body_10k(signals: dict, filing_url: str, filed_at: str) -> str:
     return "\n".join(lines)
 
 
-BODY_RENDERERS = {"8-K": body_8k, "10-K": body_10k}
-TONE_CLASSIFIERS = {"8-K": tone_8k, "10-K": tone_10k}
+BODY_RENDERERS = {"event": body_8k, "annual": body_10k}
+TONE_CLASSIFIERS = {"event": tone_8k, "annual": tone_10k}
+
+
+def body_for(form: str, signals: dict, url: str, filed_at: str) -> str:
+    return BODY_RENDERERS[FORM_CONFIG[form]["schema"]](signals, url, filed_at)
+
+
+def tone_for(form: str, signals: dict) -> str:
+    return TONE_CLASSIFIERS[FORM_CONFIG[form]["schema"]](signals)
 
 
 def _write_card(sb, company, form, filing_id, extraction_id, signals, url, filed_at, accession):
@@ -359,8 +397,8 @@ def _write_card(sb, company, form, filing_id, extraction_id, signals, url, filed
             "company_id": company["id"],
             "extraction_id": extraction_id,
             "title": f"{company['name']} {form} · {filed_at}",
-            "body_markdown": BODY_RENDERERS[form](signals, url, filed_at),
-            "tone": TONE_CLASSIFIERS[form](signals),
+            "body_markdown": body_for(form, signals, url, filed_at),
+            "tone": tone_for(form, signals),
         }
     ).execute()
 
@@ -478,7 +516,7 @@ def run_for_ticker(ticker: str, forms: list[str]) -> None:
 
 
 def parse_args(argv: list[str]) -> tuple[list[str], list[str]]:
-    forms = ["8-K", "10-K"]
+    forms = list(DEFAULT_FORMS)
     tickers: list[str] = []
     i = 0
     while i < len(argv):
