@@ -1,8 +1,15 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+  try {
+    return await updateSession(request);
+  } catch (err) {
+    // Missing env vars or transient Supabase errors shouldn't 500 every
+    // page. Log and pass through — protected pages will gate server-side.
+    console.error("middleware error:", err);
+    return NextResponse.next({ request });
+  }
 }
 
 export const config = {
