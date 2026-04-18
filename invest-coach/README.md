@@ -3,6 +3,8 @@
 Web-first investment coaching platform. Turns SEC filings, academic
 papers, and earnings calls into concise, actionable coaching cards.
 
+Live: https://trading-bot-2-opal.vercel.app
+
 ## Layer model
 
 ```
