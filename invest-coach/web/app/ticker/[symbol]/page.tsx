@@ -100,13 +100,23 @@ export default async function TickerPage({
   const latest = cards?.[0] ?? null;
 
   return (
-    <main className="min-h-screen bg-slate-50 p-8">
-      <div className="mx-auto max-w-2xl">
-        <Link href="/" className="text-sm text-blue-600 hover:underline">
-          &larr; All companies
-        </Link>
+    <main className="min-h-screen bg-slate-50">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
+          <Link href="/" className="text-sm text-blue-600 hover:underline">
+            &larr; Feed
+          </Link>
+          <Link
+            href="/companies"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Companies
+          </Link>
+        </div>
+      </header>
 
-        <header className="mt-4 mb-6">
+      <div className="mx-auto max-w-2xl px-4 py-6">
+        <div className="mb-6">
           <div className="flex items-baseline gap-3">
             <h1 className="font-mono text-3xl font-bold text-slate-900">
               {company.ticker}
@@ -116,7 +126,7 @@ export default async function TickerPage({
           <p className="mt-1 text-sm text-slate-500">
             {company.country} · {company.exchange}
           </p>
-        </header>
+        </div>
 
         {latest ? (
           <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
