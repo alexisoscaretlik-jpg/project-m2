@@ -1,14 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 
+import { publicSupabaseEnv } from "./public-env";
+
 // Refresh the Supabase session on every request so cookies don't go
 // stale. Also gates protected routes — unauthed users hitting /watchlist,
 // /tax, /bank, /subscription get bounced to /login.
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const { url, anon } = publicSupabaseEnv();
   if (!url || !anon) return response;
 
   const supabase = createServerClient(
