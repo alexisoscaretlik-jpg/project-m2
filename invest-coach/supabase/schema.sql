@@ -215,3 +215,23 @@ create policy "own tx read" on bank_transactions for select using (
   )
 );
 -- Writes happen under service_role from server actions/webhooks.
+
+-- Newsletter: captures emails from logged-out visitors too, so it's
+-- not tied to auth.users. Writes from a server action using the
+-- service-role client. Nobody reads this from the browser — RLS
+-- denies everything; admin reads go through service role.
+create table if not exists newsletter_subscribers (
+  id           bigserial primary key,
+  email        text not null unique,
+  source       text,
+  user_id      uuid references auth.users(id) on delete set null,
+  unsubscribed boolean not null default false,
+  created_at   timestamptz not null default now()
+);
+
+create index if not exists idx_newsletter_active
+  on newsletter_subscribers (created_at desc)
+  where unsubscribed = false;
+
+alter table newsletter_subscribers enable row level security;
+-- No policies — only service_role touches this table.
