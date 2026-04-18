@@ -1,0 +1,31 @@
+# Secrets
+.env
+.env.local
+.env.*.local
+*.key
+
+# Node
+node_modules/
+.next/
+out/
+dist/
+build/
+.pnpm-store/
+
+# Python (if used in worker)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
