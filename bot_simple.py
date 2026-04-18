@@ -11,6 +11,13 @@ EUR_BUDGET = float(os.getenv("EUR_BUDGET_PER_TRADE", "5000"))
 MAX_TRADES = int(os.getenv("MAX_TRADES_PER_DAY", "100"))
 EUR_USD = float(os.getenv("EUR_TO_USD_RATE", "1.08"))
 LOG_FILE = os.getenv("LOG_FILE", "trades.csv")
+BROKER = os.getenv("BROKER", "paper").lower()
+IBKR_HOST = os.getenv("IBKR_HOST", "127.0.0.1")
+IBKR_PORT = int(os.getenv("IBKR_PORT", "7497"))
+IBKR_CLIENT_ID = int(os.getenv("IBKR_CLIENT_ID", "7"))
+ALPACA_API_KEY = os.getenv("ALPACA_API_KEY", "")
+ALPACA_SECRET_KEY = os.getenv("ALPACA_SECRET_KEY", "")
+ALPACA_PAPER = os.getenv("ALPACA_PAPER", "true").lower() == "true"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger("bot")
@@ -65,20 +72,30 @@ def parse_alert(subject, body):
     }
 
     m = re.search(
-        r'\b(LONG|SHORT|BUY|SELL|CLOSE|CLOSING)'
-        r'(?:\s+(?:TO\s+)?(?:OPEN|CLOSE|CLOSING))?'
-        r'\s*[:\-]\s*([A-Z]{1,5})\b',
+        r'\b(?:ADD|TRIM|OPEN|CLOSE|CLOSING)\s*\(\s*(LONG|SHORT|BUY|SELL)\s*\)\s*:\s*([A-Z]{1,5})\b',
         upper,
     )
     if m and m.group(2) not in SKIP:
         alert["ticker"] = m.group(2)
         action = m.group(1)
-        if action in ("LONG", "BUY"):
-            alert["direction"] = "BUY"
-        elif action in ("SHORT", "SELL"):
-            alert["direction"] = "SELL"
-        else:
-            alert["direction"] = "CLOSE"
+        alert["direction"] = "BUY" if action in ("LONG", "BUY") else "SELL"
+
+    if not alert["ticker"]:
+        m = re.search(
+            r'\b(LONG|SHORT|BUY|SELL|CLOSE|CLOSING)'
+            r'(?:\s+(?:TO\s+)?(?:OPEN|CLOSE|CLOSING))?'
+            r'\s*[:\-]\s*([A-Z]{1,5})\b',
+            upper,
+        )
+        if m and m.group(2) not in SKIP:
+            alert["ticker"] = m.group(2)
+            action = m.group(1)
+            if action in ("LONG", "BUY"):
+                alert["direction"] = "BUY"
+            elif action in ("SHORT", "SELL"):
+                alert["direction"] = "SELL"
+            else:
+                alert["direction"] = "CLOSE"
 
     if not alert["ticker"]:
         m = re.search(r'\$([A-Z]{1,5})\b', text)
@@ -151,7 +168,7 @@ def log_trade(info):
     exists = os.path.exists(LOG_FILE)
     with open(LOG_FILE, "a", newline="") as f:
         fields = ["timestamp", "ticker", "direction", "type", "entry", "stop", "target",
-                  "size", "option_type", "strike", "expiry", "paper", "status"]
+                  "size", "option_type", "strike", "expiry", "paper", "status", "order_id"]
         w = csv.DictWriter(f, fieldnames=fields)
         if not exists:
             w.writeheader()
@@ -159,9 +176,145 @@ def log_trade(info):
         w.writerow(row)
 
 
+_ib = None
+
+
+def get_ib():
+    global _ib
+    if BROKER != "ibkr":
+        return None
+    try:
+        from ib_insync import IB
+    except ImportError:
+        log.error("ib_insync not installed; add it to requirements.txt")
+        return None
+    if _ib is not None and _ib.isConnected():
+        return _ib
+    _ib = IB()
+    try:
+        _ib.connect(IBKR_HOST, IBKR_PORT, clientId=IBKR_CLIENT_ID, timeout=10)
+        log.info("Connected to IBKR %s:%s clientId=%s", IBKR_HOST, IBKR_PORT, IBKR_CLIENT_ID)
+    except Exception as e:
+        log.error("IBKR connect failed: %s", e)
+        _ib = None
+    return _ib
+
+
+def place_ibkr_order(ticker, direction, size, stop, target):
+    from ib_insync import Stock, MarketOrder, LimitOrder, StopOrder
+    ib = get_ib()
+    if ib is None:
+        return None, "IBKR_DISCONNECTED"
+    try:
+        contract = Stock(ticker, "SMART", "USD")
+        ib.qualifyContracts(contract)
+        action = "BUY" if direction == "BUY" else "SELL"
+        close_action = "SELL" if action == "BUY" else "BUY"
+        parent = MarketOrder(action, size)
+        parent.transmit = not (stop or target)
+        parent_trade = ib.placeOrder(contract, parent)
+        parent_id = parent_trade.order.orderId
+        if target:
+            tp = LimitOrder(close_action, size, target)
+            tp.parentId = parent_id
+            tp.transmit = not stop
+            ib.placeOrder(contract, tp)
+        if stop:
+            sl = StopOrder(close_action, size, stop)
+            sl.parentId = parent_id
+            sl.transmit = True
+            ib.placeOrder(contract, sl)
+        ib.sleep(1)
+        status = parent_trade.orderStatus.status or "SUBMITTED"
+        return parent_trade.order.orderId, status
+    except Exception as e:
+        log.error("IBKR order failed for %s: %s", ticker, e)
+        return None, "IBKR_ERROR"
+
+
+_alpaca = None
+
+
+def get_alpaca():
+    global _alpaca
+    if BROKER != "alpaca":
+        return None
+    if _alpaca is not None:
+        return _alpaca
+    if not ALPACA_API_KEY or not ALPACA_SECRET_KEY:
+        log.error("ALPACA_API_KEY/ALPACA_SECRET_KEY not set")
+        return None
+    try:
+        from alpaca.trading.client import TradingClient
+    except ImportError:
+        log.error("alpaca-py not installed; add it to requirements.txt")
+        return None
+    try:
+        _alpaca = TradingClient(ALPACA_API_KEY, ALPACA_SECRET_KEY, paper=ALPACA_PAPER)
+        acct = _alpaca.get_account()
+        log.info("Connected to Alpaca (%s) account=%s equity=%s",
+                 "paper" if ALPACA_PAPER else "live", acct.account_number, acct.equity)
+    except Exception as e:
+        log.error("Alpaca connect failed: %s", e)
+        _alpaca = None
+    return _alpaca
+
+
+def place_alpaca_order(ticker, direction, size, stop, target):
+    from alpaca.trading.requests import (
+        MarketOrderRequest, TakeProfitRequest, StopLossRequest,
+    )
+    from alpaca.trading.enums import OrderSide, TimeInForce, OrderClass
+    client = get_alpaca()
+    if client is None:
+        return None, "ALPACA_DISCONNECTED"
+    try:
+        side = OrderSide.BUY if direction == "BUY" else OrderSide.SELL
+        kwargs = dict(
+            symbol=ticker,
+            qty=size,
+            side=side,
+            time_in_force=TimeInForce.GTC,
+        )
+        if stop and target:
+            kwargs["order_class"] = OrderClass.BRACKET
+            kwargs["take_profit"] = TakeProfitRequest(limit_price=float(target))
+            kwargs["stop_loss"] = StopLossRequest(stop_price=float(stop))
+        req = MarketOrderRequest(**kwargs)
+        order = client.submit_order(req)
+        return str(order.id), str(order.status)
+    except Exception as e:
+        log.error("Alpaca order failed for %s: %s", ticker, e)
+        return None, "ALPACA_ERROR"
+
+
 def execute(alert):
     global trades_today
     size = alert.get("shares") or position_size(alert["entry"], alert["type"])
+    order_id = None
+    if BROKER == "alpaca" and alert["type"] == "stock":
+        order_id, status = place_alpaca_order(
+            alert["ticker"], alert["direction"], size,
+            alert["stop"], alert["target"],
+        )
+        prefix = "[ALPACA]"
+    elif BROKER == "alpaca":
+        status = "ALPACA_SKIPPED_OPTION"
+        prefix = "[ALPACA]"
+        log.warning("Alpaca does not support options in this bot; skipping %s", alert["ticker"])
+    elif BROKER == "ibkr" and alert["type"] == "stock":
+        order_id, status = place_ibkr_order(
+            alert["ticker"], alert["direction"], size,
+            alert["stop"], alert["target"],
+        )
+        prefix = "[IBKR]"
+    elif BROKER == "ibkr":
+        status = "IBKR_SKIPPED_OPTION"
+        prefix = "[IBKR]"
+        log.warning("IBKR option orders not implemented; skipping %s", alert["ticker"])
+    else:
+        status = "PAPER" if PAPER_TRADING else "PENDING"
+        prefix = "[PAPER]" if PAPER_TRADING else "[LIVE]"
     info = {
         "timestamp": datetime.now().isoformat(),
         "ticker": alert["ticker"],
@@ -175,11 +328,12 @@ def execute(alert):
         "strike": alert.get("strike"),
         "expiry": alert.get("expiry"),
         "paper": PAPER_TRADING,
-        "status": "PAPER" if PAPER_TRADING else "PENDING"
+        "status": status,
+        "order_id": order_id,
     }
-    log.info("[PAPER] %s %s x %s @ %s | SL:%s TP:%s",
-             alert["direction"], size, alert["ticker"],
-             alert["entry"], alert["stop"], alert["target"])
+    log.info("%s %s %s x %s @ %s | SL:%s TP:%s | status=%s order=%s",
+             prefix, alert["direction"], size, alert["ticker"],
+             alert["entry"], alert["stop"], alert["target"], status, order_id)
     trades_today += 1
     log_trade(info)
     return info
@@ -244,10 +398,19 @@ def check_email():
 def main():
     log.info("=" * 50)
     log.info("Trading Bot Started")
+    log.info("Broker: %s", BROKER)
+    if BROKER == "ibkr":
+        log.info("IBKR: %s:%s clientId=%s", IBKR_HOST, IBKR_PORT, IBKR_CLIENT_ID)
+    elif BROKER == "alpaca":
+        log.info("Alpaca: %s", "paper" if ALPACA_PAPER else "LIVE")
     log.info("Paper Trading: %s", PAPER_TRADING)
     log.info("Budget: EUR %.0f", EUR_BUDGET)
     log.info("Max trades/day: %d", MAX_TRADES)
     log.info("=" * 50)
+    if BROKER == "ibkr":
+        get_ib()
+    elif BROKER == "alpaca":
+        get_alpaca()
     while True:
         try:
             reset_counter()
