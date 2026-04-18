@@ -11,6 +11,10 @@ EUR_BUDGET = float(os.getenv("EUR_BUDGET_PER_TRADE", "5000"))
 MAX_TRADES = int(os.getenv("MAX_TRADES_PER_DAY", "100"))
 EUR_USD = float(os.getenv("EUR_TO_USD_RATE", "1.08"))
 LOG_FILE = os.getenv("LOG_FILE", "trades.csv")
+BROKER = os.getenv("BROKER", "paper").lower()
+IBKR_HOST = os.getenv("IBKR_HOST", "127.0.0.1")
+IBKR_PORT = int(os.getenv("IBKR_PORT", "7497"))
+IBKR_CLIENT_ID = int(os.getenv("IBKR_CLIENT_ID", "7"))
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger("bot")
@@ -161,7 +165,7 @@ def log_trade(info):
     exists = os.path.exists(LOG_FILE)
     with open(LOG_FILE, "a", newline="") as f:
         fields = ["timestamp", "ticker", "direction", "type", "entry", "stop", "target",
-                  "size", "option_type", "strike", "expiry", "paper", "status"]
+                  "size", "option_type", "strike", "expiry", "paper", "status", "order_id"]
         w = csv.DictWriter(f, fieldnames=fields)
         if not exists:
             w.writeheader()
@@ -169,9 +173,79 @@ def log_trade(info):
         w.writerow(row)
 
 
+_ib = None
+
+
+def get_ib():
+    global _ib
+    if BROKER != "ibkr":
+        return None
+    try:
+        from ib_insync import IB
+    except ImportError:
+        log.error("ib_insync not installed; add it to requirements.txt")
+        return None
+    if _ib is not None and _ib.isConnected():
+        return _ib
+    _ib = IB()
+    try:
+        _ib.connect(IBKR_HOST, IBKR_PORT, clientId=IBKR_CLIENT_ID, timeout=10)
+        log.info("Connected to IBKR %s:%s clientId=%s", IBKR_HOST, IBKR_PORT, IBKR_CLIENT_ID)
+    except Exception as e:
+        log.error("IBKR connect failed: %s", e)
+        _ib = None
+    return _ib
+
+
+def place_ibkr_order(ticker, direction, size, stop, target):
+    from ib_insync import Stock, MarketOrder, LimitOrder, StopOrder
+    ib = get_ib()
+    if ib is None:
+        return None, "IBKR_DISCONNECTED"
+    try:
+        contract = Stock(ticker, "SMART", "USD")
+        ib.qualifyContracts(contract)
+        action = "BUY" if direction == "BUY" else "SELL"
+        close_action = "SELL" if action == "BUY" else "BUY"
+        parent = MarketOrder(action, size)
+        parent.transmit = not (stop or target)
+        parent_trade = ib.placeOrder(contract, parent)
+        parent_id = parent_trade.order.orderId
+        if target:
+            tp = LimitOrder(close_action, size, target)
+            tp.parentId = parent_id
+            tp.transmit = not stop
+            ib.placeOrder(contract, tp)
+        if stop:
+            sl = StopOrder(close_action, size, stop)
+            sl.parentId = parent_id
+            sl.transmit = True
+            ib.placeOrder(contract, sl)
+        ib.sleep(1)
+        status = parent_trade.orderStatus.status or "SUBMITTED"
+        return parent_trade.order.orderId, status
+    except Exception as e:
+        log.error("IBKR order failed for %s: %s", ticker, e)
+        return None, "IBKR_ERROR"
+
+
 def execute(alert):
     global trades_today
     size = alert.get("shares") or position_size(alert["entry"], alert["type"])
+    order_id = None
+    if BROKER == "ibkr" and alert["type"] == "stock":
+        order_id, status = place_ibkr_order(
+            alert["ticker"], alert["direction"], size,
+            alert["stop"], alert["target"],
+        )
+        prefix = "[IBKR]"
+    elif BROKER == "ibkr":
+        status = "IBKR_SKIPPED_OPTION"
+        prefix = "[IBKR]"
+        log.warning("IBKR option orders not implemented; skipping %s", alert["ticker"])
+    else:
+        status = "PAPER" if PAPER_TRADING else "PENDING"
+        prefix = "[PAPER]" if PAPER_TRADING else "[LIVE]"
     info = {
         "timestamp": datetime.now().isoformat(),
         "ticker": alert["ticker"],
@@ -185,11 +259,12 @@ def execute(alert):
         "strike": alert.get("strike"),
         "expiry": alert.get("expiry"),
         "paper": PAPER_TRADING,
-        "status": "PAPER" if PAPER_TRADING else "PENDING"
+        "status": status,
+        "order_id": order_id,
     }
-    log.info("[PAPER] %s %s x %s @ %s | SL:%s TP:%s",
-             alert["direction"], size, alert["ticker"],
-             alert["entry"], alert["stop"], alert["target"])
+    log.info("%s %s %s x %s @ %s | SL:%s TP:%s | status=%s order=%s",
+             prefix, alert["direction"], size, alert["ticker"],
+             alert["entry"], alert["stop"], alert["target"], status, order_id)
     trades_today += 1
     log_trade(info)
     return info
@@ -254,10 +329,15 @@ def check_email():
 def main():
     log.info("=" * 50)
     log.info("Trading Bot Started")
+    log.info("Broker: %s", BROKER)
+    if BROKER == "ibkr":
+        log.info("IBKR: %s:%s clientId=%s", IBKR_HOST, IBKR_PORT, IBKR_CLIENT_ID)
     log.info("Paper Trading: %s", PAPER_TRADING)
     log.info("Budget: EUR %.0f", EUR_BUDGET)
     log.info("Max trades/day: %d", MAX_TRADES)
     log.info("=" * 50)
+    if BROKER == "ibkr":
+        get_ib()
     while True:
         try:
             reset_counter()
