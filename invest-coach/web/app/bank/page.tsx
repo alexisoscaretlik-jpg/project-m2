@@ -277,7 +277,7 @@ export default async function BankPage({
           </div>
         </section>
 
-        {!hasBank && gcConfigured ? (
+        {!hasBank && gcConfigured && (
           <section className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-slate-900">
               Ou connecte en direct (PSD2)
