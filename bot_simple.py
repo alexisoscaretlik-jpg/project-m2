@@ -340,6 +340,9 @@ def execute(alert):
 
 
 seen = set()
+from email.utils import parsedate_to_datetime
+from datetime import timezone
+startup_cutoff = datetime.now(timezone.utc)
 
 
 def check_email():
@@ -351,7 +354,7 @@ def check_email():
         mail = imaplib.IMAP4_SSL(EMAIL_IMAP_SERVER)
         mail.login(EMAIL_USERNAME, EMAIL_PASSWORD)
         mail.select("inbox")
-        date_str = (datetime.now() - timedelta(days=1)).strftime("%d-%b-%Y")
+        date_str = startup_cutoff.strftime("%d-%b-%Y")
         status, msgs = mail.search(None, '(SINCE "%s" FROM "verifiedinvesting")' % date_str)
         if status != "OK":
             return alerts
@@ -363,6 +366,15 @@ def check_email():
             if status != "OK":
                 continue
             msg = email.message_from_bytes(data[0][1])
+            try:
+                msg_dt = parsedate_to_datetime(msg["Date"])
+                if msg_dt.tzinfo is None:
+                    msg_dt = msg_dt.replace(tzinfo=timezone.utc)
+                if msg_dt < startup_cutoff:
+                    seen.add(mid_str)
+                    continue
+            except Exception:
+                pass
             subject = ""
             for part, enc in decode_header(msg["Subject"] or ""):
                 if isinstance(part, bytes):
