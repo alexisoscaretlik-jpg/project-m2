@@ -290,7 +290,7 @@ def place_alpaca_order(ticker, direction, size, stop, target):
 
 def execute(alert):
     global trades_today
-    size = alert.get("shares") or position_size(alert["entry"], alert["type"])
+    size = position_size(alert["entry"], alert["type"])
     order_id = None
     if BROKER == "alpaca" and alert["type"] == "stock":
         order_id, status = place_alpaca_order(
