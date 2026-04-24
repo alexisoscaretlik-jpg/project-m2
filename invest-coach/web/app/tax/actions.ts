@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 
+import { DEV_USER_ID, IS_DEV } from "@/lib/devUser";
 import { createClient } from "@/lib/supabase/server";
 import { serviceClient } from "@/lib/supabase/service";
-import { extractAvis, recommend } from "@/lib/tax/claude";
+import { extractAvis, recommend, type TaxOnboarding } from "@/lib/tax/claude";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 
@@ -19,7 +20,8 @@ export async function uploadAvis(formData: FormData) {
   const {
     data: { user },
   } = await sb.auth.getUser();
-  if (!user) return { error: "Not signed in" };
+  const userId = user?.id ?? (IS_DEV ? DEV_USER_ID : null);
+  if (!userId) return { error: "Not signed in" };
 
   const buf = Buffer.from(await file.arrayBuffer());
   const base64 = buf.toString("base64");
@@ -31,16 +33,28 @@ export async function uploadAvis(formData: FormData) {
     return { error: `Extraction failed: ${(e as Error).message}` };
   }
 
+  // Pull the onboarding record (if the user filled it) so the
+  // recommender can tailor advice to the declared profile.
+  const onboardingDb = user ? sb : serviceClient();
+  const { data: onboardingRow } = await onboardingDb
+    .from("tax_onboarding")
+    .select(
+      "profile_type, income_types, situation, nb_enfants, owns_real_estate, has_investments, has_crypto, goals, notes",
+    )
+    .eq("user_id", userId)
+    .maybeSingle();
+  const onboarding = (onboardingRow ?? null) as TaxOnboarding | null;
+
   let recommendations;
   try {
-    recommendations = await recommend(extraction);
+    recommendations = await recommend(extraction, onboarding);
   } catch (e) {
     return { error: `Recommendations failed: ${(e as Error).message}` };
   }
 
   // Store raw PDF in private bucket keyed by user + year.
   const svc = serviceClient();
-  const path = `${user.id}/${extraction.tax_year}.pdf`;
+  const path = `${userId}/${extraction.tax_year}.pdf`;
   const { error: upErr } = await svc.storage
     .from("tax-docs")
     .upload(path, buf, { contentType: "application/pdf", upsert: true });
@@ -52,7 +66,7 @@ export async function uploadAvis(formData: FormData) {
     .from("tax_profiles")
     .upsert(
       {
-        user_id: user.id,
+        user_id: userId,
         tax_year: extraction.tax_year,
         rfr: extraction.rfr,
         revenu_imposable: extraction.revenu_imposable,
@@ -81,14 +95,15 @@ export async function deleteAvis(formData: FormData) {
   const {
     data: { user },
   } = await sb.auth.getUser();
-  if (!user) return;
+  const userId = user?.id ?? (IS_DEV ? DEV_USER_ID : null);
+  if (!userId) return;
 
   const svc = serviceClient();
-  await svc.storage.from("tax-docs").remove([`${user.id}/${year}.pdf`]);
+  await svc.storage.from("tax-docs").remove([`${userId}/${year}.pdf`]);
   await svc
     .from("tax_profiles")
     .delete()
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("tax_year", year);
 
   revalidatePath("/tax");

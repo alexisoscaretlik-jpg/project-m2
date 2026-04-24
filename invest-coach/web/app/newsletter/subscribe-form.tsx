@@ -56,7 +56,7 @@ export function SubscribeForm({
         <button
           type="submit"
           disabled={pending}
-          className={`rounded-lg bg-slate-900 font-medium text-white hover:bg-slate-800 disabled:opacity-60 sm:rounded-l-none ${
+          className={`rounded-lg bg-primary font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60 sm:rounded-l-none ${
             big ? "px-6 py-3 text-base" : "px-4 py-2 text-sm"
           }`}
         >

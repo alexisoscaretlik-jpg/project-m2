@@ -4,6 +4,8 @@ import { emailConfigured, send } from "@/lib/email";
 import { serviceClient } from "@/lib/supabase/service";
 import {
   DigestCard,
+  DigestKevinBrief,
+  DigestTweet,
   digestHtml,
   digestSubject,
   digestText,
@@ -26,6 +28,33 @@ type CardRow = {
   published_at: string;
   companies: { ticker: string; name: string } | null;
 };
+
+type TweetRow = {
+  id: string;
+  author_handle: string;
+  author_name: string | null;
+  text: string;
+  url: string;
+  created_at: string;
+  metrics: {
+    like_count?: number;
+    retweet_count?: number;
+    reply_count?: number;
+    quote_count?: number;
+  } | null;
+};
+
+const MAX_TWEETS_IN_DIGEST = 3;
+
+function totalEngagement(m: TweetRow["metrics"]): number {
+  if (!m) return 0;
+  return (
+    (m.like_count ?? 0) +
+    (m.retweet_count ?? 0) +
+    (m.reply_count ?? 0) +
+    (m.quote_count ?? 0)
+  );
+}
 
 export async function GET(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
@@ -63,8 +92,66 @@ export async function GET(req: NextRequest) {
   const tip = weeklyTip(weekOf);
   const metric = await fetchMetric();
 
-  const html = digestHtml({ cards, tip, weekOf, metric });
-  const text = digestText({ cards, tip, weekOf, metric });
+  // Top-engagement tweets from the past 7 days (the fetch-tweets cron has
+  // already upserted them into the table). Gracefully empty if the table
+  // doesn't exist yet or no tweets have been fetched — the digest still ships
+  // without the X section.
+  let tweets: DigestTweet[] = [];
+  try {
+    const { data: tweetRows } = await sb
+      .from("tweets")
+      .select("id, author_handle, author_name, text, url, created_at, metrics")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(30);
+    const rowsTyped = (tweetRows ?? []) as unknown as TweetRow[];
+    tweets = rowsTyped
+      .map((r) => ({
+        handle: r.author_handle,
+        name: r.author_name ?? r.author_handle,
+        text: r.text,
+        url: r.url,
+        createdAt: new Date(r.created_at),
+        engagement: totalEngagement(r.metrics),
+      }))
+      .sort((a, b) => b.engagement - a.engagement)
+      .slice(0, MAX_TWEETS_IN_DIGEST);
+  } catch {
+    // Table missing or other non-fatal read error — ship without the section.
+  }
+
+  // Meet Kevin livestream briefings from the past 7 days.
+  // Pulled from private_notes where source starts with 'meet-kevin-youtube-'.
+  // Each row's `polished` column is already Claude's French distillation.
+  let kevinBriefs: DigestKevinBrief[] = [];
+  try {
+    const { data: kevinRows } = await sb
+      .from("private_notes")
+      .select("id, source, polished, created_at")
+      .like("source", "meet-kevin-youtube-%")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(10);
+    kevinBriefs = (kevinRows ?? []).map((r) => {
+      // source format: meet-kevin-youtube-YYYY-MM-DD-<videoId>
+      const parts = String(r.source).split("-");
+      const videoId = parts.slice(-1)[0] ?? "";
+      // First `# ...` heading in the polished body = the video title Claude emitted.
+      const titleMatch = String(r.polished).match(/^#\s+(.+)$/m);
+      const title = titleMatch ? titleMatch[1] : `Session ${videoId}`;
+      return {
+        title,
+        videoId,
+        date: new Date(String(r.created_at)),
+        polished: String(r.polished),
+      };
+    });
+  } catch {
+    // private_notes may not exist in some environments — ship without the section.
+  }
+
+  const html = digestHtml({ cards, tip, weekOf, metric, tweets, kevinBriefs });
+  const text = digestText({ cards, tip, weekOf, metric, tweets, kevinBriefs });
   const subject = digestSubject(weekOf);
 
   if (preview) {

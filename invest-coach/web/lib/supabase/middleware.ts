@@ -38,9 +38,12 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
+  // Dev bypass: /tax is auth-open in development (pages use hardcoded
+  // fallback user from lib/devUser.ts). Other routes stay protected.
+  const isDev = process.env.NODE_ENV === "development";
   const isProtected =
     path.startsWith("/watchlist") ||
-    path.startsWith("/tax") ||
+    (path.startsWith("/tax") && !isDev) ||
     path.startsWith("/bank") ||
     path.startsWith("/subscription");
 
