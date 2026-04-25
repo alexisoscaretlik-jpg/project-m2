@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Nav } from "@/components/nav";
 import { TvMini } from "@/components/tv-mini";
 import { TvTickerTape } from "@/components/tv-ticker-tape";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/supabase/require-auth";
 import { toTvSymbol } from "@/lib/tradingview";
 
 import { addToWatchlist, removeFromWatchlist } from "./actions";
@@ -33,7 +33,7 @@ function first<T>(v: T | T[] | null): T | null {
 }
 
 export default async function WatchlistPage() {
-  const sb = await createClient();
+  const { supabase: sb } = await requireUser("/watchlist");
 
   const { data: rows } = await sb
     .from("watchlist")
