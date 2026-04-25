@@ -1,5 +1,5 @@
 import { Nav } from "@/components/nav";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/supabase/require-auth";
 
 import { openPortal, startCheckout } from "./actions";
 
@@ -65,18 +65,14 @@ export default async function SubscriptionPage({
   searchParams: Promise<{ status?: string }>;
 }) {
   const { status } = await searchParams;
-  const sb = await createClient();
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
+  const { user, supabase: sb } = await requireUser("/subscription");
 
-  const { data: profile } = user
-    ? await sb
+
+  const { data: profile } = await sb
         .from("profiles")
         .select("tier, current_period_end, stripe_customer_id")
         .eq("user_id", user.id)
-        .maybeSingle<Profile>()
-    : { data: null };
+        .maybeSingle<Profile>();
 
   const currentTier: Tier = profile?.tier ?? "free";
 
