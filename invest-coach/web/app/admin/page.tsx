@@ -41,11 +41,11 @@ function StatusPill({ healthy, label }: { healthy: boolean; label: string }) {
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${
         healthy
-          ? "bg-emerald-500/15 text-emerald-300"
-          : "bg-rose-500/15 text-rose-300"
+          ? "bg-[color:var(--forest-50)]0/15 text-[color:var(--forest-300)]"
+          : "bg-[color:var(--terracotta-50)]0/15 text-[color:var(--terracotta-300)]"
       }`}
     >
-      <span className={`inline-block h-1.5 w-1.5 rounded-full ${healthy ? "bg-emerald-400" : "bg-rose-400"}`} />
+      <span className={`inline-block h-1.5 w-1.5 rounded-full ${healthy ? "bg-[color:var(--forest-400)]" : "bg-[color:var(--terracotta-400)]"}`} />
       {label}
     </span>
   );
@@ -88,28 +88,28 @@ export default async function AdminPage() {
   const h = await headers();
   const forwarded = h.get("x-forwarded-for") ?? "";
   if (forwarded && !forwarded.split(",").some((ip) => ip.trim().startsWith("127.") || ip.trim() === "::1")) {
-    return <main className="p-8 text-rose-400">Admin is localhost-only.</main>;
+    return <main className="p-8 text-[color:var(--terracotta-400)]">Admin is localhost-only.</main>;
   }
 
   const data = await loadAll();
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-200 font-sans">
+    <main className="min-h-screen bg-[color:var(--ink-800)] text-[color:var(--paper-200)] font-sans">
       <div className="mx-auto max-w-5xl px-6 py-10">
         <header className="mb-10 flex items-baseline justify-between">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Invest Coach · Admin</h1>
-            <p className="text-sm text-slate-500">Localhost control panel · {new Date().toLocaleString("fr-FR")}</p>
+            <p className="text-sm text-muted-foreground">Localhost control panel · {new Date().toLocaleString("fr-FR")}</p>
           </div>
           <div className="flex items-center gap-2">
             <a
               href="/admin/notes"
-              className="rounded-md border border-slate-700 px-3 py-1 text-xs text-slate-300 hover:bg-slate-800"
+              className="rounded-md border border-[color:var(--ink-500)] px-3 py-1 text-xs text-[color:var(--paper-200)] hover:bg-[color:var(--ink-600)]"
             >
               Private notes →
             </a>
             <form action={async () => { "use server"; const { revalidatePath } = await import("next/cache"); revalidatePath("/admin"); }}>
-              <button className="rounded-md border border-slate-700 px-3 py-1 text-xs text-slate-300 hover:bg-slate-800">
+              <button className="rounded-md border border-[color:var(--ink-500)] px-3 py-1 text-xs text-[color:var(--paper-200)] hover:bg-[color:var(--ink-600)]">
                 ↻ Refresh
               </button>
             </form>
@@ -118,10 +118,10 @@ export default async function AdminPage() {
 
         {/* SERVICES ──────────────────────────────────────────────── */}
         <section className="mb-10">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-400">Services</h2>
-          <div className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900/50">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Services</h2>
+          <div className="overflow-hidden rounded-lg border border-[color:var(--ink-500)] bg-foreground/50">
             <table className="w-full text-sm">
-              <thead className="bg-slate-900 text-slate-400">
+              <thead className="bg-foreground text-muted-foreground">
                 <tr>
                   <th className="px-4 py-2 text-left font-medium">Service</th>
                   <th className="px-4 py-2 text-left font-medium">Status</th>
@@ -135,7 +135,7 @@ export default async function AdminPage() {
                   <tr key={s.label}>
                     <td className="px-4 py-3">
                       <div className="font-medium">{s.display}</div>
-                      <div className="text-xs text-slate-500 font-mono">{s.label}</div>
+                      <div className="text-xs text-muted-foreground font-mono">{s.label}</div>
                     </td>
                     <td className="px-4 py-3">
                       {s.kind === "keepalive" ? (
@@ -144,11 +144,11 @@ export default async function AdminPage() {
                         <StatusPill healthy={s.healthy} label="scheduled" />
                       )}
                     </td>
-                    <td className="px-4 py-3 font-mono text-slate-400">{s.pid ?? "—"}</td>
-                    <td className="px-4 py-3 text-slate-300">{s.summary}</td>
+                    <td className="px-4 py-3 font-mono text-muted-foreground">{s.pid ?? "—"}</td>
+                    <td className="px-4 py-3 text-[color:var(--paper-200)]">{s.summary}</td>
                     <td className="px-4 py-3 text-right">
                       <form action={restartService.bind(null, s.label)} className="inline">
-                        <button className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:bg-slate-800" title="unload + load">
+                        <button className="rounded-md border border-[color:var(--ink-500)] px-2 py-1 text-xs text-[color:var(--paper-200)] hover:bg-[color:var(--ink-600)]" title="unload + load">
                           Restart
                         </button>
                       </form>
@@ -163,41 +163,41 @@ export default async function AdminPage() {
         <div className="mb-10 grid gap-6 md:grid-cols-2">
           {/* TRADER ──────────────────────────────────────────────── */}
           <section>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-400">Trading · Alpaca {data.alpaca.paper ? "Paper" : "LIVE"}</h2>
-            <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-4">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Trading · Alpaca {data.alpaca.paper ? "Paper" : "LIVE"}</h2>
+            <div className="rounded-lg border border-[color:var(--ink-500)] bg-foreground/50 p-4">
               {data.alpaca.configured && data.alpaca.account ? (
                 <>
                   <div className="mb-4 grid grid-cols-3 gap-3 text-center">
                     <div>
-                      <div className="text-xs text-slate-500">Equity</div>
+                      <div className="text-xs text-muted-foreground">Equity</div>
                       <div className="font-mono text-lg">${fmtEUR(data.alpaca.account.equity)}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500">Cash</div>
+                      <div className="text-xs text-muted-foreground">Cash</div>
                       <div className="font-mono text-lg">${fmtEUR(data.alpaca.account.cash)}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500">Positions</div>
+                      <div className="text-xs text-muted-foreground">Positions</div>
                       <div className="font-mono text-lg">{data.alpaca.positions.length}</div>
                     </div>
                   </div>
-                  <div className="mb-2 text-xs text-slate-500">Account {data.alpaca.account.account_number} · {data.alpaca.account.status}</div>
+                  <div className="mb-2 text-xs text-muted-foreground">Account {data.alpaca.account.account_number} · {data.alpaca.account.status}</div>
                 </>
               ) : (
-                <div className="text-sm text-slate-500">Alpaca keys not readable from ~/Projects/trading-agent-v2/.env</div>
+                <div className="text-sm text-muted-foreground">Alpaca keys not readable from ~/Projects/trading-agent-v2/.env</div>
               )}
 
               <div className="mt-4">
-                <div className="mb-1 text-xs uppercase tracking-wider text-slate-500">Last trades</div>
+                <div className="mb-1 text-xs uppercase tracking-wider text-muted-foreground">Last trades</div>
                 {data.trades.length === 0 ? (
-                  <div className="text-sm text-slate-500">No trades yet.</div>
+                  <div className="text-sm text-muted-foreground">No trades yet.</div>
                 ) : (
                   <ul className="space-y-1 font-mono text-xs">
                     {data.trades.map((t, i) => (
                       <li key={i} className="flex justify-between gap-2">
-                        <span className="text-slate-500">{t.timestamp.slice(0, 19).replace("T", " ")}</span>
-                        <span className="text-slate-100">{t.action} {t.shares} {t.ticker}</span>
-                        <span className="text-slate-400">{t.status}</span>
+                        <span className="text-muted-foreground">{t.timestamp.slice(0, 19).replace("T", " ")}</span>
+                        <span className="text-[color:var(--paper-50)]">{t.action} {t.shares} {t.ticker}</span>
+                        <span className="text-muted-foreground">{t.status}</span>
                       </li>
                     ))}
                   </ul>
@@ -208,30 +208,30 @@ export default async function AdminPage() {
 
           {/* NEWSLETTER ──────────────────────────────────────────── */}
           <section>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-400">Newsletter</h2>
-            <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/50 p-4">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Newsletter</h2>
+            <div className="space-y-4 rounded-lg border border-[color:var(--ink-500)] bg-foreground/50 p-4">
               <div className="grid grid-cols-2 gap-3 text-center">
                 <div>
-                  <div className="text-xs text-slate-500">Subscribers</div>
+                  <div className="text-xs text-muted-foreground">Subscribers</div>
                   <div className="font-mono text-lg">{data.subscribers}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-slate-500">Cards (7d)</div>
+                  <div className="text-xs text-muted-foreground">Cards (7d)</div>
                   <div className="font-mono text-lg">{data.cardsLast7d}</div>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
                 <form action={sendDigestNow}>
-                  <button className="rounded-md bg-blue-600/90 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-600">
+                  <button className="rounded-md bg-primary/90 px-3 py-1.5 text-xs font-medium text-white hover:bg-primary">
                     Send digest now
                   </button>
                 </form>
-                <a href="/api/cron/weekly-digest?preview=1" target="_blank" className="rounded-md border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-800">
+                <a href="/api/cron/weekly-digest?preview=1" target="_blank" className="rounded-md border border-[color:var(--ink-500)] px-3 py-1.5 text-xs text-[color:var(--paper-200)] hover:bg-[color:var(--ink-600)]">
                   Preview digest (no send)
                 </a>
               </div>
-              <div className="text-xs text-slate-500">
-                Sender: <span className="font-mono text-slate-400">{process.env.EMAIL_FROM || "not set"}</span>
+              <div className="text-xs text-muted-foreground">
+                Sender: <span className="font-mono text-muted-foreground">{process.env.EMAIL_FROM || "not set"}</span>
               </div>
             </div>
           </section>
@@ -239,23 +239,23 @@ export default async function AdminPage() {
 
         {/* TWITTER ──────────────────────────────────────────────── */}
         <section className="mb-10">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-400">X / Twitter</h2>
-          <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/50 p-4">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">X / Twitter</h2>
+          <div className="space-y-4 rounded-lg border border-[color:var(--ink-500)] bg-foreground/50 p-4">
             <div className="flex items-center gap-6">
               <div>
-                <div className="text-xs text-slate-500">Tweets cached</div>
+                <div className="text-xs text-muted-foreground">Tweets cached</div>
                 <div className="font-mono text-lg">{data.tweetsTotal}</div>
               </div>
               <div>
-                <div className="text-xs text-slate-500">Handle</div>
-                <div className="font-mono text-slate-300">@{process.env.TWITTER_CREATOR_HANDLE || "—"}</div>
+                <div className="text-xs text-muted-foreground">Handle</div>
+                <div className="font-mono text-[color:var(--paper-200)]">@{process.env.TWITTER_CREATOR_HANDLE || "—"}</div>
               </div>
               <div>
-                <div className="text-xs text-slate-500">Latest tweet</div>
-                <div className="text-slate-300">{fmtRelative(data.latestTweet?.created_at)}</div>
+                <div className="text-xs text-muted-foreground">Latest tweet</div>
+                <div className="text-[color:var(--paper-200)]">{fmtRelative(data.latestTweet?.created_at)}</div>
               </div>
               <form action={triggerFetchTweetsNow} className="ml-auto">
-                <button className="rounded-md border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-800">
+                <button className="rounded-md border border-[color:var(--ink-500)] px-3 py-1.5 text-xs text-[color:var(--paper-200)] hover:bg-[color:var(--ink-600)]">
                   Fetch now
                 </button>
               </form>
@@ -265,9 +265,9 @@ export default async function AdminPage() {
                 href={data.latestTweet.url}
                 target="_blank"
                 rel="noreferrer"
-                className="block rounded-md border border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300 hover:bg-slate-900"
+                className="block rounded-md border border-[color:var(--ink-500)] bg-[color:var(--ink-800)]/60 p-3 text-sm text-[color:var(--paper-200)] hover:bg-foreground"
               >
-                <div className="mb-1 text-xs text-slate-500">
+                <div className="mb-1 text-xs text-muted-foreground">
                   @{data.latestTweet.author_handle} · {new Date(data.latestTweet.created_at).toLocaleString("fr-FR")}
                 </div>
                 <div className="whitespace-pre-line">{data.latestTweet.text}</div>
@@ -278,17 +278,17 @@ export default async function AdminPage() {
 
         {/* LOGS ──────────────────────────────────────────────── */}
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-400">Recent logs</h2>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Recent logs</h2>
           <div className="space-y-4">
             {data.logs.map((log) => (
-              <div key={log.path} className="rounded-lg border border-slate-800 bg-slate-900/50">
-                <div className="flex items-center justify-between border-b border-slate-800 px-4 py-2 text-xs">
-                  <span className="font-medium text-slate-300">{log.label}</span>
-                  <span className="text-slate-500">
+              <div key={log.path} className="rounded-lg border border-[color:var(--ink-500)] bg-foreground/50">
+                <div className="flex items-center justify-between border-b border-[color:var(--ink-500)] px-4 py-2 text-xs">
+                  <span className="font-medium text-[color:var(--paper-200)]">{log.label}</span>
+                  <span className="text-muted-foreground">
                     {log.exists ? `${(log.bytes / 1024).toFixed(1)} KB · ${fmtRelative(log.mtime)}` : "missing"}
                   </span>
                 </div>
-                <pre className="max-h-56 overflow-auto px-4 py-2 text-xs text-slate-400">
+                <pre className="max-h-56 overflow-auto px-4 py-2 text-xs text-muted-foreground">
                   {log.lastLines.length ? log.lastLines.join("\n") : "(empty)"}
                 </pre>
               </div>
@@ -296,7 +296,7 @@ export default async function AdminPage() {
           </div>
         </section>
 
-        <footer className="mt-12 border-t border-slate-800 pt-6 text-xs text-slate-500">
+        <footer className="mt-12 border-t border-[color:var(--ink-500)] pt-6 text-xs text-muted-foreground">
           <p>
             This page is only reachable from <span className="font-mono">http://localhost:3000/admin</span>.
             It reads from the filesystem, Supabase, and Alpaca paper API.

@@ -42,13 +42,13 @@ export function CsvUploadForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-3">
       <div>
-        <label className="block text-xs font-medium text-slate-700">
+        <label className="block text-xs font-medium text-foreground">
           Banque
         </label>
         <select
           name="bank_name"
           required
-          className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+          className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
           defaultValue="BNP Paribas"
         >
           {FRENCH_BANKS.map((b) => (
@@ -59,7 +59,7 @@ export function CsvUploadForm() {
         </select>
       </div>
       <div>
-        <label className="block text-xs font-medium text-slate-700">
+        <label className="block text-xs font-medium text-foreground">
           Fichier CSV
         </label>
         <input
@@ -67,19 +67,19 @@ export function CsvUploadForm() {
           name="csv"
           accept=".csv,text/csv"
           required
-          className="mt-1 block w-full text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100"
+          className="mt-1 block w-full text-sm text-muted-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-accent file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary hover:file:bg-accent"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+        className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary disabled:opacity-50"
       >
         {pending ? "Parsing with Claude…" : "Importer & catégoriser"}
       </button>
-      {error ? <p className="text-sm text-rose-600">{error}</p> : null}
-      {message ? <p className="text-sm text-emerald-700">{message}</p> : null}
-      <p className="text-xs text-slate-500">
+      {error ? <p className="text-sm text-[color:var(--terracotta-500)]">{error}</p> : null}
+      {message ? <p className="text-sm text-[color:var(--forest-700)]">{message}</p> : null}
+      <p className="text-xs text-muted-foreground">
         Export ton relevé de la banque (3-6 mois), uploade — Claude reconnaît
         le format et catégorise tout en une passe.
       </p>

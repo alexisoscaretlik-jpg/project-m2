@@ -40,16 +40,18 @@ export function LoginForm({ next }: { next: string }) {
         placeholder="ton@email.fr"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="w-full rounded-md border border-border bg-card px-3 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+        style={{ fontFamily: "var(--font-display)" }}
       />
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+        className="w-full rounded-md bg-primary px-4 py-2.5 font-medium text-primary-foreground transition-colors hover:opacity-90 disabled:opacity-50"
+        style={{ fontFamily: "var(--font-display)" }}
       >
         {pending ? "Envoi…" : "Recevoir le lien magique"}
       </button>
-      {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+      {error ? <p className="text-sm text-[color:var(--terracotta-500)]">{error}</p> : null}
     </form>
   );
 }

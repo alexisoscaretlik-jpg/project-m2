@@ -37,9 +37,9 @@ export function TvMini({
       largeChartUrl: "",
       noTimeScale: true,
       chartOnly: false,
-      trendLineColor: "rgba(37, 99, 235, 1)",
-      underLineColor: "rgba(37, 99, 235, 0.12)",
-      underLineBottomColor: "rgba(37, 99, 235, 0)",
+      trendLineColor: "rgba(90, 124, 79, 1)",
+      underLineColor: "rgba(90, 124, 79, 0.18)",
+      underLineBottomColor: "rgba(90, 124, 79, 0)",
     });
     container.appendChild(script);
 

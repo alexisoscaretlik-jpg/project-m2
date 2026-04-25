@@ -12,33 +12,33 @@ export const metadata = {
 
 export default function MarketsPage() {
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-muted">
       <Nav active="/markets" />
       <TvTickerTape />
 
       <div className="mx-auto max-w-6xl px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Marchés</h1>
-          <p className="mt-1 text-sm text-slate-600">
+          <h1 className="text-2xl font-bold text-foreground">Marchés</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Indices, top movers et agenda macro. En direct.
           </p>
         </div>
 
         <section className="mb-10">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Vue d&apos;ensemble
           </h2>
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="overflow-hidden rounded-xl border border-border bg-card">
             <TvMarketOverview />
           </div>
         </section>
 
         <section className="mb-10 grid gap-6 lg:grid-cols-2">
           <div>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               Top gagnants — France
             </h2>
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <div className="overflow-hidden rounded-xl border border-border bg-card">
               <TvScreener
                 market="france"
                 defaultScreen="top_gainers"
@@ -47,10 +47,10 @@ export default function MarketsPage() {
             </div>
           </div>
           <div>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               Top perdants — France
             </h2>
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <div className="overflow-hidden rounded-xl border border-border bg-card">
               <TvScreener
                 market="france"
                 defaultScreen="top_losers"
@@ -61,19 +61,19 @@ export default function MarketsPage() {
         </section>
 
         <section className="mb-10">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Agenda macro — cette semaine
           </h2>
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="overflow-hidden rounded-xl border border-border bg-card">
             <TvEconomicCalendar />
           </div>
         </section>
 
         <section className="mb-12">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Les plus capitalisées — US
           </h2>
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="overflow-hidden rounded-xl border border-border bg-card">
             <TvScreener
               market="america"
               defaultScreen="most_capitalized"
@@ -82,7 +82,7 @@ export default function MarketsPage() {
           </div>
         </section>
 
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-muted-foreground">
           Données fournies par TradingView. Décalées de 15 minutes sur certains
           marchés. Pas un conseil en investissement.
         </p>

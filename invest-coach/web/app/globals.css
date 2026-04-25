@@ -4,12 +4,20 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ==========================================================================
+   Capucine — design tokens (Cozy palette default)
+   French-first finance literacy. Parisian editorial × fintech precision.
+   These tokens are the source of truth. They are also mapped onto the shadcn
+   variable names below so existing Card / Button / Badge / etc. inherit them.
+   ========================================================================== */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-display);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,85 +57,236 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  /* Brand blue — matches the blue-600 used across the app. */
-  --primary: oklch(0.546 0.245 262.881);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.95 0.05 258);
-  --accent-foreground: oklch(0.35 0.2 262);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.546 0.245 262.881);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  /* ── Capucine raw palette (Cozy) ───────────────────────────────────── */
+  --forest-50:  #ecf2e9;
+  --forest-100: #d6e3d1;
+  --forest-200: #b9ccb3;
+  --forest-300: #8eac86;
+  --forest-400: #648c5e;
+  --forest-500: #5a7c4f;
+  --forest-600: #5a7c4f;   /* Cozy primary brand */
+  --forest-700: #466540;
+  --forest-800: #1b3220;
+  --forest-900: #122318;
+
+  --terracotta-50:  #fbeadc;
+  --terracotta-100: #f4dccd;
+  --terracotta-200: #e9b89c;
+  --terracotta-300: #e8a07a;
+  --terracotta-400: #cf6f43;
+  --terracotta-500: #cc7448;   /* Cozy primary accent */
+  --terracotta-600: #964326;
+  --terracotta-700: #743321;
+  --terracotta-800: #54251a;
+  --terracotta-900: #361810;
+
+  --paper-0:   #ffffff;
+  --paper-50:  #fbf5ea;        /* Cozy default page bg */
+  --paper-100: #f4ead4;
+  --paper-200: #e8d8b6;
+  --paper-300: #d8c194;
+
+  --ink-50:  #ecebe7;
+  --ink-100: #d6d4cc;
+  --ink-200: #aaa79b;
+  --ink-300: #7e7a6c;
+  --ink-400: #5a564a;
+  --ink-500: #3d3a31;
+  --ink-600: #2a2823;
+  --ink-700: #2a2820;          /* Cozy primary text */
+  --ink-800: #121110;
+  --ink-900: #08080a;
+
+  /* Semantic */
+  --positive:        var(--forest-600);
+  --positive-soft:   var(--forest-50);
+  --negative:        var(--terracotta-500);
+  --negative-soft:   var(--terracotta-50);
+  --warning:         #c98a2b;
+  --warning-soft:    #f5e6c8;
+  --info:            #466b8a;
+  --info-soft:       #dde6ee;
+
+  /* Capucine semantic tokens (used by .cap-* utilities) */
+  --bg:              var(--paper-50);
+  --bg-elevated:     #fffaf0;
+  --bg-sunken:       var(--paper-100);
+  --bg-inverse:      var(--ink-700);
+  --fg:              var(--ink-700);
+  --fg-muted:        var(--ink-400);
+  --fg-subtle:       var(--ink-300);
+  --fg-inverse:      var(--paper-50);
+  --border-strong:   var(--paper-300);
+  --border-inverse:  var(--ink-500);
+  --highlight:       var(--terracotta-500);
+  --highlight-soft:  var(--terracotta-50);
+  --accent-soft:     var(--forest-50);
+
+  /* Type families */
+  --font-display: var(--font-inter-tight, "Inter Tight"), "Helvetica Neue", Arial, sans-serif;
+  --font-serif:   var(--font-source-serif, "Source Serif 4"), "Iowan Old Style", Georgia, serif;
+  --font-mono:    var(--font-jetbrains-mono, "JetBrains Mono"), "SF Mono", Menlo, monospace;
+  --font-sans:    var(--font-inter-tight, "Inter Tight"), system-ui, sans-serif;
+
+  /* Type scale */
+  --fs-xs:   12px;
+  --fs-sm:   14px;
+  --fs-base: 16px;
+  --fs-md:   18px;
+  --fs-lg:   22px;
+  --fs-xl:   28px;
+  --fs-2xl:  36px;
+  --fs-3xl:  46px;
+  --fs-4xl:  60px;
+  --fs-5xl:  76px;
+
+  --lh-tight:   1.05;
+  --lh-snug:    1.2;
+  --lh-normal:  1.45;
+  --lh-relaxed: 1.65;
+
+  --tr-tight:  -0.02em;
+  --tr-snug:   -0.01em;
+  --tr-normal: 0;
+  --tr-wide:   0.04em;
+  --tr-eyebrow: 0.12em;
+
+  /* Spacing */
+  --sp-1: 4px;  --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;  --sp-5: 20px;
+  --sp-6: 24px; --sp-8: 32px;  --sp-10: 40px; --sp-12: 48px; --sp-16: 64px;
+  --sp-20: 80px; --sp-24: 96px; --sp-32: 128px;
+
+  /* Radii */
+  --r-xs:   2px;
+  --r-sm:   4px;
+  --r-md:   8px;
+  --r-lg:   12px;
+  --r-xl:   16px;
+  --r-2xl:  24px;
+  --r-pill: 999px;
+
+  /* Shadows — soft, paper-like, warm-tinted */
+  --sh-xs: 0 1px 0 0 rgba(28, 27, 23, 0.04);
+  --sh-sm: 0 1px 2px 0 rgba(28, 27, 23, 0.05), 0 1px 1px 0 rgba(28, 27, 23, 0.03);
+  --sh-md: 0 4px 8px -2px rgba(28, 27, 23, 0.06), 0 2px 4px -1px rgba(28, 27, 23, 0.04);
+  --sh-lg: 0 12px 24px -6px rgba(28, 27, 23, 0.08), 0 4px 8px -2px rgba(28, 27, 23, 0.04);
+  --sh-xl: 0 24px 48px -12px rgba(28, 27, 23, 0.12);
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasis: cubic-bezier(0.3, 0, 0, 1);
+  --ease-out:      cubic-bezier(0, 0, 0.2, 1);
+  --dur-fast:      120ms;
+  --dur-base:      200ms;
+  --dur-slow:      320ms;
+
+  /* Layout */
+  --container-narrow: 720px;
+  --container:        1080px;
+  --container-wide:   1280px;
+
+  /* ── shadcn token mappings ─────────────────────────────────────────── */
+  /* These are what every Card/Button/Badge/Input/etc. references.       */
+  /* By pointing them at Capucine tokens, every shadcn surface rebrands. */
+
+  --background: var(--paper-50);
+  --foreground: var(--ink-700);
+
+  --card: var(--bg-elevated);
+  --card-foreground: var(--ink-700);
+
+  --popover: var(--bg-elevated);
+  --popover-foreground: var(--ink-700);
+
+  /* Forest is primary */
+  --primary: var(--forest-600);
+  --primary-foreground: var(--paper-50);
+
+  --secondary: var(--paper-100);
+  --secondary-foreground: var(--ink-700);
+
+  --muted: var(--paper-100);
+  --muted-foreground: var(--ink-400);
+
+  /* shadcn's --accent is a soft surface (used for hover states), not the brand. */
+  --accent: var(--forest-50);
+  --accent-foreground: var(--forest-700);
+
+  /* Terracotta as destructive — warm, not aggressive. */
+  --destructive: var(--terracotta-500);
+
+  --border: var(--paper-200);
+  --input: var(--paper-200);
+  --ring: var(--forest-600);
+
+  /* Charts: forest, terracotta, ink shades — warm, editorial. */
+  --chart-1: var(--forest-600);
+  --chart-2: var(--terracotta-500);
+  --chart-3: var(--forest-300);
+  --chart-4: var(--terracotta-300);
+  --chart-5: var(--ink-400);
+
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  --sidebar: var(--paper-100);
+  --sidebar-foreground: var(--ink-700);
+  --sidebar-primary: var(--forest-600);
+  --sidebar-primary-foreground: var(--paper-50);
+  --sidebar-accent: var(--paper-50);
+  --sidebar-accent-foreground: var(--ink-700);
+  --sidebar-border: var(--paper-200);
+  --sidebar-ring: var(--forest-600);
 }
 
+/* Dark theme — Premium-ish. */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.6 0.25 262.881);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --paper-50:  #0f1614;
+  --paper-100: #16201d;
+  --paper-200: #1f2c28;
+  --paper-300: #2a3a35;
+  --ink-700: #f4ede0;
+  --ink-400: #a39a87;
+  --ink-300: #7a7263;
+
+  --bg: var(--paper-50);
+  --bg-elevated: var(--paper-100);
+  --bg-sunken: #0a100e;
+  --fg: var(--ink-700);
+  --fg-muted: var(--ink-400);
+  --fg-subtle: var(--ink-300);
+
+  --background: var(--paper-50);
+  --foreground: var(--ink-700);
+  --card: var(--paper-100);
+  --card-foreground: var(--ink-700);
+  --popover: var(--paper-100);
+  --popover-foreground: var(--ink-700);
+  --primary: #4fa372;
+  --primary-foreground: #0f1614;
+  --secondary: var(--paper-200);
+  --secondary-foreground: var(--ink-700);
+  --muted: var(--paper-200);
+  --muted-foreground: var(--ink-400);
+  --accent: #1a2a22;
+  --accent-foreground: #4fa372;
+  --destructive: #c89a4a;
+  --border: var(--paper-200);
+  --input: var(--paper-200);
+  --ring: #4fa372;
+  --sidebar: var(--paper-100);
+  --sidebar-foreground: var(--ink-700);
+  --sidebar-primary: #4fa372;
+  --sidebar-primary-foreground: #0f1614;
+  --sidebar-accent: var(--paper-50);
+  --sidebar-accent-foreground: var(--ink-700);
+  --sidebar-border: var(--paper-200);
+  --sidebar-ring: #4fa372;
 }
 
-/* Aceternity UI — spotlight keyframe */
+/* Aceternity UI — spotlight keyframe (kept for compatibility) */
 @keyframes spotlight {
-  0% {
-    opacity: 0;
-    transform: translate(-72%, -62%) scale(0.5);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(-50%, -40%) scale(1);
-  }
+  0% { opacity: 0; transform: translate(-72%, -62%) scale(0.5); }
+  100% { opacity: 1; transform: translate(-50%, -40%) scale(1); }
 }
 
 @layer base {
@@ -136,8 +295,229 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   html {
     @apply font-sans;
   }
+  /* Reading-surface defaults: serif for long-form. */
+  .prose, .reader-body {
+    font-family: var(--font-serif);
+    font-size: var(--fs-md);
+    line-height: var(--lh-relaxed);
+    color: var(--fg);
+    text-wrap: pretty;
+  }
+}
+
+/* ==========================================================================
+   Capucine — utility classes
+   Use these for editorial flourishes (hero, eyebrows, pullquotes, numbers).
+   They co-exist with Tailwind utilities — apply via className.
+   ========================================================================== */
+
+/* Eyebrow — small uppercase label above a heading */
+.cap-eyebrow {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--terracotta-500);
+}
+
+/* Display / hero heading */
+.cap-display {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5.5vw, 76px);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  text-wrap: balance;
+}
+.cap-display em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--terracotta-500);
+}
+
+.cap-h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tr-tight);
+  color: var(--fg);
+  text-wrap: balance;
+}
+.cap-h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tr-snug);
+  color: var(--fg);
+  text-wrap: balance;
+}
+.cap-h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 500;
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tr-snug);
+  color: var(--fg);
+}
+
+/* Lede / subtitle */
+.cap-lede {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  line-height: 1.5;
+  color: var(--fg-muted);
+  text-wrap: pretty;
+}
+
+/* Body */
+.cap-body-serif {
+  font-family: var(--font-serif);
+  font-size: var(--fs-md);
+  line-height: var(--lh-relaxed);
+  color: var(--fg);
+  text-wrap: pretty;
+}
+
+/* Numbers — tabular */
+.cap-num {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1, "zero" 1;
+  letter-spacing: var(--tr-snug);
+}
+.cap-num-positive { color: var(--positive); }
+.cap-num-negative { color: var(--negative); }
+
+/* Pullquote */
+.cap-pullquote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--fs-2xl);
+  line-height: 1.3;
+  color: var(--fg);
+  border-left: 2px solid var(--terracotta-500);
+  padding: 6px 0 6px 24px;
+  margin: 32px 0;
+  text-wrap: balance;
+}
+
+/* Drop cap */
+.cap-dropcap::first-letter {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 4.4em;
+  line-height: 0.85;
+  float: left;
+  padding: 6px 12px 0 0;
+  color: var(--terracotta-500);
+}
+
+/* Editorial card on cream background */
+.cap-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  transition: all 200ms var(--ease-standard);
+}
+.cap-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--sh-md);
+}
+
+/* Inverse "spotlight" card — used for featured editorial blocks */
+.cap-card-inverse {
+  background: var(--ink-700);
+  color: var(--paper-50);
+  border-radius: var(--r-xl);
+  padding: 36px;
+}
+.cap-card-inverse a { color: var(--paper-50); }
+
+/* Aside — soft cream callout in articles */
+.cap-aside {
+  background: var(--paper-100);
+  border-radius: var(--r-lg);
+  padding: 20px 24px;
+  margin: 28px 0;
+}
+
+/* Pricing tier */
+.cap-tier {
+  position: relative;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.cap-tier-featured {
+  border-color: var(--forest-600);
+  border-width: 2px;
+  box-shadow: var(--sh-lg);
+}
+.cap-tier-ribbon {
+  position: absolute;
+  top: -12px;
+  left: 28px;
+  background: var(--forest-600);
+  color: var(--paper-50);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+}
+
+/* Pill / tag */
+.cap-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--fg-muted);
+}
+
+/* Branching pattern decoration helper */
+.cap-pattern-bg {
+  position: relative;
+  isolation: isolate;
+}
+.cap-pattern-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/capucine/pattern-branches.svg");
+  background-repeat: no-repeat;
+  background-position: right -80px top 24px;
+  background-size: 600px auto;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0ms !important; animation-duration: 0ms !important; }
 }
