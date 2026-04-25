@@ -1,0 +1,121 @@
+schema: "paperclip/v1"
+agents:
+  editorial-lead:
+    role: "editorial-lead"
+    adapter:
+      type: "claude_local"
+      config:
+        dangerouslySkipPermissions: true
+    runtime:
+      heartbeat:
+        intervalSec: 600
+        maxConcurrentRuns: 1
+    permissions:
+      canCreateAgents: false
+  content-manager:
+    role: "fr-writer"
+    adapter:
+      type: "claude_local"
+      config:
+        dangerouslySkipPermissions: true
+    runtime:
+      heartbeat:
+        intervalSec: 600
+        maxConcurrentRuns: 1
+    permissions:
+      canCreateAgents: false
+  newsletter-operator:
+    role: "newsletter-operator"
+    adapter:
+      type: "claude_local"
+      config:
+        dangerouslySkipPermissions: true
+    runtime:
+      heartbeat:
+        intervalSec: 600
+        maxConcurrentRuns: 1
+    permissions:
+      canCreateAgents: false
+  twitter-curator:
+    role: "twitter-curator"
+    adapter:
+      type: "claude_local"
+      config:
+        dangerouslySkipPermissions: true
+    runtime:
+      heartbeat:
+        intervalSec: 900
+        maxConcurrentRuns: 1
+    permissions:
+      canCreateAgents: false
+  yt-distiller:
+    role: "yt-distiller"
+    adapter:
+      type: "claude_local"
+      config:
+        dangerouslySkipPermissions: true
+    runtime:
+      heartbeat:
+        intervalSec: 900
+        maxConcurrentRuns: 1
+    permissions:
+      canCreateAgents: false
+  product-builder:
+    role: "product-builder"
+    adapter:
+      type: "claude_local"
+      config:
+        dangerouslySkipPermissions: true
+    runtime:
+      heartbeat:
+        intervalSec: 600
+        maxConcurrentRuns: 1
+    permissions:
+      canCreateAgents: false
+  qa:
+    role: "qa"
+    adapter:
+      type: "claude_local"
+      config:
+        dangerouslySkipPermissions: true
+    runtime:
+      heartbeat:
+        intervalSec: 600
+        maxConcurrentRuns: 1
+    permissions:
+      canCreateAgents: false
+  tax-bank-specialist:
+    role: "tax-bank-specialist"
+    adapter:
+      type: "claude_local"
+      config:
+        dangerouslySkipPermissions: true
+    runtime:
+      heartbeat:
+        intervalSec: 600
+        maxConcurrentRuns: 1
+    permissions:
+      canCreateAgents: false
+  analyst:
+    role: "analyst"
+    adapter:
+      type: "claude_local"
+      config:
+        dangerouslySkipPermissions: true
+    runtime:
+      heartbeat:
+        intervalSec: 3600
+        maxConcurrentRuns: 1
+    permissions:
+      canCreateAgents: false
+sidebar:
+  agents:
+    - "editorial-lead"
+    - "content-manager"
+    - "newsletter-operator"
+    - "twitter-curator"
+    - "yt-distiller"
+    - "product-builder"
+    - "qa"
+    - "tax-bank-specialist"
+    - "analyst"
