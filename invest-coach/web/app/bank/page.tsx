@@ -1,7 +1,7 @@
 import { Nav } from "@/components/nav";
 import { CATEGORIES, Category } from "@/lib/bank/categorize";
 import { listInstitutions, Institution } from "@/lib/gocardless";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/supabase/require-auth";
 
 import {
   disconnectBank,
@@ -79,10 +79,8 @@ export default async function BankPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
-  const sb = await createClient();
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
+  const { user, supabase: sb } = await requireUser("/bank");
+
 
   const { data: connData } = await sb
     .from("bank_connections")
