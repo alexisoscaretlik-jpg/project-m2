@@ -5,7 +5,6 @@ import { signOut } from "@/app/auth/actions";
 
 const TABS = [
   { href: "/", label: "Coaching" },
-  { href: "/markets", label: "Marchés" },
   { href: "/charts", label: "Vue technique" },
   { href: "/watchlist", label: "Watchlist" },
   { href: "/simulation", label: "Simulateur" },

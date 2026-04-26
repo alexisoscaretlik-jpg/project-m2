@@ -3,48 +3,18 @@ import Link from "next/link";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { SubscribeForm } from "@/app/newsletter/subscribe-form";
-import { TvTickerTape } from "@/components/tv-ticker-tape";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { CoachingPodcast } from "@/components/coaching-podcast";
 import { createClient } from "@/lib/supabase/server";
 import { supabase } from "@/lib/supabase";
 
-type CompanyRef = { ticker: string; name: string };
-type ExtractionRef = { the_one_thing: string | null };
-type FeedCard = {
-  id: number;
-  title: string;
-  tone: string | null;
-  published_at: string;
-  companies: CompanyRef | CompanyRef[] | null;
-  extractions: ExtractionRef | ExtractionRef[] | null;
-};
+type ArticleRow = { slug: string; title: string; published_at: string };
 
-const toneVariants: Record<
-  string,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  bullish: "default",
-  cautious: "secondary",
-  red_flag: "destructive",
-  educational: "outline",
-};
-
-function first<T>(v: T | T[] | null): T | null {
-  if (!v) return null;
-  return Array.isArray(v) ? v[0] ?? null : v;
-}
-
-function relativeDate(iso: string): string {
-  const then = new Date(iso).getTime();
-  const now = Date.now();
-  const days = Math.floor((now - then) / (1000 * 60 * 60 * 24));
-  if (days < 1) return "aujourd'hui";
-  if (days === 1) return "hier";
-  if (days < 30) return `il y a ${days}j`;
-  if (days < 365) return `il y a ${Math.floor(days / 30)} mois`;
-  return `il y a ${Math.floor(days / 365)}a`;
-}
+const QUICK_TOOLS: { href: string; label: string; desc: string }[] = [
+  { href: "/simulation", label: "Simulateur", desc: "PEA, CTO, AV — compare tes enveloppes" },
+  { href: "/charts", label: "Vue technique", desc: "Lecture des marchés par @great_martis" },
+  { href: "/tax", label: "Fiscalité", desc: "IR 2042, plus-values, déclaration guidée" },
+  { href: "/bank", label: "Banque", desc: "Analyse tes relevés et frais cachés" },
+];
 
 export default async function Home() {
   let user = null;
@@ -56,123 +26,110 @@ export default async function Home() {
 
   if (!user) return <Landing />;
 
-  let feed: FeedCard[] = [];
+  let articles: ArticleRow[] = [];
   try {
-    const { data: cards } = await supabase
-      .from("cards")
-      .select(
-        "id, title, tone, published_at, companies(ticker, name), extractions(the_one_thing)",
-      )
+    const { data } = await supabase
+      .from("articles")
+      .select("slug, title, published_at")
       .order("published_at", { ascending: false })
-      .limit(20);
-    feed = (cards ?? []) as FeedCard[];
+      .limit(5);
+    articles = (data ?? []) as ArticleRow[];
   } catch {
-    feed = [];
+    articles = [];
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/" />
-      <TvTickerTape />
-      <div className="mx-auto max-w-2xl px-4 py-8">
-        <div className="mb-5 flex items-baseline justify-between">
-          <span className="cap-eyebrow">Aujourd&apos;hui · feed</span>
-          <Link
-            href="/companies"
-            className="text-xs font-medium text-primary hover:underline"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
-            Toutes les entreprises →
-          </Link>
-        </div>
-        <p className="cap-lede mb-6 text-base">
-          Lectures de 30 secondes sur les derniers filings SEC.
-        </p>
-        {feed.length === 0 ? (
-          <p
-            className="text-center"
-            style={{
-              fontFamily: "var(--font-serif)",
-              color: "var(--fg-muted)",
-              fontStyle: "italic",
-            }}
-          >
-            Aucune carte aujourd&apos;hui. C&apos;est aussi ça, investir long terme.
-          </p>
-        ) : (
-          <ul className="space-y-3">
-            {feed.map((card) => {
-              const company = first(card.companies);
-              const extraction = first(card.extractions);
-              const oneThing = extraction?.the_one_thing;
-              return (
-                <li key={card.id}>
-                  <Link
-                    href={`/ticker/${company ? encodeURIComponent(company.ticker) : ""}`}
-                    className="block"
+
+      <div className="mx-auto max-w-[720px] px-6 py-10">
+        <div className="cap-eyebrow mb-1">Money Coaching · espace personnel</div>
+        <h1
+          className="mb-8 text-[28px] font-semibold leading-tight"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--fg)",
+            letterSpacing: "-0.015em",
+          }}
+        >
+          Apprends à faire travailler ton argent.
+        </h1>
+
+        {/* Podcast generator */}
+        <CoachingPodcast />
+
+        {/* Quick tools */}
+        <section className="mb-10">
+          <div className="cap-eyebrow mb-4">Outils rapides</div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {QUICK_TOOLS.map((t) => (
+              <Link key={t.href} href={t.href} className="block">
+                <div
+                  className="rounded-xl p-4 transition-colors hover:border-[var(--forest-600)]"
+                  style={{
+                    background: "var(--paper-100)",
+                    border: "1px solid var(--border)",
+                  }}
+                >
+                  <div
+                    className="text-[15px] font-semibold"
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      color: "var(--fg)",
+                    }}
                   >
-                    <Card className="transition hover:border-primary/40 hover:shadow-md">
-                      <CardContent className="p-5">
-                        <div className="mb-2 flex items-center justify-between gap-3">
-                          <div className="flex items-baseline gap-2">
-                            <span
-                              className="cap-num text-sm font-semibold"
-                              style={{ color: "var(--ink-700)" }}
-                            >
-                              {company?.ticker ?? "?"}
-                            </span>
-                            <span className="text-sm text-muted-foreground">
-                              {company?.name ?? ""}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {card.tone ? (
-                              <Badge
-                                variant={toneVariants[card.tone] ?? "outline"}
-                                className="text-[10px] uppercase tracking-wide"
-                              >
-                                {card.tone.replace("_", " ")}
-                              </Badge>
-                            ) : null}
-                            <span
-                              className="text-xs"
-                              style={{
-                                color: "var(--fg-subtle)",
-                                fontFamily: "var(--font-mono)",
-                              }}
-                            >
-                              {relativeDate(card.published_at)}
-                            </span>
-                          </div>
-                        </div>
-                        {oneThing ? (
-                          <p
-                            className="text-[16px] leading-snug"
-                            style={{
-                              fontFamily: "var(--font-serif)",
-                              color: "var(--fg)",
-                              fontWeight: 500,
-                            }}
-                          >
-                            {oneThing}
-                          </p>
-                        ) : (
-                          <p className="text-sm italic text-muted-foreground">
-                            {card.title}
-                          </p>
-                        )}
-                        <p className="mt-2 text-xs text-muted-foreground">
-                          {card.title}
-                        </p>
-                      </CardContent>
-                    </Card>
+                    {t.label}
+                  </div>
+                  <div
+                    className="mt-0.5 text-[13px]"
+                    style={{
+                      fontFamily: "var(--font-serif)",
+                      color: "var(--fg-muted)",
+                    }}
+                  >
+                    {t.desc}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Recent articles */}
+        {articles.length > 0 && (
+          <section className="mb-10">
+            <div className="mb-4 flex items-baseline justify-between">
+              <div className="cap-eyebrow">Guides récents</div>
+              <Link
+                href="/articles"
+                className="text-[13px] font-medium"
+                style={{ color: "var(--forest-600)", fontFamily: "var(--font-display)" }}
+              >
+                Tous les guides →
+              </Link>
+            </div>
+            <ul className="space-y-2">
+              {articles.map((a) => (
+                <li key={a.slug}>
+                  <Link
+                    href={`/articles/${a.slug}`}
+                    className="block rounded-xl px-4 py-3 transition-colors hover:bg-[var(--paper-100)]"
+                    style={{ border: "1px solid var(--border)" }}
+                  >
+                    <span
+                      className="text-[15px]"
+                      style={{ fontFamily: "var(--font-serif)", color: "var(--fg)" }}
+                    >
+                      {a.title}
+                    </span>
                   </Link>
                 </li>
-              );
-            })}
-          </ul>
+              ))}
+            </ul>
+          </section>
         )}
       </div>
+
       <Footer />
     </main>
   );
