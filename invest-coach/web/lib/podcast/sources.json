@@ -1,0 +1,76 @@
+{
+  "_comment": "Curated French finance/investing YouTube channels for weekly podcast source selection. channelId is the UC... ID needed for the RSS feed. priority weights ranking when multiple channels publish in the same week. topics drives relevance scoring against user onboarding interests.",
+  "channels": [
+    {
+      "name": "Heu?reka",
+      "handle": "@Heureka",
+      "channelId": "UCS_yaQS6_4QGxR1HPpNqRrA",
+      "priority": 1.0,
+      "topics": ["macro", "investissement", "education", "finance-personnelle"]
+    },
+    {
+      "name": "Sylvain Cabro",
+      "handle": "@SylvainCabro",
+      "channelId": "UCwHk0xL5oNbkj7nL2-3-XLQ",
+      "priority": 0.9,
+      "topics": ["bourse", "PEA", "ETF", "investissement"]
+    },
+    {
+      "name": "Investir Sereinement",
+      "handle": "@InvestirSereinement",
+      "channelId": "UCZyXh-Hq4xErvUhFGSGGwzw",
+      "priority": 0.85,
+      "topics": ["ETF", "PEA", "AV", "passive-investing"]
+    },
+    {
+      "name": "Snowball",
+      "handle": "@snowball-",
+      "channelId": "UC1cZ-1TBbDgJZ_4Pz8YmmAA",
+      "priority": 0.85,
+      "topics": ["bourse", "actualite", "newsletter"]
+    },
+    {
+      "name": "Mr Toulemonde",
+      "handle": "@MrToulemonde",
+      "channelId": "UC8ENHE5xdFSwx71u3fDH5Xw",
+      "priority": 0.7,
+      "topics": ["finance-personnelle", "fiscalite", "patrimoine"]
+    },
+    {
+      "name": "Le coin des entrepreneurs (finance)",
+      "handle": "@lecoindesentrepreneurs",
+      "channelId": "UCl4O7gNGuVF1eL2wfIWcM7Q",
+      "priority": 0.6,
+      "topics": ["fiscalite", "PER", "TNS", "independants"]
+    },
+    {
+      "name": "Olivier Seban",
+      "handle": "@OlivierSeban",
+      "channelId": "UCu3UvMTphULBKLp59cJv7Tw",
+      "priority": 0.6,
+      "topics": ["immobilier", "patrimoine", "rente"]
+    },
+    {
+      "name": "Le RIC (Revenu Indépendant)",
+      "handle": "@LeRIC",
+      "channelId": "UCnqRELmJCkgBXTXQlEEi5Hw",
+      "priority": 0.55,
+      "topics": ["dividendes", "passive-income", "bourse"]
+    },
+    {
+      "name": "ZoneBourse",
+      "handle": "@ZoneBourseOfficiel",
+      "channelId": "UCUEK4O5oeeRmqIC8YbLfmiw",
+      "priority": 0.55,
+      "topics": ["actualite", "bourse", "marches"]
+    },
+    {
+      "name": "Boursorama",
+      "handle": "@boursorama",
+      "channelId": "UCOuIgj0CYCXCvjWywjDbauw",
+      "priority": 0.5,
+      "topics": ["actualite", "marches", "macro"]
+    }
+  ],
+  "_todo": "Channel IDs marked here are best-effort placeholders. Verify each by visiting the channel page → view source → search for 'externalId' or 'channelId' before relying on the RSS feed in production."
+}
