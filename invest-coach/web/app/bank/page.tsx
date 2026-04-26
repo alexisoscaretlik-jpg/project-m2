@@ -1,7 +1,7 @@
 import { Nav } from "@/components/nav";
 import { CATEGORIES, Category } from "@/lib/bank/categorize";
 import { listInstitutions, Institution } from "@/lib/gocardless";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/supabase/require-auth";
 
 import {
   disconnectBank,
@@ -79,10 +79,7 @@ export default async function BankPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
-  const sb = await createClient();
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
+  const { user, supabase: sb } = await requireUser("/bank");
 
   const { data: connData } = await sb
     .from("bank_connections")
@@ -123,17 +120,17 @@ export default async function BankPage({
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-muted">
       <Nav active="/bank" />
 
       <div className="mx-auto max-w-2xl px-4 py-6">
-        <h1 className="text-xl font-bold text-slate-900">Bank &amp; spending</h1>
-        <p className="text-xs text-slate-500">
+        <h1 className="text-xl font-bold text-foreground">Bank &amp; spending</h1>
+        <p className="text-xs text-muted-foreground">
           PSD2 via GoCardless. Read-only, regulated, up to 2,500+ EU banks.
         </p>
 
         {error ? (
-          <p className="mt-3 rounded-lg bg-rose-50 p-3 text-sm text-rose-700">
+          <p className="mt-3 rounded-lg bg-[color:var(--terracotta-50)] p-3 text-sm text-[color:var(--terracotta-600)]">
             {error}
           </p>
         ) : null}
@@ -141,26 +138,26 @@ export default async function BankPage({
         {hasBank && summary ? (
           <>
             <section className="mt-6 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="text-xs uppercase text-slate-500">
+              <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                <p className="text-xs uppercase text-muted-foreground">
                   Revenus (30 derniers jours)
                 </p>
-                <p className="mt-1 text-2xl font-bold text-emerald-700">
+                <p className="mt-1 text-2xl font-bold text-[color:var(--forest-700)]">
                   {fmtEur(summary.income)}
                 </p>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="text-xs uppercase text-slate-500">
+              <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                <p className="text-xs uppercase text-muted-foreground">
                   Dépenses (30 derniers jours)
                 </p>
-                <p className="mt-1 text-2xl font-bold text-rose-700">
+                <p className="mt-1 text-2xl font-bold text-[color:var(--terracotta-600)]">
                   {fmtEur(summary.spend)}
                 </p>
               </div>
             </section>
 
-            <section className="mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <section className="mt-6 rounded-xl border border-border bg-card p-4 shadow-sm">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 Par catégorie
               </h2>
               <ul className="mt-3 space-y-2">
@@ -171,16 +168,16 @@ export default async function BankPage({
                   return (
                     <li key={c}>
                       <div className="flex items-baseline justify-between text-sm">
-                        <span className="text-slate-700">
+                        <span className="text-foreground">
                           {CATEGORY_LABEL[c]}
                         </span>
-                        <span className="font-mono text-slate-900">
+                        <span className="font-mono text-foreground">
                           {fmtEur(amount)}
                         </span>
                       </div>
-                      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
                         <div
-                          className="h-full rounded-full bg-slate-900"
+                          className="h-full rounded-full bg-foreground"
                           style={{ width: `${Math.min(pct, 100)}%` }}
                         />
                       </div>
@@ -190,14 +187,14 @@ export default async function BankPage({
               </ul>
             </section>
 
-            <section className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-5">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-blue-900">
+            <section className="mt-6 rounded-xl border border-[color:var(--forest-200)] bg-accent p-5">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground">
                 Potentiel d&apos;investissement
               </h2>
-              <p className="mt-2 text-2xl font-bold text-blue-900">
+              <p className="mt-2 text-2xl font-bold text-foreground">
                 {fmtEur(Math.max(summary.income - summary.spend, 0))}
               </p>
-              <p className="mt-1 text-xs text-blue-900/70">
+              <p className="mt-1 text-xs text-foreground/70">
                 Surplus mensuel — à arbitrer entre épargne de précaution,
                 PEA et assurance-vie.
               </p>
@@ -205,13 +202,13 @@ export default async function BankPage({
 
             <section className="mt-6">
               <div className="mb-2 flex items-center justify-between">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                   Comptes
                 </h2>
                 <form action={resyncAllAccounts}>
                   <button
                     type="submit"
-                    className="text-xs text-blue-600 hover:underline"
+                    className="text-xs text-primary hover:underline"
                   >
                     Resync
                   </button>
@@ -221,10 +218,10 @@ export default async function BankPage({
                 {connections.map((c) => (
                   <li
                     key={c.id}
-                    className="rounded-lg border border-slate-200 bg-white p-3"
+                    className="rounded-lg border border-border bg-card p-3"
                   >
                     <div className="flex items-baseline justify-between">
-                      <span className="font-medium text-slate-900">
+                      <span className="font-medium text-foreground">
                         {c.institution_name}
                       </span>
                       <form action={disconnectBank}>
@@ -235,7 +232,7 @@ export default async function BankPage({
                         />
                         <button
                           type="submit"
-                          className="text-xs text-slate-500 hover:text-rose-600"
+                          className="text-xs text-muted-foreground hover:text-[color:var(--terracotta-500)]"
                         >
                           Disconnect
                         </button>
@@ -247,10 +244,10 @@ export default async function BankPage({
                           key={a.id}
                           className="flex items-baseline justify-between"
                         >
-                          <span className="text-slate-700">
+                          <span className="text-foreground">
                             {a.display_name ?? a.iban ?? "Account"}
                           </span>
-                          <span className="font-mono text-slate-900">
+                          <span className="font-mono text-foreground">
                             {fmtEur(a.balance, a.currency ?? "EUR")}
                           </span>
                         </li>
@@ -264,11 +261,11 @@ export default async function BankPage({
         ) : null}
 
         {/* CSV upload — always available, no SIRET / regulator needed. */}
-        <section className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">
+        <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-foreground">
             {hasBank ? "Importer plus de transactions" : "Importer un CSV"}
           </h2>
-          <p className="mt-2 text-sm text-slate-600">
+          <p className="mt-2 text-sm text-muted-foreground">
             Exporte le relevé CSV depuis ta banque — Claude détecte le
             format et catégorise automatiquement.
           </p>
@@ -278,17 +275,17 @@ export default async function BankPage({
         </section>
 
         {!hasBank && gcConfigured && (
-          <section className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">
+          <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-foreground">
               Ou connecte en direct (PSD2)
             </h2>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               Connexion bancaire temps réel via GoCardless. Tu te connectes
               chez ta banque — on ne voit jamais ton mot de passe.
             </p>
 
             {instError ? (
-              <p className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+              <p className="mt-3 rounded-lg bg-[color:var(--warning-soft)] p-3 text-sm text-[color:var(--warning)]">
                 GoCardless indisponible: {instError}
               </p>
             ) : (
@@ -304,7 +301,7 @@ export default async function BankPage({
                       />
                       <button
                         type="submit"
-                        className="flex w-full items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 text-left hover:border-blue-500 hover:bg-blue-50"
+                        className="flex w-full items-center gap-3 rounded-lg border border-border bg-card p-3 text-left hover:border-primary hover:bg-accent"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         {i.logo ? (
@@ -314,9 +311,9 @@ export default async function BankPage({
                             className="h-8 w-8 rounded"
                           />
                         ) : (
-                          <div className="h-8 w-8 rounded bg-slate-100" />
+                          <div className="h-8 w-8 rounded bg-muted" />
                         )}
-                        <span className="text-sm text-slate-900">
+                        <span className="text-sm text-foreground">
                           {i.name}
                         </span>
                       </button>
@@ -328,7 +325,7 @@ export default async function BankPage({
           </section>
         )}
 
-        <p className="mt-6 text-xs text-slate-500">
+        <p className="mt-6 text-xs text-muted-foreground">
           Signed in as {user?.email}.
         </p>
       </div>

@@ -49,7 +49,7 @@ export function TvTickerTape({ symbols }: { symbols?: Tick[] }) {
   return (
     <div
       ref={containerRef}
-      className="tradingview-widget-container border-b border-slate-200 bg-white"
+      className="tradingview-widget-container border-b border-border bg-card"
     />
   );
 }

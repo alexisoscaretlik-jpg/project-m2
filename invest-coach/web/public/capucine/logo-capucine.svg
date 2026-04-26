@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" fill="none">
+  
+  <g transform="translate(8 12)">
+    <circle cx="20" cy="20" r="3.5" fill="#2f5430"></circle>
+    <circle cx="6" cy="6" r="2.2" fill="#2f5430"></circle>
+    <circle cx="34" cy="6" r="2.2" fill="#2f5430"></circle>
+    <circle cx="6" cy="34" r="2.2" fill="#2f5430"></circle>
+    <circle cx="34" cy="34" r="2.2" fill="#2f5430"></circle>
+    <circle cx="20" cy="2" r="1.6" fill="#b85730"></circle>
+    <circle cx="38" cy="20" r="1.6" fill="#2f5430"></circle>
+    <line x1="20" y1="20" x2="6" y2="6" stroke="#2f5430" stroke-width="1.4" stroke-linecap="round"></line>
+    <line x1="20" y1="20" x2="34" y2="6" stroke="#2f5430" stroke-width="1.4" stroke-linecap="round"></line>
+    <line x1="20" y1="20" x2="6" y2="34" stroke="#2f5430" stroke-width="1.4" stroke-linecap="round"></line>
+    <line x1="20" y1="20" x2="34" y2="34" stroke="#2f5430" stroke-width="1.4" stroke-linecap="round"></line>
+    <line x1="20" y1="20" x2="20" y2="2" stroke="#b85730" stroke-width="1.4" stroke-linecap="round"></line>
+    <line x1="20" y1="20" x2="38" y2="20" stroke="#2f5430" stroke-width="1.4" stroke-linecap="round"></line>
+  </g>
+  
+  <text x="64" y="42" font-family="Inter Tight, Helvetica Neue, sans-serif" font-weight="600" font-size="28" letter-spacing="-0.02em" fill="#1c1b17">capucine</text>
+</svg>

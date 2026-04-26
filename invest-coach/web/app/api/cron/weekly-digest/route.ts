@@ -150,7 +150,11 @@ export async function GET(req: NextRequest) {
     // private_notes may not exist in some environments — ship without the section.
   }
 
-  const html = digestHtml({ cards, tip, weekOf, metric, tweets, kevinBriefs });
+  const campaign = `W${isoWeek(weekOf)}`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://trading-bot-2-opal.vercel.app";
+  const trackPixelUrl = `${siteUrl}/api/track/open?cid=${encodeURIComponent(campaign)}`;
+
+  const html = digestHtml({ cards, tip, weekOf, metric, tweets, kevinBriefs, campaign, trackPixelUrl });
   const text = digestText({ cards, tip, weekOf, metric, tweets, kevinBriefs });
   const subject = digestSubject(weekOf);
 
@@ -181,7 +185,7 @@ export async function GET(req: NextRequest) {
   const errors: string[] = [];
   for (const to of emails) {
     try {
-      await send({ to, subject, html, text });
+      await send({ to, subject, html, text, trackOpens: true, trackClicks: true });
       sent++;
     } catch (err) {
       errors.push(`${to}: ${(err as Error).message}`);
@@ -195,6 +199,14 @@ export async function GET(req: NextRequest) {
     cards: cards.length,
     tip: tip.slug,
   });
+}
+
+// ISO week number (1–53) per ISO 8601.
+function isoWeek(d: Date): number {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 }
 
 // Small metric to anchor the digest. Static fallback values so the cron

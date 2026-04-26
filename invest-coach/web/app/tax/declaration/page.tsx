@@ -31,23 +31,23 @@ export default async function DeclarationPage() {
   const initial = (data?.answers ?? null) as Answers | null;
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-muted">
       <Nav active="/tax" />
 
       <div className="mx-auto max-w-2xl px-4 py-6">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-slate-900">
+            <h1 className="text-xl font-bold text-foreground">
               Déclaration Cerfa 2042
             </h1>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Un questionnaire guidé, une question à la fois. À la fin,
               vous pourrez télécharger votre déclaration pré-remplie.
             </p>
           </div>
           <Link
             href="/tax"
-            className="text-xs text-slate-500 hover:text-blue-600"
+            className="text-xs text-muted-foreground hover:text-primary"
           >
             ← Fiscalité
           </Link>
@@ -55,7 +55,7 @@ export default async function DeclarationPage() {
 
         <Wizard initial={initial} />
 
-        <p className="mt-6 text-center text-xs text-slate-400">
+        <p className="mt-6 text-center text-xs text-muted-foreground">
           Informations éducatives. Votre déclaration officielle reste
           sous votre responsabilité — vous la signez et la soumettez
           sur impots.gouv.fr.

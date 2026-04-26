@@ -71,7 +71,7 @@ export default async function LeversPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-muted">
       <Nav active="/tax" />
       <LeversContent initial={initial} />
     </main>

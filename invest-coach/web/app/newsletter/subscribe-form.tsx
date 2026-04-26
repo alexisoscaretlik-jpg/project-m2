@@ -49,25 +49,40 @@ export function SubscribeForm({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder={placeholder}
-          className={`flex-1 rounded-lg border border-slate-300 bg-white px-4 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:rounded-r-none ${
+          className={`flex-1 rounded-md px-4 focus:outline-none focus:ring-2 sm:rounded-r-none ${
             big ? "py-3 text-base" : "py-2 text-sm"
           }`}
+          style={{
+            fontFamily: "var(--font-display)",
+            background: "var(--bg-elevated)",
+            color: "var(--ink-700)",
+            border: "1px solid var(--border-strong)",
+          }}
         />
         <button
           type="submit"
           disabled={pending}
-          className={`rounded-lg bg-primary font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60 sm:rounded-l-none ${
+          className={`rounded-md font-medium transition-colors disabled:opacity-60 sm:rounded-l-none ${
             big ? "px-6 py-3 text-base" : "px-4 py-2 text-sm"
           }`}
+          style={{
+            fontFamily: "var(--font-display)",
+            background: "var(--terracotta-500)",
+            color: "var(--paper-50)",
+            border: "1px solid var(--terracotta-500)",
+          }}
         >
           {pending ? "…" : cta}
         </button>
       </div>
       {state ? (
         <p
-          className={`mt-2 text-sm ${
-            state.ok ? "text-emerald-700" : "text-rose-700"
-          }`}
+          className="mt-2 text-sm"
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontStyle: "italic",
+            color: state.ok ? "var(--forest-300)" : "var(--terracotta-300)",
+          }}
         >
           {state.message}
         </p>

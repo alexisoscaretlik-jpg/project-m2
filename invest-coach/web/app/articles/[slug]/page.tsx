@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Nav } from "@/components/nav";
+import { Footer } from "@/components/footer";
 import { SubscribeForm } from "@/app/newsletter/subscribe-form";
 import { ARTICLES, findArticle } from "../articles";
 
@@ -41,11 +42,11 @@ function renderMarkdown(md: string) {
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       .replace(
         /`([^`]+)`/g,
-        '<code class="rounded bg-slate-100 px-1 py-0.5 text-sm">$1</code>',
+        '<code class="rounded bg-muted px-1 py-0.5 text-sm">$1</code>',
       )
       .replace(
         /\[([^\]]+)\]\(([^)]+)\)/g,
-        '<a href="$2" class="text-blue-600 underline">$1</a>',
+        '<a href="$2" class="text-primary underline">$1</a>',
       );
 
   const flushList = () => {
@@ -55,7 +56,7 @@ function renderMarkdown(md: string) {
         {listBuffer.map((item, i) => (
           <li
             key={i}
-            className="text-slate-700"
+            className="text-foreground"
             dangerouslySetInnerHTML={{ __html: inline(item) }}
           />
         ))}
@@ -71,7 +72,12 @@ function renderMarkdown(md: string) {
       out.push(
         <h2
           key={`h2-${out.length}`}
-          className="mt-8 text-xl font-semibold text-slate-900"
+          className="mt-10 mb-3 text-[28px] font-semibold"
+          style={{
+            fontFamily: "var(--font-display)",
+            letterSpacing: "-0.01em",
+            color: "var(--fg)",
+          }}
         >
           {line.slice(3)}
         </h2>,
@@ -81,7 +87,11 @@ function renderMarkdown(md: string) {
       out.push(
         <h3
           key={`h3-${out.length}`}
-          className="mt-6 text-base font-semibold text-slate-900"
+          className="mt-6 text-[20px] font-medium"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--fg)",
+          }}
         >
           {line.slice(4)}
         </h3>,
@@ -95,7 +105,13 @@ function renderMarkdown(md: string) {
       out.push(
         <p
           key={`p-${out.length}`}
-          className="my-3 leading-relaxed text-slate-700"
+          className="mb-5 text-[19px]"
+          style={{
+            fontFamily: "var(--font-serif)",
+            lineHeight: 1.65,
+            color: "var(--fg)",
+            textWrap: "pretty",
+          }}
           dangerouslySetInnerHTML={{ __html: inline(line) }}
         />,
       );
@@ -117,35 +133,76 @@ export default async function ArticlePage({
   const others = ARTICLES.filter((a) => a.slug !== slug).slice(0, 3);
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/articles" />
 
-      <div className="mx-auto max-w-2xl px-4 py-8">
+      <div className="mx-auto max-w-[720px] px-6 py-12">
         <Link
           href="/articles"
-          className="text-sm text-blue-600 hover:underline"
+          className="inline-block text-[13px] font-medium"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--forest-600)",
+          }}
         >
-          &larr; Tous les guides
+          ← Tous les guides
         </Link>
 
-        <article className="mt-6">
-          <h1 className="text-3xl font-bold text-slate-900">{article.title}</h1>
-          <p className="mt-3 text-lg text-slate-600">{article.teaser}</p>
-          <p className="mt-4 text-xs text-slate-400">
-            {article.readMinutes} min de lecture · Mis à jour le{" "}
-            {formatDate(article.updated)}
-          </p>
-
-          <div className="mt-8 border-t border-slate-200 pt-6">
-            {renderMarkdown(article.body)}
+        <article
+          className="mt-6 pb-8"
+          style={{ borderBottom: "1px solid var(--border)" }}
+        >
+          <div className="cap-eyebrow">
+            Guide · {article.readMinutes} min de lecture
           </div>
+          <h1 className="cap-h1 mt-3 text-[46px] leading-[1.05]">
+            {article.title}
+          </h1>
+          <p
+            className="mt-4 text-[22px] italic"
+            style={{
+              fontFamily: "var(--font-serif)",
+              color: "var(--fg-muted)",
+              lineHeight: 1.45,
+            }}
+          >
+            {article.teaser}
+          </p>
+          <p
+            className="mt-6 text-[12px]"
+            style={{
+              fontFamily: "var(--font-mono)",
+              color: "var(--fg-subtle)",
+              letterSpacing: "0.04em",
+            }}
+          >
+            Mis à jour le {formatDate(article.updated)}
+          </p>
         </article>
 
-        <section className="mt-10 rounded-xl border border-blue-100 bg-blue-50 p-6">
-          <h3 className="text-base font-semibold text-slate-900">
+        <div className="mt-8 reader-body">
+          {renderMarkdown(article.body)}
+        </div>
+
+        <section
+          className="cap-aside mt-12"
+          style={{ background: "var(--paper-100)" }}
+        >
+          <div className="cap-eyebrow">La lettre du dimanche</div>
+          <h3
+            className="mt-2 text-[20px] font-semibold"
+            style={{ fontFamily: "var(--font-display)", color: "var(--fg)" }}
+          >
             Un guide par semaine dans ta boîte mail
           </h3>
-          <p className="mt-1 text-sm text-slate-600">
+          <p
+            className="mt-1 text-[15px]"
+            style={{
+              fontFamily: "var(--font-serif)",
+              color: "var(--fg-muted)",
+              lineHeight: 1.55,
+            }}
+          >
             Pas de spam, pas de pub déguisée. Tu peux te désabonner en un clic.
           </p>
           <div className="mt-4">
@@ -154,26 +211,44 @@ export default async function ArticlePage({
         </section>
 
         {others.length > 0 ? (
-          <section className="mt-10">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-              À lire ensuite
-            </h3>
+          <section className="mt-12">
+            <div className="cap-eyebrow">À lire ensuite</div>
             <ul className="mt-4 space-y-3">
               {others.map((a) => (
                 <li key={a.slug}>
-                  <Link
-                    href={`/articles/${a.slug}`}
-                    className="block rounded-lg border border-slate-200 bg-white p-4 transition hover:border-blue-300"
-                  >
-                    <div className="flex items-baseline justify-between gap-3">
-                      <span className="font-medium text-slate-900">
-                        {a.title}
-                      </span>
-                      <span className="shrink-0 text-xs text-slate-500">
-                        {a.readMinutes} min
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm text-slate-600">{a.teaser}</p>
+                  <Link href={`/articles/${a.slug}`} className="block">
+                    <article className="cap-card">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <span
+                          className="text-[18px] font-medium"
+                          style={{
+                            fontFamily: "var(--font-display)",
+                            color: "var(--fg)",
+                          }}
+                        >
+                          {a.title}
+                        </span>
+                        <span
+                          className="shrink-0 text-[11px]"
+                          style={{
+                            fontFamily: "var(--font-mono)",
+                            color: "var(--fg-subtle)",
+                          }}
+                        >
+                          {a.readMinutes} min
+                        </span>
+                      </div>
+                      <p
+                        className="mt-1.5 text-[14px]"
+                        style={{
+                          fontFamily: "var(--font-serif)",
+                          color: "var(--fg-muted)",
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {a.teaser}
+                      </p>
+                    </article>
                   </Link>
                 </li>
               ))}
@@ -181,11 +256,18 @@ export default async function ArticlePage({
           </section>
         ) : null}
 
-        <p className="mt-12 text-xs text-slate-400">
-          Contenu éducatif. Rien de ce qui est écrit ici ne constitue un
-          conseil en investissement personnalisé.
+        <p
+          className="mt-12 text-[12px] italic"
+          style={{
+            fontFamily: "var(--font-serif)",
+            color: "var(--fg-subtle)",
+          }}
+        >
+          Contenu éducatif. Rien de ce qui est écrit ici ne constitue un conseil
+          en investissement personnalisé.
         </p>
       </div>
+      <Footer />
     </main>
   );
 }

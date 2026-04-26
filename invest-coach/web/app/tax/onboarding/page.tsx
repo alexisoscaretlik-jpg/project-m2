@@ -40,20 +40,20 @@ export default async function OnboardingPage() {
   const initial = (data ?? undefined) as Onboarding | undefined;
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-muted">
       <Nav active="/tax" />
 
       <div className="mx-auto max-w-2xl px-4 py-6">
-        <h1 className="text-xl font-bold text-slate-900">
+        <h1 className="text-xl font-bold text-foreground">
           Votre profil fiscal
         </h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm text-muted-foreground">
           Cinq questions rapides. Plus vos réponses sont précises, plus
           les recommandations sont utiles — et plus vous économisez
           d&apos;impôts légalement.
         </p>
 
-        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="mt-6 rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <OnboardingForm initial={initial} />
         </div>
       </div>

@@ -44,12 +44,12 @@ export function LeversContent({ initial }: { initial?: InitialProfile }) {
   return (
     <>
       {/* ============ CALCULATOR BAND (STICKY) ============ */}
-      <div className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <div className="sticky top-0 z-20 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto max-w-3xl px-4 py-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
-            <label className="text-xs text-slate-600">
+            <label className="text-xs text-muted-foreground">
               Salaire net annuel
-              <div className="mt-1 flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5">
+              <div className="mt-1 flex items-center rounded-lg border border-border bg-card px-3 py-1.5">
                 <input
                   type="number"
                   min={0}
@@ -57,25 +57,25 @@ export function LeversContent({ initial }: { initial?: InitialProfile }) {
                   step={1000}
                   value={salary}
                   onChange={(e) => setSalary(Number(e.target.value) || 0)}
-                  className="w-full border-0 bg-transparent p-0 text-sm font-semibold text-slate-900 focus:outline-none"
+                  className="w-full border-0 bg-transparent p-0 text-sm font-semibold text-foreground focus:outline-none"
                 />
-                <span className="text-xs text-slate-500">€</span>
+                <span className="text-xs text-muted-foreground">€</span>
               </div>
             </label>
 
-            <label className="text-xs text-slate-600">
+            <label className="text-xs text-muted-foreground">
               Situation
               <select
                 value={situation}
                 onChange={(e) => setSituation(e.target.value as Situation)}
-                className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-900"
+                className="mt-1 w-full rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-semibold text-foreground"
               >
                 <option value="single">Seul(e)</option>
                 <option value="couple">En couple</option>
               </select>
             </label>
 
-            <label className="text-xs text-slate-600">
+            <label className="text-xs text-muted-foreground">
               Enfants
               <input
                 type="number"
@@ -85,21 +85,21 @@ export function LeversContent({ initial }: { initial?: InitialProfile }) {
                 onChange={(e) =>
                   setNbEnfants(Math.max(0, Number(e.target.value) || 0))
                 }
-                className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-900"
+                className="mt-1 w-full rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-semibold text-foreground"
               />
             </label>
 
-            <div className="flex flex-col justify-end text-right text-xs text-slate-500">
+            <div className="flex flex-col justify-end text-right text-xs text-muted-foreground">
               <div>
                 TMI&nbsp;
-                <span className="text-sm font-bold text-blue-700">
+                <span className="text-sm font-bold text-primary">
                   {s.tmi}%
                 </span>{" "}
                 · {parts} parts
               </div>
               <div className="mt-0.5">
                 Économie estimée{" "}
-                <span className="text-base font-bold text-emerald-700">
+                <span className="text-base font-bold text-[color:var(--forest-700)]">
                   {formatEur(s.total)}/an
                 </span>
               </div>
@@ -113,30 +113,30 @@ export function LeversContent({ initial }: { initial?: InitialProfile }) {
         <header className="mb-10">
           <Link
             href="/tax"
-            className="text-xs text-slate-500 hover:text-blue-600"
+            className="text-xs text-muted-foreground hover:text-primary"
           >
             ← Retour à Fiscalité
           </Link>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Votre plan fiscal, levier par levier
           </h1>
-          <p className="mt-4 text-base text-slate-600">
+          <p className="mt-4 text-base text-muted-foreground">
             Les chiffres affichés ci-dessous sont{" "}
-            <strong className="text-slate-900">calculés pour vous</strong>{" "}
+            <strong className="text-foreground">calculés pour vous</strong>{" "}
             selon vos entrées ci-dessus (salaire, situation, enfants).
             Modifiez-les à tout moment — tout se met à jour
             instantanément.
           </p>
 
-          <section className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-5">
-            <div className="text-xs font-semibold uppercase tracking-wide text-blue-700">
+          <section className="mt-6 rounded-xl border border-[color:var(--forest-200)] bg-accent p-5">
+            <div className="text-xs font-semibold uppercase tracking-wide text-primary">
               Votre profil fiscal
             </div>
-            <p className="mt-2 text-sm text-slate-800 sm:text-base">
+            <p className="mt-2 text-sm text-foreground sm:text-base">
               Vous êtes en tranche marginale{" "}
-              <strong className="text-blue-700">{s.tmi}%</strong>. Chaque
+              <strong className="text-primary">{s.tmi}%</strong>. Chaque
               euro placé sur un bon levier vous économise{" "}
-              <strong className="text-blue-700">
+              <strong className="text-primary">
                 €{(s.tmi / 100).toFixed(2)}
               </strong>{" "}
               d&apos;impôts immédiatement.
@@ -151,25 +151,25 @@ export function LeversContent({ initial }: { initial?: InitialProfile }) {
           <div className="mt-4 grid grid-cols-4 gap-2 text-center text-xs sm:text-sm">
             <a
               href="#tier-1"
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 font-medium text-slate-700 hover:border-blue-400"
+              className="rounded-lg border border-border bg-card px-3 py-2 font-medium text-foreground hover:border-primary"
             >
               1 · Essentiel
             </a>
             <a
               href="#tier-2"
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 font-medium text-slate-700 hover:border-blue-400"
+              className="rounded-lg border border-border bg-card px-3 py-2 font-medium text-foreground hover:border-primary"
             >
               2 · Épargne
             </a>
             <a
               href="#tier-3"
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 font-medium text-slate-700 hover:border-blue-400"
+              className="rounded-lg border border-border bg-card px-3 py-2 font-medium text-foreground hover:border-primary"
             >
               3 · Patrimoine
             </a>
             <a
               href="#tier-4"
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 font-medium text-slate-700 hover:border-blue-400"
+              className="rounded-lg border border-border bg-card px-3 py-2 font-medium text-foreground hover:border-primary"
             >
               4 · Avancé
             </a>
@@ -360,8 +360,8 @@ export function LeversContent({ initial }: { initial?: InitialProfile }) {
           description="Niche, risqué ou réservé aux hauts revenus / patrimoines. Ces dispositifs ne sont pertinents que dans des situations très précises. À ne pas lancer sans conseil d'expert-comptable."
         />
 
-        <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <ul className="space-y-4 text-sm text-slate-700">
+        <section className="rounded-xl border border-border bg-card p-6 shadow-sm">
+          <ul className="space-y-4 text-sm text-foreground">
             <CompactItem
               name="Girardin industriel"
               line="Financement d'équipements industriels en outre-mer. Vous investissez €10k, vous récupérez €11-11.5k de réduction sur UNE année."
@@ -411,24 +411,24 @@ export function LeversContent({ initial }: { initial?: InitialProfile }) {
         </section>
 
         {/* ========== CTA ========== */}
-        <section className="mt-10 rounded-xl border border-blue-200 bg-blue-50 p-6 text-center shadow-sm">
-          <h2 className="text-lg font-bold text-slate-900">
+        <section className="mt-10 rounded-xl border border-[color:var(--forest-200)] bg-accent p-6 text-center shadow-sm">
+          <h2 className="text-lg font-bold text-foreground">
             Prêt à personnaliser votre plan ?
           </h2>
-          <p className="mt-2 text-sm text-slate-700">
+          <p className="mt-2 text-sm text-foreground">
             Chargez votre avis d&apos;imposition, on identifie les
             leviers les plus rentables pour vous et on génère votre
             Cerfa 2042 pré-rempli.
           </p>
           <Link
             href="/tax"
-            className="mt-4 inline-block rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+            className="mt-4 inline-block rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary"
           >
             Générer mon plan personnalisé →
           </Link>
         </section>
 
-        <p className="mt-8 text-center text-xs text-slate-400">
+        <p className="mt-8 text-center text-xs text-muted-foreground">
           Informations éducatives. Ne constitue pas un conseil fiscal
           personnalisé au sens de la loi. Confirmer avec un
           expert-comptable ou un notaire avant toute décision.
@@ -437,16 +437,16 @@ export function LeversContent({ initial }: { initial?: InitialProfile }) {
 
       {/* ============ FLOATING TOTAL BAR ============ */}
       <div className="pointer-events-none sticky bottom-4 z-10 mx-auto mt-4 max-w-3xl px-4">
-        <div className="pointer-events-auto flex items-center justify-between rounded-xl border border-emerald-300 bg-emerald-600 px-5 py-3 text-white shadow-lg">
+        <div className="pointer-events-auto flex items-center justify-between rounded-xl border border-[color:var(--forest-300)] bg-[color:var(--forest-600)] px-5 py-3 text-white shadow-lg">
           <div>
-            <div className="text-xs uppercase tracking-wide text-emerald-100">
+            <div className="text-xs uppercase tracking-wide text-[color:var(--forest-100)]">
               Économie annuelle estimée
             </div>
             <div className="text-xl font-bold">{formatEur(s.total)}</div>
           </div>
           <Link
             href="/tax"
-            className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50"
+            className="rounded-lg bg-card px-4 py-2 text-sm font-semibold text-[color:var(--forest-700)] hover:bg-[color:var(--forest-50)]"
           >
             Activer mon plan →
           </Link>
@@ -474,13 +474,13 @@ function TierHeading({
   return (
     <div id={id} className="mb-5 mt-12 scroll-mt-24">
       <div className="flex items-baseline gap-3">
-        <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
+        <span className="text-xs font-bold uppercase tracking-wider text-primary">
           Tier {number}
         </span>
-        <div className="h-px flex-1 bg-slate-200" />
+        <div className="h-px flex-1 bg-secondary" />
       </div>
-      <h2 className="mt-2 text-2xl font-bold text-slate-900">{title}</h2>
-      <p className="mt-1 text-sm text-slate-600">{description}</p>
+      <h2 className="mt-2 text-2xl font-bold text-foreground">{title}</h2>
+      <p className="mt-1 text-sm text-muted-foreground">{description}</p>
     </div>
   );
 }
@@ -508,19 +508,19 @@ function LeverCard({
 }) {
   const tagClass =
     tagTone === "green"
-      ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+      ? "bg-[color:var(--forest-100)] text-[color:var(--forest-700)] border-[color:var(--forest-200)]"
       : tagTone === "blue"
-        ? "bg-blue-100 text-blue-800 border-blue-200"
-        : "bg-amber-100 text-amber-800 border-amber-200";
+        ? "bg-accent text-foreground border-[color:var(--forest-200)]"
+        : "bg-[color:var(--warning-soft)] text-[color:var(--warning)] border-[color:var(--warning)]";
 
   return (
-    <article className="mb-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <article className="mb-5 rounded-xl border border-border bg-card p-6 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-lg font-bold text-slate-900 sm:text-xl">
+          <h3 className="text-lg font-bold text-foreground sm:text-xl">
             {title}
           </h3>
-          <p className="mt-1 text-sm font-medium text-slate-500">{subtitle}</p>
+          <p className="mt-1 text-sm font-medium text-muted-foreground">{subtitle}</p>
         </div>
         <div className="flex flex-col items-end gap-1">
           <span
@@ -529,36 +529,36 @@ function LeverCard({
             {tag}
           </span>
           {typeof personalImpact === "number" && personalImpact > 0 ? (
-            <span className="whitespace-nowrap rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-700">
+            <span className="whitespace-nowrap rounded-full bg-[color:var(--forest-50)] px-2 py-0.5 text-xs font-bold text-[color:var(--forest-700)]">
               ~{formatEur(personalImpact)}/an pour vous
             </span>
           ) : null}
         </div>
       </div>
 
-      <p className="mt-4 text-sm text-slate-700">{concept}</p>
+      <p className="mt-4 text-sm text-foreground">{concept}</p>
 
-      <div className="mt-5 rounded-lg bg-slate-50 p-4">{diagram}</div>
+      <div className="mt-5 rounded-lg bg-muted p-4">{diagram}</div>
 
       <div className="mt-5">
-        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           À retenir
         </div>
-        <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
+        <ul className="mt-2 space-y-1.5 text-sm text-foreground">
           {takeaways.map((t, i) => (
             <li key={i} className="flex gap-2">
-              <span className="text-blue-500">▸</span>
+              <span className="text-primary">▸</span>
               <span>{t}</span>
             </li>
           ))}
         </ul>
       </div>
 
-      <div className="mt-5 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-        <div className="text-xs font-semibold uppercase tracking-wide text-emerald-800">
+      <div className="mt-5 rounded-lg border border-[color:var(--forest-200)] bg-[color:var(--forest-50)] p-3">
+        <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--forest-700)]">
           Pour vous
         </div>
-        <p className="mt-1 text-sm text-slate-800">{example}</p>
+        <p className="mt-1 text-sm text-foreground">{example}</p>
       </div>
     </article>
   );
@@ -576,16 +576,16 @@ function CompactCard({
   example: string;
 }) {
   return (
-    <article className="mb-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <article className="mb-4 rounded-xl border border-border bg-card p-5 shadow-sm">
       <div className="flex items-baseline justify-between gap-3">
-        <h3 className="text-base font-bold text-slate-900">{title}</h3>
-        <span className="whitespace-nowrap text-xs font-medium text-slate-500">
+        <h3 className="text-base font-bold text-foreground">{title}</h3>
+        <span className="whitespace-nowrap text-xs font-medium text-muted-foreground">
           {tag}
         </span>
       </div>
-      <p className="mt-2 text-sm text-slate-700">{summary}</p>
-      <div className="mt-3 rounded-lg bg-slate-50 p-3 text-xs text-slate-700">
-        <strong className="text-slate-900">Pour vous · </strong>
+      <p className="mt-2 text-sm text-foreground">{summary}</p>
+      <div className="mt-3 rounded-lg bg-muted p-3 text-xs text-foreground">
+        <strong className="text-foreground">Pour vous · </strong>
         {example}
       </div>
     </article>
@@ -602,10 +602,10 @@ function CompactItem({
   risk: string;
 }) {
   return (
-    <li className="border-l-2 border-slate-200 pl-4">
-      <div className="font-semibold text-slate-900">{name}</div>
-      <div className="mt-1 text-sm text-slate-700">{line}</div>
-      <div className="mt-1 text-xs text-amber-700">⚠ {risk}</div>
+    <li className="border-l-2 border-border pl-4">
+      <div className="font-semibold text-foreground">{name}</div>
+      <div className="mt-1 text-sm text-foreground">{line}</div>
+      <div className="mt-1 text-xs text-[color:var(--warning)]">⚠ {risk}</div>
     </li>
   );
 }

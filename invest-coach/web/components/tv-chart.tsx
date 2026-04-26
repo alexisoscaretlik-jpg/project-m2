@@ -2,12 +2,26 @@
 
 import { useEffect, useRef } from "react";
 
+/**
+ * TradingView Advanced Chart embed.
+ *
+ * Defaults to daily candlesticks with a 50-period MA — same setup most
+ * great_martis tweets use, so vue technique pages mirror what the analyst
+ * was looking at without us having to over-engineer per-tweet config.
+ *
+ * The chart JS reaches across the iframe boundary, so we re-init on
+ * symbol/interval change.
+ */
 export function TvChart({
   symbol,
   height = 520,
+  interval = "D",
+  studies = ["MASimple@tv-basicstudies", "RSI@tv-basicstudies"],
 }: {
   symbol: string;
   height?: number;
+  interval?: "1" | "5" | "15" | "30" | "60" | "240" | "D" | "W" | "M";
+  studies?: string[];
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -30,12 +44,12 @@ export function TvChart({
     script.text = JSON.stringify({
       autosize: true,
       symbol,
-      interval: "D",
+      interval,
       timezone: "Europe/Paris",
       theme: "light",
       style: "1",
       locale: "fr",
-      toolbar_bg: "#f8fafc",
+      toolbar_bg: "#fbf5ea",
       enable_publishing: false,
       hide_top_toolbar: false,
       hide_legend: false,
@@ -43,7 +57,7 @@ export function TvChart({
       withdateranges: true,
       allow_symbol_change: true,
       details: true,
-      studies: ["MASimple@tv-basicstudies"],
+      studies,
       support_host: "https://www.tradingview.com",
     });
     container.appendChild(script);
@@ -51,12 +65,12 @@ export function TvChart({
     return () => {
       container.innerHTML = "";
     };
-  }, [symbol]);
+  }, [symbol, interval, JSON.stringify(studies)]);
 
   return (
     <div
       ref={containerRef}
-      className="tradingview-widget-container overflow-hidden rounded-xl border border-slate-200 bg-white"
+      className="tradingview-widget-container overflow-hidden rounded-xl border border-border bg-card"
       style={{ height }}
     />
   );

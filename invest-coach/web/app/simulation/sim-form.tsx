@@ -28,7 +28,7 @@ export function SimForm() {
 
   return (
     <div>
-      <div className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-3">
+      <div className="grid gap-4 rounded-2xl border border-border bg-card p-6 shadow-sm sm:grid-cols-3">
         <Field
           label="Versement mensuel"
           suffix="€"
@@ -64,18 +64,18 @@ export function SimForm() {
         ))}
       </div>
 
-      <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-        <p className="text-sm font-medium text-blue-900">
+      <div className="mt-4 rounded-lg border border-[color:var(--forest-200)] bg-accent p-4">
+        <p className="text-sm font-medium text-foreground">
           Meilleur choix sur ce scénario : {results[best].label}
         </p>
-        <p className="mt-1 text-xs text-blue-900/70">
+        <p className="mt-1 text-xs text-foreground/70">
           Net après impôts : {fmtEur.format(Math.round(results[best].net))} —
           soit {fmtEur.format(Math.round(results[best].net - results[best].contributions))}{" "}
           de gain net sur {fmtEur.format(results[best].contributions)} investis.
         </p>
       </div>
 
-      <p className="mt-6 text-xs text-slate-500">
+      <p className="mt-6 text-xs text-muted-foreground">
         Hypothèses : rendement constant, versements mensuels en fin de mois,
         capitalisation mensuelle. Fiscalité 2025 : PFU 30% (12,8% IR + 17,2% PS),
         PEA exonéré d&apos;IR après 5 ans, AV abattement 4 600€/an après 8 ans.
@@ -104,7 +104,7 @@ function Field({
 }) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
+      <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </span>
       <div className="flex items-baseline gap-2">
@@ -115,9 +115,9 @@ function Field({
           step={step}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="w-28 rounded-md border border-slate-300 px-2 py-1 text-lg font-semibold text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-28 rounded-md border border-border px-2 py-1 text-lg font-semibold text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
-        <span className="text-sm text-slate-500">{suffix}</span>
+        <span className="text-sm text-muted-foreground">{suffix}</span>
       </div>
       <input
         type="range"
@@ -135,24 +135,24 @@ function Field({
 function Card({ result, highlight }: { result: SimResult; highlight: boolean }) {
   return (
     <div
-      className={`rounded-xl border bg-white p-5 shadow-sm transition ${
+      className={`rounded-xl border bg-card p-5 shadow-sm transition ${
         highlight
-          ? "border-blue-400 ring-2 ring-blue-100"
-          : "border-slate-200"
+          ? "border-primary ring-2 ring-blue-100"
+          : "border-border"
       }`}
     >
       <div className="flex items-baseline justify-between">
-        <h3 className="text-sm font-semibold text-slate-900">{result.label}</h3>
+        <h3 className="text-sm font-semibold text-foreground">{result.label}</h3>
         {highlight ? (
-          <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-medium uppercase text-white">
+          <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium uppercase text-white">
             Optimal
           </span>
         ) : null}
       </div>
-      <p className="mt-3 text-2xl font-bold text-slate-900">
+      <p className="mt-3 text-2xl font-bold text-foreground">
         {fmtEur.format(Math.round(result.net))}
       </p>
-      <p className="text-xs text-slate-500">net après impôts</p>
+      <p className="text-xs text-muted-foreground">net après impôts</p>
       <dl className="mt-3 space-y-1 text-xs">
         <Row label="Valeur brute" value={fmtEur.format(Math.round(result.gross))} />
         <Row
@@ -161,7 +161,7 @@ function Card({ result, highlight }: { result: SimResult; highlight: boolean }) 
           tone="rose"
         />
       </dl>
-      <p className="mt-3 border-t border-slate-100 pt-3 text-xs text-slate-600">
+      <p className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
         {result.why}
       </p>
     </div>
@@ -179,10 +179,10 @@ function Row({
 }) {
   return (
     <div className="flex items-baseline justify-between">
-      <dt className="text-slate-500">{label}</dt>
+      <dt className="text-muted-foreground">{label}</dt>
       <dd
         className={`font-mono ${
-          tone === "rose" ? "text-rose-700" : "text-slate-900"
+          tone === "rose" ? "text-[color:var(--terracotta-600)]" : "text-foreground"
         }`}
       >
         {value}

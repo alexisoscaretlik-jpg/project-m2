@@ -9,6 +9,8 @@ export type Email = {
   html: string;
   text?: string;
   replyTo?: string;
+  trackOpens?: boolean;
+  trackClicks?: boolean;
 };
 
 export function emailConfigured(): boolean {
@@ -31,6 +33,8 @@ export async function send(email: Email): Promise<boolean> {
       html: email.html,
       text: email.text,
       reply_to: email.replyTo,
+      ...(email.trackOpens !== undefined && { track_opens: email.trackOpens }),
+      ...(email.trackClicks !== undefined && { track_clicks: email.trackClicks }),
     }),
   });
 

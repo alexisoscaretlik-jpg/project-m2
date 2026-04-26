@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Nav } from "@/components/nav";
 import { TvMini } from "@/components/tv-mini";
 import { TvTickerTape } from "@/components/tv-ticker-tape";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/supabase/require-auth";
 import { toTvSymbol } from "@/lib/tradingview";
 
 import { addToWatchlist, removeFromWatchlist } from "./actions";
@@ -21,10 +21,10 @@ type FeedCard = {
 };
 
 const toneStyles: Record<string, string> = {
-  bullish: "bg-emerald-100 text-emerald-800 border-emerald-200",
-  cautious: "bg-amber-100 text-amber-800 border-amber-200",
-  red_flag: "bg-rose-100 text-rose-800 border-rose-200",
-  educational: "bg-slate-100 text-slate-700 border-slate-200",
+  bullish: "bg-[color:var(--forest-100)] text-[color:var(--forest-700)] border-[color:var(--forest-200)]",
+  cautious: "bg-[color:var(--warning-soft)] text-[color:var(--warning)] border-[color:var(--warning)]",
+  red_flag: "bg-[color:var(--terracotta-100)] text-[color:var(--terracotta-700)] border-[color:var(--terracotta-200)]",
+  educational: "bg-muted text-foreground border-border",
 };
 
 function first<T>(v: T | T[] | null): T | null {
@@ -33,7 +33,7 @@ function first<T>(v: T | T[] | null): T | null {
 }
 
 export default async function WatchlistPage() {
-  const sb = await createClient();
+  const { supabase: sb } = await requireUser("/watchlist");
 
   const { data: rows } = await sb
     .from("watchlist")
@@ -68,7 +68,7 @@ export default async function WatchlistPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-muted">
       <Nav active="/watchlist" />
       <TvTickerTape
         symbols={
@@ -82,17 +82,17 @@ export default async function WatchlistPage() {
       />
 
       <div className="mx-auto max-w-2xl px-4 py-6">
-        <h1 className="text-xl font-bold text-slate-900">Ta watchlist</h1>
-        <p className="text-xs text-slate-500">
+        <h1 className="text-xl font-bold text-foreground">Ta watchlist</h1>
+        <p className="text-xs text-muted-foreground">
           Les cartes des entreprises que tu suis apparaissent ici en priorité.
         </p>
 
         <section className="mt-6">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Tu suis ({watched.length})
           </h2>
           {watched.length === 0 ? (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               Tu ne suis encore personne. Ajoute un ticker ci-dessous.
             </p>
           ) : (
@@ -100,23 +100,23 @@ export default async function WatchlistPage() {
               {watched.map((c) => (
                 <li
                   key={c.id}
-                  className="rounded-lg border border-slate-200 bg-white p-3"
+                  className="rounded-lg border border-border bg-card p-3"
                 >
                   <div className="flex items-center justify-between">
                     <Link
                       href={`/ticker/${encodeURIComponent(c.ticker)}`}
                       className="flex items-baseline gap-2 hover:underline"
                     >
-                      <span className="font-mono text-sm font-semibold text-slate-900">
+                      <span className="font-mono text-sm font-semibold text-foreground">
                         {c.ticker}
                       </span>
-                      <span className="text-sm text-slate-700">{c.name}</span>
+                      <span className="text-sm text-foreground">{c.name}</span>
                     </Link>
                     <form action={removeFromWatchlist}>
                       <input type="hidden" name="company_id" value={c.id} />
                       <button
                         type="submit"
-                        className="text-xs text-slate-500 hover:text-rose-600"
+                        className="text-xs text-muted-foreground hover:text-[color:var(--terracotta-500)]"
                       >
                         Retirer
                       </button>
@@ -133,7 +133,7 @@ export default async function WatchlistPage() {
 
         {addable.length > 0 ? (
           <section className="mt-8">
-            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               Ajouter un ticker
             </h2>
             <ul className="flex flex-wrap gap-2">
@@ -143,12 +143,12 @@ export default async function WatchlistPage() {
                     <input type="hidden" name="ticker" value={c.ticker} />
                     <button
                       type="submit"
-                      className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs hover:border-blue-500 hover:bg-blue-50"
+                      className="rounded-full border border-border bg-card px-3 py-1 text-xs hover:border-primary hover:bg-accent"
                     >
                       <span className="font-mono font-semibold">
                         {c.ticker}
                       </span>
-                      <span className="ml-1 text-slate-600">{c.name}</span>
+                      <span className="ml-1 text-muted-foreground">{c.name}</span>
                     </button>
                   </form>
                 </li>
@@ -159,7 +159,7 @@ export default async function WatchlistPage() {
 
         {feed.length > 0 ? (
           <section className="mt-10">
-            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               Ton fil
             </h2>
             <ul className="space-y-3">
@@ -169,10 +169,10 @@ export default async function WatchlistPage() {
                   <li key={card.id}>
                     <Link
                       href={`/ticker/${company ? encodeURIComponent(company.ticker) : ""}`}
-                      className="block rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-400 hover:shadow"
+                      className="block rounded-xl border border-border bg-card p-4 shadow-sm transition hover:border-border hover:shadow"
                     >
                       <div className="mb-1 flex items-center justify-between gap-3">
-                        <span className="font-mono text-sm font-semibold text-slate-900">
+                        <span className="font-mono text-sm font-semibold text-foreground">
                           {company?.ticker ?? "?"}
                         </span>
                         {card.tone ? (
@@ -185,8 +185,8 @@ export default async function WatchlistPage() {
                           </span>
                         ) : null}
                       </div>
-                      <p className="text-sm text-slate-900">{card.title}</p>
-                      <p className="mt-1 text-xs text-slate-400">
+                      <p className="text-sm text-foreground">{card.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {new Date(card.published_at).toLocaleDateString()}
                       </p>
                     </Link>

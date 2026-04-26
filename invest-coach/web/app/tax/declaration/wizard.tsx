@@ -236,21 +236,21 @@ export function Wizard({ initial }: Props) {
 
   if (submitted) {
     return (
-      <div className="rounded-xl border border-emerald-200 bg-white p-8 text-center shadow-sm">
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+      <div className="rounded-xl border border-[color:var(--forest-200)] bg-card p-8 text-center shadow-sm">
+        <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--forest-100)] text-[color:var(--forest-700)]">
           ✓
         </div>
-        <h2 className="mt-4 text-xl font-semibold text-slate-900">
+        <h2 className="mt-4 text-xl font-semibold text-foreground">
           Questionnaire enregistré
         </h2>
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="mt-2 text-sm text-muted-foreground">
           Nous avons toutes les données nécessaires. Retournez sur la page
           fiscalité pour télécharger votre déclaration pré-remplie.
         </p>
         <div className="mt-6 flex justify-center gap-3">
           <button
             onClick={() => router.push("/tax")}
-            className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-700"
+            className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-white hover:bg-[color:var(--ink-500)]"
           >
             Retour à /tax →
           </button>
@@ -259,7 +259,7 @@ export function Wizard({ initial }: Props) {
               setSubmitted(false);
               setIndex(0);
             }}
-            className="rounded-lg border border-slate-200 px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+            className="rounded-lg border border-border px-5 py-2.5 text-sm text-foreground hover:bg-muted"
           >
             Modifier mes réponses
           </button>
@@ -269,33 +269,33 @@ export function Wizard({ initial }: Props) {
   }
 
   if (!q) {
-    return <p className="text-sm text-slate-500">Aucune question à afficher.</p>;
+    return <p className="text-sm text-muted-foreground">Aucune question à afficher.</p>;
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <div className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
       {/* Progress */}
       <div className="mb-6">
-        <div className="flex items-center justify-between text-xs text-slate-500">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>
             Question {safeIndex + 1} / {total}
           </span>
           <span>{Math.round(((safeIndex + 1) / total) * 100)} %</span>
         </div>
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
           <div
-            className="h-full bg-blue-600 transition-all duration-300"
+            className="h-full bg-primary transition-all duration-300"
             style={{ width: `${((safeIndex + 1) / total) * 100}%` }}
           />
         </div>
       </div>
 
       {/* Question */}
-      <h2 className="text-xl font-semibold text-slate-900 sm:text-2xl">
+      <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
         {q.title}
       </h2>
       {q.subtitle ? (
-        <p className="mt-2 text-sm text-slate-500">{q.subtitle}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{q.subtitle}</p>
       ) : null}
 
       <div className="mt-6">
@@ -304,7 +304,7 @@ export function Wizard({ initial }: Props) {
             {q.options.map((opt) => (
               <label
                 key={opt.value}
-                className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 p-3 text-sm hover:border-blue-400 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50"
+                className="flex cursor-pointer items-center gap-3 rounded-lg border border-border p-3 text-sm hover:border-primary has-[:checked]:border-primary has-[:checked]:bg-accent"
               >
                 <input
                   type="radio"
@@ -313,7 +313,7 @@ export function Wizard({ initial }: Props) {
                   checked={currentValue === opt.value}
                   onChange={() => setValue(q.ref, opt.value)}
                 />
-                <span className="font-medium text-slate-900">{opt.label}</span>
+                <span className="font-medium text-foreground">{opt.label}</span>
               </label>
             ))}
           </div>
@@ -331,8 +331,8 @@ export function Wizard({ initial }: Props) {
                 onClick={() => setValue(q.ref, opt.value)}
                 className={`rounded-lg border px-4 py-3 text-sm font-medium transition ${
                   currentValue === opt.value
-                    ? "border-blue-600 bg-blue-50 text-blue-700"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-blue-400"
+                    ? "border-primary bg-accent text-primary"
+                    : "border-border bg-card text-foreground hover:border-primary"
                 }`}
               >
                 {opt.label}
@@ -353,11 +353,11 @@ export function Wizard({ initial }: Props) {
                 const v = e.target.value;
                 setValue(q.ref, v === "" ? null : Number(v));
               }}
-              className="w-full rounded-lg border border-slate-300 px-4 py-3 text-lg focus:border-blue-600 focus:outline-none"
+              className="w-full rounded-lg border border-border px-4 py-3 text-lg focus:border-primary focus:outline-none"
               placeholder="0"
             />
             {q.unit ? (
-              <span className="text-sm text-slate-500">{q.unit}</span>
+              <span className="text-sm text-muted-foreground">{q.unit}</span>
             ) : null}
           </div>
         ) : null}
@@ -369,7 +369,7 @@ export function Wizard({ initial }: Props) {
             maxLength={2000}
             value={typeof currentValue === "string" ? currentValue : ""}
             onChange={(e) => setValue(q.ref, e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-blue-600 focus:outline-none"
+            className="w-full rounded-lg border border-border px-4 py-3 text-sm focus:border-primary focus:outline-none"
             placeholder={q.optional ? "Facultatif — laissez vide si rien à ajouter." : ""}
           />
         ) : null}
@@ -381,7 +381,7 @@ export function Wizard({ initial }: Props) {
           type="button"
           onClick={back}
           disabled={safeIndex === 0}
-          className="rounded-lg px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+          className="rounded-lg px-4 py-2 text-sm text-muted-foreground hover:bg-muted disabled:opacity-40"
         >
           ← Retour
         </button>
@@ -391,7 +391,7 @@ export function Wizard({ initial }: Props) {
             <button
               type="button"
               onClick={next}
-              className="rounded-lg px-4 py-2 text-sm text-slate-500 hover:bg-slate-100"
+              className="rounded-lg px-4 py-2 text-sm text-muted-foreground hover:bg-muted"
             >
               Passer
             </button>
@@ -400,7 +400,7 @@ export function Wizard({ initial }: Props) {
             type="button"
             onClick={next}
             disabled={!canAdvance() || pending}
-            className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+            className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary disabled:opacity-50"
           >
             {pending
               ? "Enregistrement…"
@@ -412,13 +412,13 @@ export function Wizard({ initial }: Props) {
       </div>
 
       {error ? (
-        <p className="mt-3 text-right text-sm text-rose-600">{error}</p>
+        <p className="mt-3 text-right text-sm text-[color:var(--terracotta-500)]">{error}</p>
       ) : null}
 
-      <p className="mt-6 text-center text-xs text-slate-400">
-        Astuce : <kbd className="rounded bg-slate-100 px-1.5 py-0.5 font-mono">Entrée</kbd>{" "}
+      <p className="mt-6 text-center text-xs text-muted-foreground">
+        Astuce : <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono">Entrée</kbd>{" "}
         pour continuer,{" "}
-        <kbd className="rounded bg-slate-100 px-1.5 py-0.5 font-mono">Échap</kbd>{" "}
+        <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono">Échap</kbd>{" "}
         pour revenir.
       </p>
     </div>
