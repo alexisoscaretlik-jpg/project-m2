@@ -4,10 +4,20 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { SubscribeForm } from "@/app/newsletter/subscribe-form";
 import { CoachingPodcast } from "@/components/coaching-podcast";
+import { PodcastEpisodeList } from "@/components/podcast-episode-list";
 import { createClient } from "@/lib/supabase/server";
-import { supabase } from "@/lib/supabase";
+import { serviceClient } from "@/lib/supabase/service";
 
 type ArticleRow = { slug: string; title: string; published_at: string };
+export type PodcastEpisode = {
+  id: string;
+  title: string;
+  summary: string;
+  script: { speaker: "Coach" | "Investisseur"; text: string }[];
+  youtube_url: string;
+  audio_url?: string;
+  created_at: string;
+};
 
 const QUICK_TOOLS: { href: string; label: string; desc: string }[] = [
   { href: "/simulation", label: "Simulateur", desc: "PEA, CTO, AV — compare tes enveloppes" },
@@ -15,6 +25,32 @@ const QUICK_TOOLS: { href: string; label: string; desc: string }[] = [
   { href: "/tax", label: "Fiscalité", desc: "IR 2042, plus-values, déclaration guidée" },
   { href: "/bank", label: "Banque", desc: "Analyse tes relevés et frais cachés" },
 ];
+
+async function fetchEpisodes(): Promise<PodcastEpisode[]> {
+  try {
+    const sb = serviceClient();
+    const { data } = await sb
+      .from("private_notes")
+      .select("id, source, polished, raw_input, created_at")
+      .like("source", "podcast-%")
+      .order("created_at", { ascending: false })
+      .limit(10);
+    return (data ?? []).map((row: { id: number; source: string; polished: string; raw_input: string; created_at: string }) => {
+      const parsed = JSON.parse(row.polished);
+      return {
+        id: String(row.id),
+        title: parsed.title ?? "Episode",
+        summary: parsed.summary ?? "",
+        script: parsed.script ?? [],
+        youtube_url: row.raw_input,
+        audio_url: parsed.audioUrl ?? undefined,
+        created_at: row.created_at,
+      };
+    });
+  } catch {
+    return [];
+  }
+}
 
 export default async function Home() {
   let user = null;
@@ -26,67 +62,51 @@ export default async function Home() {
 
   if (!user) return <Landing />;
 
-  let articles: ArticleRow[] = [];
-  try {
-    const { data } = await supabase
-      .from("articles")
-      .select("slug, title, published_at")
-      .order("published_at", { ascending: false })
-      .limit(5);
-    articles = (data ?? []) as ArticleRow[];
-  } catch {
-    articles = [];
-  }
+  const [episodes, articles] = await Promise.all([
+    fetchEpisodes(),
+    (async (): Promise<ArticleRow[]> => {
+      try {
+        const sb = serviceClient();
+        const { data } = await sb
+          .from("articles")
+          .select("slug, title, published_at")
+          .order("published_at", { ascending: false })
+          .limit(4);
+        return (data ?? []) as ArticleRow[];
+      } catch { return []; }
+    })(),
+  ]);
 
   return (
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/" />
 
       <div className="mx-auto max-w-[720px] px-6 py-10">
-        <div className="cap-eyebrow mb-1">Money Coaching · espace personnel</div>
+        <div className="cap-eyebrow mb-1">Money Coaching</div>
         <h1
           className="mb-8 text-[28px] font-semibold leading-tight"
-          style={{
-            fontFamily: "var(--font-display)",
-            color: "var(--fg)",
-            letterSpacing: "-0.015em",
-          }}
+          style={{ fontFamily: "var(--font-display)", color: "var(--fg)", letterSpacing: "-0.015em" }}
         >
           Apprends à faire travailler ton argent.
         </h1>
 
-        {/* Podcast generator */}
-        <CoachingPodcast />
+        {/* Pre-generated podcast episodes */}
+        <PodcastEpisodeList episodes={episodes} />
 
         {/* Quick tools */}
         <section className="mb-10">
-          <div className="cap-eyebrow mb-4">Outils rapides</div>
+          <div className="cap-eyebrow mb-4">Outils</div>
           <div className="grid gap-3 sm:grid-cols-2">
             {QUICK_TOOLS.map((t) => (
               <Link key={t.href} href={t.href} className="block">
                 <div
                   className="rounded-xl p-4 transition-colors hover:border-[var(--forest-600)]"
-                  style={{
-                    background: "var(--paper-100)",
-                    border: "1px solid var(--border)",
-                  }}
+                  style={{ background: "var(--paper-100)", border: "1px solid var(--border)" }}
                 >
-                  <div
-                    className="text-[15px] font-semibold"
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      color: "var(--fg)",
-                    }}
-                  >
+                  <div className="text-[15px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--fg)" }}>
                     {t.label}
                   </div>
-                  <div
-                    className="mt-0.5 text-[13px]"
-                    style={{
-                      fontFamily: "var(--font-serif)",
-                      color: "var(--fg-muted)",
-                    }}
-                  >
+                  <div className="mt-0.5 text-[13px]" style={{ fontFamily: "var(--font-serif)", color: "var(--fg-muted)" }}>
                     {t.desc}
                   </div>
                 </div>
@@ -100,34 +120,34 @@ export default async function Home() {
           <section className="mb-10">
             <div className="mb-4 flex items-baseline justify-between">
               <div className="cap-eyebrow">Guides récents</div>
-              <Link
-                href="/articles"
-                className="text-[13px] font-medium"
-                style={{ color: "var(--forest-600)", fontFamily: "var(--font-display)" }}
-              >
-                Tous les guides →
+              <Link href="/articles" className="text-[13px] font-medium" style={{ color: "var(--forest-600)", fontFamily: "var(--font-display)" }}>
+                Tous →
               </Link>
             </div>
             <ul className="space-y-2">
               {articles.map((a) => (
                 <li key={a.slug}>
-                  <Link
-                    href={`/articles/${a.slug}`}
-                    className="block rounded-xl px-4 py-3 transition-colors hover:bg-[var(--paper-100)]"
-                    style={{ border: "1px solid var(--border)" }}
-                  >
-                    <span
-                      className="text-[15px]"
-                      style={{ fontFamily: "var(--font-serif)", color: "var(--fg)" }}
-                    >
-                      {a.title}
-                    </span>
+                  <Link href={`/articles/${a.slug}`} className="block rounded-xl px-4 py-3 transition-colors hover:bg-[var(--paper-100)]" style={{ border: "1px solid var(--border)" }}>
+                    <span className="text-[15px]" style={{ fontFamily: "var(--font-serif)", color: "var(--fg)" }}>{a.title}</span>
                   </Link>
                 </li>
               ))}
             </ul>
           </section>
         )}
+
+        {/* Generate from your own URL — collapsed at bottom */}
+        <details className="mb-8">
+          <summary
+            className="cursor-pointer select-none rounded-xl px-4 py-3 text-[14px] font-medium"
+            style={{ background: "var(--paper-100)", border: "1px solid var(--border)", fontFamily: "var(--font-display)", color: "var(--fg-muted)" }}
+          >
+            Générer un épisode depuis une autre vidéo YouTube…
+          </summary>
+          <div className="mt-3">
+            <CoachingPodcast />
+          </div>
+        </details>
       </div>
 
       <Footer />
