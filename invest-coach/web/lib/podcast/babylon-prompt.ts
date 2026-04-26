@@ -29,6 +29,26 @@ export const LAW_FR: Record<BabylonianLaw, string> = {
     "Augmente ta capacité à gagner (compétences, négociation salariale, side income).",
 };
 
+// Authentic refrains drawn from Clason — translated into modern French.
+// Each law has ONE refrain phrase the Coach is expected to drop, once,
+// inside Act 2. Used as a recurring sonic signature across episodes.
+export const LAW_REFRAIN_FR: Record<BabylonianLaw, string> = {
+  "pay-yourself-first":
+    "Une partie de tout ce que tu gagnes t'appartient.",
+  "control-thy-expenditures":
+    "Ce que nous appelons nos « dépenses nécessaires » grandit toujours pour égaler nos revenus, à moins que nous n'y résistions.",
+  "make-thy-gold-multiply":
+    "L'or vient volontiers et en quantité croissante à celui qui met de côté au moins un dixième de ce qu'il gagne.",
+  "guard-thy-treasures-from-loss":
+    "Mieux vaut un peu de prudence qu'un grand regret.",
+  "make-thy-dwelling-a-profitable-investment":
+    "Posséder son toit, c'est cesser de payer le toit d'un autre.",
+  "ensure-income-for-the-future":
+    "L'homme prudent ne laisse pas son avenir au hasard.",
+  "increase-thy-ability-to-earn":
+    "Plus tu sais, plus tu vaux. Plus tu vaux, plus tu gagnes.",
+};
+
 export type BabylonBrief = {
   sourceUrl: string;
   sourceCreator: string;
@@ -61,11 +81,21 @@ export type BabylonScript = {
 
 export function buildBabylonPrompt(brief: BabylonBrief): string {
   const lawFr = LAW_FR[brief.law];
+  const refrain = LAW_REFRAIN_FR[brief.law];
   const c = brief.character;
 
   return `Tu écris un épisode de podcast français de 19 minutes (~2 900 mots) pour Invest Coach.
 
 Le format s'inspire du livre "L'homme le plus riche de Babylone" de G.S. Clason : chaque épisode raconte UNE leçon d'argent à travers UNE histoire de personnage. Pas de résumé plat, pas de listes à puces récitées. Du récit, du dialogue, de la chair humaine.
+
+# ADN narratif (à respecter)
+1. **L'enseignement passe par les questions, jamais par la déclaration sèche.** Le Coach demande avant d'affirmer. Exactement comme Arkad qui demande au marchand d'œufs "Si tu mets dix œufs dans le panier le matin et n'en sors que neuf le soir, que se passera-t-il ?" — avant de donner la règle des 10 %.
+2. **Concret avant abstrait.** Toute leçon est ancrée dans un métier, un chiffre, un objet du quotidien français. Un café à 1,80 €, un loyer à 1 200 €/mois, le virement Pôle Emploi du 5 du mois. Pas d'abstraction sans exemple.
+3. **Répétition comme rythme parlé.** Le livre dit "Working, working, working! Getting nowhere." → en français : "Travailler, travailler, travailler. Et n'arriver à rien." Les répétitions à trois temps fonctionnent à l'oral.
+4. **Une vérité simple est plus forte qu'une vérité compliquée.** Si une phrase peut tenir en six mots, qu'elle tienne en six mots.
+5. **La sagesse babylonienne se cite UNE seule fois par épisode**, dans l'Acte 2, par le Coach. Le refrain de cet épisode est :
+   > « ${refrain} »
+   Le Coach le prononce une fois, à un moment où l'Investisseur est en train de douter.
 
 # Loi babylonienne de cet épisode
 **${lawFr}**
@@ -96,11 +126,13 @@ ${brief.targetAction}
 
 ## ACTE 2 — Dialogue Coach + Investisseur (≈ 2 000 mots, ~13-15 min)
 - Voix : **Coach** et **Investisseur** en alternance, 18 à 24 échanges.
-- Le Coach explique la leçon en s'appuyant sur le cas de ${c.name}. Il cite la sagesse babylonienne quand c'est naturel ("Comme Arkad le disait à ses élèves...", "La première loi enseignée par Algamish..."). Une ou deux références au livre, pas davantage — on ne fait pas un cours d'histoire.
+- Le Coach explique la leçon en s'appuyant sur le cas de ${c.name}. Il introduit la leçon **par une question**, à la manière d'Arkad avec le marchand d'œufs — pas par une affirmation. Exemple : avant de poser la règle des 10 %, il demande "Si tu encaisses 2 800 € chaque mois et que tu en dépenses 2 800, qu'est-ce qui te reste à la fin de l'année ?"
 - L'Investisseur (35-50 ans, autodidacte) pose les vraies questions d'un auditeur français : "Mais avec un PEA plafonné à 150 000 €, est-ce que ça vaut le coup ?" "Et si je suis à la TMI 30 %, je perds combien sur l'AV ?" Il pose des doutes. Il revient sur ce que ${c.name} devrait faire concrètement.
 - Reprends les insights de la vidéo source mais reformulés pour le contexte fiscal français (PEA, AV, PER, CTO, PFU 30 %, TMI 0/11/30/41/45 %, Livret A 22 950 €, abattement AV 4 600 €/9 200 €).
 - Chiffres exacts pour 2026. Si un chiffre est cité dans la vidéo source mais ne s'applique pas en France, le Coach le précise et donne l'équivalent FR.
 - Pas de conseil personnalisé d'achat/vente sur un titre précis. Mécanismes, comparaisons, seuils statutaires uniquement.
+- **Le refrain babylonien (« ${refrain} ») doit apparaître exactement une fois**, prononcé par le Coach, dans un moment de doute de l'Investisseur. Pas plus. Pas moins. Un usage rare, comme un sceau.
+- Une référence textuelle au livre est autorisée (ex. "Comme Arkad le disait au marchand d'œufs...") mais une seule par épisode.
 
 ## ACTE 3 — Action concrète (≈ 500 mots, ~3-4 min)
 - Voix : **Coach** d'abord, puis **Investisseur** qui reformule, puis **Narrateur** pour fermer.
@@ -115,11 +147,7 @@ ${brief.targetAction}
 - Tirets typographiques : utilise « · » ou coupe la phrase. Pas de « — » em-dash dans le texte parlé (ils s'entendent mal).
 - Variations de longueur : alterne phrases courtes (5-8 mots) et longues (20-25 mots). Le rythme parlé doit respirer.
 - Émotions parlées : autorise "Hum.", "Bon.", "D'accord.", "Attends..." en début de réplique pour casser la lecture mécanique de la TTS.
-- Une fois par acte 2, le Coach utilise une phrase rituelle babylonienne. Choix possibles :
-  - "Une partie de ce que tu gagnes est à toi."
-  - "Si tu désires aider ton ami, fais-le d'une manière qui n'attire pas vers toi le fardeau de ton ami."
-  - "Mieux vaut un peu de prudence qu'un grand regret."
-  - "Le conseil est une chose donnée librement, mais veille à ne prendre que ce qui mérite d'être pris."
+- Le refrain babylonien de cet épisode est défini plus haut dans la section "ADN narratif". Le Coach le prononce une seule fois, tel quel, dans l'Acte 2. Pas de variante, pas de paraphrase.
 - Pas d'emojis dans le script (la TTS les lit littéralement).
 
 # Format de sortie
