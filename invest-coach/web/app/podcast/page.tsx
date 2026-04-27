@@ -3,9 +3,9 @@ import { Footer } from "@/components/footer";
 import { serviceClient } from "@/lib/supabase/service";
 
 export const metadata = {
-  title: "Podcast — Invest Coach",
+  title: "Argent · Podcast — Invest Coach",
   description:
-    "Des épisodes de coaching financier en français, inspirés de L'homme le plus riche de Babylone.",
+    "Le podcast français qui transforme une vidéo YouTube en coaching personnel. Coach et Investisseur creusent une seule loi de l'argent par épisode.",
 };
 
 const BUCKET = "podcasts";
@@ -14,8 +14,9 @@ type EpisodeMeta = {
   title: string;
   summary: string;
   law: string;
+  theme?: string;
   character: { name: string; age: number; city: string; situation: string };
-  source: { url: string; creator: string };
+  source?: { url: string; creator: string };
 };
 
 type Episode = {
@@ -76,8 +77,18 @@ function formatDate(iso: string) {
   });
 }
 
-export default async function PodcastIndexPage() {
-  const episodes = await listEpisodes();
+export default async function PodcastIndexPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ theme?: string }>;
+}) {
+  const params = (await searchParams) ?? {};
+  const themeFilter = params.theme;
+  const all = await listEpisodes();
+  // Episodes default to "money" theme when the field is absent (back-compat).
+  const episodes = themeFilter
+    ? all.filter((e) => (e.meta.theme ?? "money") === themeFilter)
+    : all;
 
   return (
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
@@ -85,12 +96,12 @@ export default async function PodcastIndexPage() {
 
       <div className="mx-auto max-w-3xl px-6 py-12">
         <div className="mb-10">
-          <div className="cap-eyebrow">Le podcast</div>
-          <h1 className="cap-h1 mt-3">Épisodes</h1>
+          <div className="cap-eyebrow">Thème · Argent</div>
+          <h1 className="cap-h1 mt-3">Le podcast Invest Coach</h1>
           <p className="cap-lede mt-4 max-w-[640px]">
-            Des leçons inspirées de <em>L&apos;homme le plus riche de Babylone</em>,
-            appliquées à un salarié français aujourd&apos;hui. Vingt minutes,
-            trois actes, une action concrète.
+            Une seule loi de l&apos;argent par épisode, appliquée à ton vrai
+            salaire. Coach + Investisseur, conversation naturelle de vingt
+            minutes, une action concrète à la fin.
           </p>
         </div>
 
@@ -104,11 +115,11 @@ export default async function PodcastIndexPage() {
         )}
 
         <ul className="space-y-6">
-          {episodes.map((ep) => (
+          {episodes.map((ep, idx) => (
             <li key={ep.slug}>
               <article className="cap-card">
                 <div className="cap-eyebrow mb-2">
-                  {formatDate(ep.date)} · {ep.meta.character.city}
+                  Épisode {episodes.length - idx} · {formatDate(ep.date)}
                 </div>
                 <h2
                   className="text-[22px] font-semibold leading-snug"
@@ -143,8 +154,7 @@ export default async function PodcastIndexPage() {
                     color: "var(--fg-subtle)",
                   }}
                 >
-                  Source : {ep.meta.source.creator} · IA, pas un conseil en
-                  investissement
+                  Coaching IA · pas un conseil en investissement personnalisé
                 </p>
               </article>
             </li>

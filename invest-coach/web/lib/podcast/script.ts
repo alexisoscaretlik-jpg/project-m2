@@ -56,6 +56,7 @@ export async function writeBabylonScript(brief: BabylonBrief): Promise<BabylonSc
     title: parsed.title,
     summary: parsed.summary,
     law: parsed.law,
+    theme: parsed.theme || "money",
     character: parsed.character,
     source: parsed.source,
     lines,

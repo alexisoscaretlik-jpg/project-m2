@@ -44,6 +44,8 @@ async function main() {
   console.log(`Reading ${MP3}…`);
   const audio = new Uint8Array(readFileSync(MP3));
   const meta = JSON.parse(readFileSync(META, "utf8"));
+  // Default theme is "money" — first public-facing shelf on the site.
+  if (!meta.theme) meta.theme = "money";
 
   console.log("Uploading to Supabase Storage…");
   const result = await uploadEpisode({

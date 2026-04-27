@@ -169,6 +169,9 @@ function Landing() {
       {/* Hero */}
       <HeroSection />
 
+      {/* Themes — one card per public-facing shelf (money today, more later) */}
+      <ThemesSection />
+
       {/* Features */}
       <FeaturesSection />
 
@@ -180,6 +183,83 @@ function Landing() {
 
       <Footer />
     </main>
+  );
+}
+
+const THEMES: {
+  slug: string;
+  label: string;
+  eyebrow: string;
+  title: string;
+  body: string;
+  cta: string;
+  href: string;
+}[] = [
+  {
+    slug: "money",
+    label: "Argent",
+    eyebrow: "Thème · 01",
+    title: "Argent",
+    body: "Le podcast qui transforme une vidéo en coaching. Une loi simple par épisode, appliquée à ton vrai salaire — PEA, AV, PER, IR.",
+    cta: "Écouter les épisodes",
+    href: "/podcast?theme=money",
+  },
+];
+
+function ThemesSection() {
+  return (
+    <section
+      className="mx-auto px-8 pb-12 pt-4"
+      style={{ maxWidth: "1280px" }}
+    >
+      <div className="pb-8">
+        <div className="cap-eyebrow">Sujets</div>
+        <h2 className="cap-h1 mt-3" style={{ maxWidth: "720px" }}>
+          Choisis le sujet qui te concerne aujourd&apos;hui.
+        </h2>
+      </div>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {THEMES.map((t) => (
+          <Link key={t.slug} href={t.href} className="block">
+            <article
+              className="cap-card flex h-full flex-col"
+              style={{ minHeight: "240px" }}
+            >
+              <div
+                className="text-[11px]"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  color: "var(--terracotta-500)",
+                  letterSpacing: "0.06em",
+                }}
+              >
+                {t.eyebrow}
+              </div>
+              <h3 className="cap-h3 mt-2 text-[28px]">{t.title}</h3>
+              <p
+                className="mt-3 flex-1 text-[15px]"
+                style={{
+                  fontFamily: "var(--font-serif)",
+                  color: "var(--fg-muted)",
+                  lineHeight: 1.55,
+                }}
+              >
+                {t.body}
+              </p>
+              <span
+                className="mt-4 inline-flex items-center gap-1 text-[13px] font-medium"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  color: "var(--forest-600)",
+                }}
+              >
+                {t.cta} →
+              </span>
+            </article>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }
 
