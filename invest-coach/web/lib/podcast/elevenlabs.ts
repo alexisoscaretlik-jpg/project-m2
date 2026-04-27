@@ -84,19 +84,47 @@ export async function synthLine(
   return new Uint8Array(buf);
 }
 
-// Concatenate raw MP3 segments. Browsers and standard MP3 decoders
-// tolerate naive concatenation of constant-bitrate MP3 frames produced by the
-// same encoder, which is what ElevenLabs returns. For VBR or true gapless,
-// we'd need ffmpeg — out of scope for v1.
+// Concatenate ElevenLabs MP3 segments into one playable file.
+//
+// ElevenLabs prefixes each segment with an ID3v2 tag. Naively concatenating
+// leaves an ID3v2 tag in the middle of the audio stream, which makes many
+// players (Apple Music, iOS Safari) report only the duration of the first
+// segment. Strip the ID3v2 prefix and any ID3v1 trailer from each segment;
+// the result is pure MP3 frames concatenated end-to-end.
 export function concatMp3(segments: Uint8Array[]): Uint8Array {
-  const total = segments.reduce((n, s) => n + s.byteLength, 0);
+  const stripped = segments.map(stripId3);
+  const total = stripped.reduce((n, s) => n + s.byteLength, 0);
   const out = new Uint8Array(total);
   let offset = 0;
-  for (const seg of segments) {
+  for (const seg of stripped) {
     out.set(seg, offset);
     offset += seg.byteLength;
   }
   return out;
+}
+
+function stripId3(seg: Uint8Array): Uint8Array {
+  let start = 0;
+  let end = seg.byteLength;
+
+  // ID3v2 header: "ID3" + 2 version bytes + 1 flags + 4 synchsafe size bytes,
+  // then `size` bytes of tag content. Total stripped = 10 + size.
+  if (seg.byteLength >= 10 && seg[0] === 0x49 && seg[1] === 0x44 && seg[2] === 0x33) {
+    const size = (seg[6] << 21) | (seg[7] << 14) | (seg[8] << 7) | seg[9];
+    start = 10 + size;
+  }
+
+  // ID3v1 trailer: last 128 bytes start with "TAG".
+  if (
+    seg.byteLength >= 128 &&
+    seg[seg.byteLength - 128] === 0x54 &&
+    seg[seg.byteLength - 127] === 0x41 &&
+    seg[seg.byteLength - 126] === 0x47
+  ) {
+    end = seg.byteLength - 128;
+  }
+
+  return start === 0 && end === seg.byteLength ? seg : seg.subarray(start, end);
 }
 
 // Rough cost estimator. ElevenLabs Creator tier pricing (subject to change):
