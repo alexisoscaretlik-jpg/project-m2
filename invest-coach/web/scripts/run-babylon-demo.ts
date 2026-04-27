@@ -41,7 +41,7 @@ try {
     ) {
       val = val.slice(1, -1);
     }
-    if (key && !(key in process.env)) process.env[key] = val;
+    if (key && !process.env[key]) process.env[key] = val;
   }
 } catch {
   console.error(`Could not read ${envPath}. Make sure you're running from invest-coach/web/.`);
