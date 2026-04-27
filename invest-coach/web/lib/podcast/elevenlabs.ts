@@ -135,8 +135,7 @@ export function estimateTtsCostUsd(text: string, tier: "creator" | "pro" = "crea
   return (text.length / 1000) * perK;
 }
 
-export function pickVoiceForSpeaker(speaker: "Narrateur" | "Coach" | "Investisseur"): ElevenVoice {
+export function pickVoiceForSpeaker(speaker: "Coach" | "Investisseur"): ElevenVoice {
   if (speaker === "Coach") return VOICES.coach;
-  if (speaker === "Investisseur") return VOICES.investisseur;
-  return VOICES.narrateur;
+  return VOICES.investisseur;
 }

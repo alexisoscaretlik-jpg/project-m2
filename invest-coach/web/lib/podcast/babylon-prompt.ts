@@ -1,7 +1,24 @@
-// Babylon-style podcast script prompt.
-// Produces a 3-act, ~2,900-word French script anchored on one Babylonian money law.
-// Inspired by The Richest Man in Babylon (G.S. Clason) — parable + dialogue,
-// not a flat summary.
+// Money-coaching podcast script prompt.
+//
+// Format: ~18-min natural conversation between TWO French voices (Coach +
+// Investisseur). The Coach carries 80 % of the speaking time, tells the
+// stories, teaches by question. The Investisseur is a 38-yo CDI salarié,
+// reacts with HIS OWN life, asks the real questions a French saver has
+// about PEA / AV / PER / Livret A / LMNP / SCPI / TMI.
+//
+// The conceptual scaffold is the seven money laws drawn from a 1926 finance
+// classic — but neither the book name, its author, nor any of its
+// characters (Arkad, Algamish, Bansir…) may appear in the audio. The book
+// is the Coach's mental map; the listener never sees it.
+//
+// The episode ends on a HOOK for the next month, not a CTA, so the
+// listener finishes thinking "I want the next one" — that's what converts
+// to a paid subscription.
+//
+// History note: an earlier version of this file was a 3-act narrator-led
+// format with explicit book quotes. It was replaced after listening tests
+// showed the explicit-citation style felt staged and the narrator role was
+// redundant. Do not re-introduce a "Narrateur" speaker.
 
 export type BabylonianLaw =
   | "pay-yourself-first"
@@ -29,26 +46,6 @@ export const LAW_FR: Record<BabylonianLaw, string> = {
     "Augmente ta capacité à gagner (compétences, négociation salariale, side income).",
 };
 
-// Authentic refrains drawn from Clason — translated into modern French.
-// Each law has ONE refrain phrase the Coach is expected to drop, once,
-// inside Act 2. Used as a recurring sonic signature across episodes.
-export const LAW_REFRAIN_FR: Record<BabylonianLaw, string> = {
-  "pay-yourself-first":
-    "Une partie de tout ce que tu gagnes t'appartient.",
-  "control-thy-expenditures":
-    "Ce que nous appelons nos « dépenses nécessaires » grandit toujours pour égaler nos revenus, à moins que nous n'y résistions.",
-  "make-thy-gold-multiply":
-    "L'or vient volontiers et en quantité croissante à celui qui met de côté au moins un dixième de ce qu'il gagne.",
-  "guard-thy-treasures-from-loss":
-    "Mieux vaut un peu de prudence qu'un grand regret.",
-  "make-thy-dwelling-a-profitable-investment":
-    "Posséder son toit, c'est cesser de payer le toit d'un autre.",
-  "ensure-income-for-the-future":
-    "L'homme prudent ne laisse pas son avenir au hasard.",
-  "increase-thy-ability-to-earn":
-    "Plus tu sais, plus tu vaux. Plus tu vaux, plus tu gagnes.",
-};
-
 export type BabylonBrief = {
   sourceUrl: string;
   sourceCreator: string;
@@ -64,9 +61,8 @@ export type BabylonBrief = {
 };
 
 export type ScriptLine = {
-  speaker: "Narrateur" | "Coach" | "Investisseur";
+  speaker: "Coach" | "Investisseur";
   text: string;
-  act: 1 | 2 | 3;
 };
 
 export type BabylonScript = {
@@ -81,97 +77,106 @@ export type BabylonScript = {
 
 export function buildBabylonPrompt(brief: BabylonBrief): string {
   const lawFr = LAW_FR[brief.law];
-  const refrain = LAW_REFRAIN_FR[brief.law];
   const c = brief.character;
 
-  return `Tu écris un épisode de podcast français de 19 minutes (~2 900 mots) pour Invest Coach.
+  return `Tu écris un épisode de podcast français de 18 minutes pour Invest Coach.
 
-Le format s'inspire du livre "L'homme le plus riche de Babylone" de G.S. Clason : chaque épisode raconte UNE leçon d'argent à travers UNE histoire de personnage. Pas de résumé plat, pas de listes à puces récitées. Du récit, du dialogue, de la chair humaine.
+# Format
+Conversation naturelle entre DEUX voix uniquement : Coach et Investisseur.
+- Pas de narrateur.
+- Pas d'actes annoncés, pas de "dans cet épisode on va voir".
+- On entre direct, comme une vraie discussion enregistrée.
 
-# ADN narratif (à respecter)
-1. **L'enseignement passe par les questions, jamais par la déclaration sèche.** Le Coach demande avant d'affirmer. Exactement comme Arkad qui demande au marchand d'œufs "Si tu mets dix œufs dans le panier le matin et n'en sors que neuf le soir, que se passera-t-il ?" — avant de donner la règle des 10 %.
-2. **Concret avant abstrait.** Toute leçon est ancrée dans un métier, un chiffre, un objet du quotidien français. Un café à 1,80 €, un loyer à 1 200 €/mois, le virement Pôle Emploi du 5 du mois. Pas d'abstraction sans exemple.
-3. **Répétition comme rythme parlé.** Le livre dit "Working, working, working! Getting nowhere." → en français : "Travailler, travailler, travailler. Et n'arriver à rien." Les répétitions à trois temps fonctionnent à l'oral.
-4. **Une vérité simple est plus forte qu'une vérité compliquée.** Si une phrase peut tenir en six mots, qu'elle tienne en six mots.
-5. **La sagesse babylonienne se cite UNE seule fois par épisode**, dans l'Acte 2, par le Coach. Le refrain de cet épisode est :
-   > « ${refrain} »
-   Le Coach le prononce une fois, à un moment où l'Investisseur est en train de douter.
+# Répartition de la parole (impérative)
+- Coach : ~80 % du nombre total de mots.
+- Investisseur : ~20 % du nombre total de mots.
+Vérifie le ratio avant de répondre.
 
-# Loi babylonienne de cet épisode
-**${lawFr}**
+# Coach — qui il est et comment il parle
+Il porte l'épisode. Il raconte les histoires (parables, exemples concrets, anecdotes), explique les principes, pose des questions pour faire réfléchir, ramène toujours la leçon vers une action concrète.
 
-# Source à exploiter
-- Vidéo YouTube : ${brief.sourceUrl}
-- Créateur : ${brief.sourceCreator}
-- Insights clés extraits de la vidéo :
-${brief.keyInsightBullets.map((b) => `  - ${b}`).join("\n")}
+Style : phrases courtes, posées, beaucoup de pauses respirées. Tutoiement total. Calme, patient, jamais condescendant. Il enseigne par questions plutôt que par affirmations sèches.
 
-# Personnage de l'acte 1
-- Prénom : ${c.name}
-- Âge : ${c.age}
-- Ville : ${c.city}
-- Situation : ${c.situation}
+Il utilise un personnage fictif pour illustrer la leçon : ${c.name}, ${c.age} ans, ${c.city}. Situation : ${c.situation}. Il raconte SA réalité, SES choix, SES erreurs, comme on parlerait d'un voisin ou d'un collègue.
 
-# Action concrète de l'acte 3
+# Investisseur — qui il est et comment il parle
+38 ans, salarié français ordinaire (CDI à Lille, loyer 850 €, fille en CP, RIB qui clignote rouge le 22 du mois). Il représente l'auditeur cible : un Français moyen avec un PEA à moitié rempli, une assurance-vie qu'il regarde rarement, et qui hésite sur le PER.
+
+Il réagit par SA PROPRE VIE — son métier, sa famille, ses doutes, des exemples du quotidien. Il ne raconte pas de parables ; il pose les questions concrètes ou rebondit avec son vécu.
+
+Ses questions sont celles que se pose un vrai Français devant ses placements :
+- PEA : "Le plafond à 150 000 €, atteignable pour moi ?", "ETF World ou CW8 ?", "Si je clôture avant 5 ans, je perds quoi ?"
+- Assurance-vie : "L'abattement à 4 600 €, par an ou cumulé ?", "Fonds euros ou UC à 38 ans ?", "Si je meurs, ma fille touche combien après les 152 500 € ?"
+- PER : "Sortie en rente ou en capital ?", "TMI 30 %, je gagne combien à la sortie ?", "Si je change d'avis, je peux le débloquer ?"
+- Livret A / LEP : "22 950 €, je le garde ou je bascule sur PEA ?"
+- Immobilier : "LMNP ou SCPI à 38 ans ?", "Acheter à Lille ou rester locataire ?"
+- Fiscalité : "TMI, IR, prélèvements sociaux 17,2 % — résume-moi en une phrase ?"
+
+Tonalité : il dit "ouais", "attends, attends", il rit parfois, il doute. Il ne se laisse pas avoir par le jargon.
+
+# Cadre conceptuel (interne, jamais nommé à voix haute)
+La leçon de cet épisode : **${lawFr}**
+
+Cette leçon vient d'un cadre de sept lois de l'argent, mais le cadre reste invisible. Le Coach enseigne le principe sans jamais le sourcer.
+
+# INTERDITS ABSOLUS
+Aucune des chaînes suivantes ne doit apparaître dans le script :
+- "Babylone", "Babylon", "babylonien", "babylonienne"
+- "L'homme le plus riche", "Richest Man"
+- "Arkad", "Algamish", "Bansir", "Kobbi", "Clason"
+- "comme dans le livre", "le livre dit", "la sagesse babylonienne"
+- "comme dans la vidéo de…", "selon Alux"
+- "abonnez-vous", "likez", "partagez"
+- "garanti", "sans risque", "doublez votre capital", "révolutionnaire"
+
+Si l'une de ces phrases apparaît, le script est rejeté.
+
+# Vidéo source (matière première — jamais citée à l'audio)
+URL : ${brief.sourceUrl}
+Créateur : ${brief.sourceCreator}
+Insights extraits :
+${brief.keyInsightBullets.map((b) => `- ${b}`).join("\n")}
+
+Utilise ces idées pour nourrir les exemples du Coach. Ne mentionne jamais la vidéo source ni son créateur dans le script.
+
+# Action concrète (vers la fin de l'épisode)
 ${brief.targetAction}
 
-# Structure (à respecter strictement)
+Le Coach énonce cette action en 2-3 phrases : précise, datée, mesurable. L'Investisseur la reformule dans ses propres mots pour confirmer qu'il a compris.
 
-## ACTE 1 — Ouverture narrative (≈ 400 mots, ~2-3 min)
-- Voix : **Narrateur** uniquement.
-- Pose le décor : ${c.name} face à une décision d'argent. On sent l'enjeu, le doute, le quotidien français.
-- Ne nomme PAS encore la leçon. Pas de morale. Juste l'humain.
-- Style : phrases courtes, présent de narration, détails concrets (le café à 1,80 €, le virement de salaire, l'application bancaire).
-- Termine sur une question implicite : qu'est-ce que ${c.name} devrait faire ?
+# Crochet final pour le mois suivant (PAS un CTA)
+L'épisode finit par un crochet d'attente — pas par une demande d'abonnement.
+- Coach : "Le mois prochain, on parle de [thème suivant]. Et tu vas comprendre pourquoi cette action de cette semaine, c'est seulement la première marche."
+- Investisseur : "Ah ouais. Là, j'attends de voir."
 
-## ACTE 2 — Dialogue Coach + Investisseur (≈ 2 000 mots, ~13-15 min)
-- Voix : **Coach** et **Investisseur** en alternance, 18 à 24 échanges.
-- Le Coach explique la leçon en s'appuyant sur le cas de ${c.name}. Il introduit la leçon **par une question**, à la manière d'Arkad avec le marchand d'œufs — pas par une affirmation. Exemple : avant de poser la règle des 10 %, il demande "Si tu encaisses 2 800 € chaque mois et que tu en dépenses 2 800, qu'est-ce qui te reste à la fin de l'année ?"
-- L'Investisseur (35-50 ans, autodidacte) pose les vraies questions d'un auditeur français : "Mais avec un PEA plafonné à 150 000 €, est-ce que ça vaut le coup ?" "Et si je suis à la TMI 30 %, je perds combien sur l'AV ?" Il pose des doutes. Il revient sur ce que ${c.name} devrait faire concrètement.
-- Reprends les insights de la vidéo source mais reformulés pour le contexte fiscal français (PEA, AV, PER, CTO, PFU 30 %, TMI 0/11/30/41/45 %, Livret A 22 950 €, abattement AV 4 600 €/9 200 €).
-- Chiffres exacts pour 2026. Si un chiffre est cité dans la vidéo source mais ne s'applique pas en France, le Coach le précise et donne l'équivalent FR.
-- Pas de conseil personnalisé d'achat/vente sur un titre précis. Mécanismes, comparaisons, seuils statutaires uniquement.
-- **Le refrain babylonien (« ${refrain} ») doit apparaître exactement une fois**, prononcé par le Coach, dans un moment de doute de l'Investisseur. Pas plus. Pas moins. Un usage rare, comme un sceau.
-- Une référence textuelle au livre est autorisée (ex. "Comme Arkad le disait au marchand d'œufs...") mais une seule par épisode.
+L'auditeur doit finir l'épisode avec UNE seule pensée : "Je veux entendre le suivant." C'est ça qui convertit en abonnement payant.
 
-## ACTE 3 — Action concrète (≈ 500 mots, ~3-4 min)
-- Voix : **Coach** d'abord, puis **Investisseur** qui reformule, puis **Narrateur** pour fermer.
-- Coach : énonce l'action concrète de la semaine en 2-3 phrases. Une seule action. Précise, datée, mesurable.
-- Investisseur : reformule l'action dans ses propres mots, pour confirmer qu'il a compris. Une touche d'humour ou de doute autorisée.
-- Narrateur (ferme l'épisode) : revient sur ${c.name}. Une phrase ou deux. Pas de CTA. Pas de "abonnez-vous". Juste la résonance.
+# Forme
+- 100 % français, tutoiement.
+- Pas d'emojis (la TTS les lit littéralement).
+- Pas d'em-dashes "—" dans le texte parlé (utilise "·" ou coupe la phrase).
+- Émotions parlées autorisées en début de réplique : "Hum.", "Bon.", "D'accord.", "Attends…".
+- Variations de longueur : alterne phrases courtes (5-8 mots) et longues (20-25 mots) pour que le rythme parlé respire.
 
-# Règles non négociables
-
-- 100 % en français, tutoiement (jamais "vous").
-- Pas de phrases interdites : "abonnez-vous", "likez", "achète cette action", "garanti", "sans risque", "doublez votre capital", "révolutionnaire".
-- Tirets typographiques : utilise « · » ou coupe la phrase. Pas de « — » em-dash dans le texte parlé (ils s'entendent mal).
-- Variations de longueur : alterne phrases courtes (5-8 mots) et longues (20-25 mots). Le rythme parlé doit respirer.
-- Émotions parlées : autorise "Hum.", "Bon.", "D'accord.", "Attends..." en début de réplique pour casser la lecture mécanique de la TTS.
-- Le refrain babylonien de cet épisode est défini plus haut dans la section "ADN narratif". Le Coach le prononce une seule fois, tel quel, dans l'Acte 2. Pas de variante, pas de paraphrase.
-- Pas d'emojis dans le script (la TTS les lit littéralement).
-
-# Format de sortie
-
+# Sortie JSON
 Réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans préambule. Schéma :
 
 {
-  "title": "Titre de l'épisode (max 70 caractères, sans guillemets)",
+  "title": "Titre de l'épisode (max 70 caractères)",
   "summary": "Deux phrases : ce que l'épisode enseigne et pour qui.",
   "law": "${brief.law}",
   "character": ${JSON.stringify(brief.character)},
   "source": { "url": "${brief.sourceUrl}", "creator": "${brief.sourceCreator}" },
   "lines": [
-    { "act": 1, "speaker": "Narrateur",    "text": "..." },
-    { "act": 2, "speaker": "Coach",        "text": "..." },
-    { "act": 2, "speaker": "Investisseur", "text": "..." },
-    { "act": 3, "speaker": "Coach",        "text": "..." },
-    { "act": 3, "speaker": "Investisseur", "text": "..." },
-    { "act": 3, "speaker": "Narrateur",    "text": "..." }
+    { "speaker": "Coach", "text": "..." },
+    { "speaker": "Investisseur", "text": "..." }
   ],
   "wordCount": 0
 }
 
 "wordCount" doit être le total réel des mots du champ "text" sur toutes les lignes. Compte avant de répondre.
+
+Le ratio Coach/Investisseur doit être proche de 80/20 en mots. Vérifie avant de répondre.
 `;
 }
 
@@ -180,28 +185,56 @@ export function countScriptWords(lines: ScriptLine[]): number {
 }
 
 export const QA_BANNED_PHRASES = [
+  // Marketing CTAs
   "abonnez-vous",
   "likez",
+  "partagez",
+  // Trading-pump language
   "achète cette action",
   "achetez cette action",
   "garanti",
   "sans risque",
   "doublez votre capital",
   "révolutionnaire",
+  // Source-book leak
+  "babylone",
+  "babylon",
+  "babylonien",
+  "richest man",
+  "arkad",
+  "algamish",
+  "bansir",
+  "clason",
+  // Source-video leak
+  "alux",
+  "comme dans la vidéo",
 ];
 
 export function qaCheckScript(script: BabylonScript): { ok: boolean; reasons: string[] } {
   const reasons: string[] = [];
   const words = countScriptWords(script.lines);
 
-  if (words < 2_500) reasons.push(`Trop court : ${words} mots (min 2 500).`);
-  if (words > 3_400) reasons.push(`Trop long : ${words} mots (max 3 400).`);
+  if (words < 2_000) reasons.push(`Trop court : ${words} mots (min 2 000).`);
+  if (words > 3_600) reasons.push(`Trop long : ${words} mots (max 3 600).`);
 
-  const acts = new Set(script.lines.map((l) => l.act));
-  if (!(acts.has(1) && acts.has(2) && acts.has(3))) {
-    reasons.push("Structure incomplète : il manque un acte.");
+  // Speakers — must be exactly Coach + Investisseur
+  const speakers = new Set(script.lines.map((l) => l.speaker));
+  if (!speakers.has("Coach") || !speakers.has("Investisseur")) {
+    reasons.push("Il manque un des deux locuteurs (Coach et Investisseur attendus).");
+  }
+  if (speakers.size > 2) {
+    reasons.push(`Trop de locuteurs : ${[...speakers].join(", ")} (Coach + Investisseur seulement).`);
   }
 
+  // Speaking ratio — Coach should carry ~80 %, accept 70-90 % band
+  const coachWords = script.lines
+    .filter((l) => l.speaker === "Coach")
+    .reduce((sum, l) => sum + l.text.trim().split(/\s+/).filter(Boolean).length, 0);
+  const ratio = coachWords / Math.max(words, 1);
+  if (ratio < 0.7) reasons.push(`Coach trop discret : ${Math.round(ratio * 100)} % des mots (cible 80 %).`);
+  if (ratio > 0.9) reasons.push(`Investisseur effacé : Coach a ${Math.round(ratio * 100)} % des mots (cible 80 %).`);
+
+  // Banned phrases — case-insensitive substring check
   const fullText = script.lines.map((l) => l.text).join(" ").toLowerCase();
   for (const banned of QA_BANNED_PHRASES) {
     if (fullText.includes(banned.toLowerCase())) {
