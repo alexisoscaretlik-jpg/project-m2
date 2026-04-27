@@ -5,11 +5,22 @@ import type { PodcastScript, DialogueLine } from "@/app/api/podcast/generate/rou
 
 type TtsState = "idle" | "playing" | "paused";
 
+type BabylonEpisode = {
+  audioUrl: string;
+  title: string;
+  summary: string;
+  durationEstimateMin: number;
+  wordCount: number;
+  source: { url: string; creator: string };
+};
+
 export function CoachingPodcast() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [babylonLoading, setBabylonLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [podcast, setPodcast] = useState<PodcastScript | null>(null);
+  const [babylonEpisode, setBabylonEpisode] = useState<BabylonEpisode | null>(null);
   const [tts, setTts] = useState<TtsState>("idle");
   const [activeIdx, setActiveIdx] = useState<number>(-1);
   const synth = typeof window !== "undefined" ? window.speechSynthesis : null;
@@ -20,6 +31,7 @@ export function CoachingPodcast() {
     setLoading(true);
     setError(null);
     setPodcast(null);
+    setBabylonEpisode(null);
     setActiveIdx(-1);
     stopTts();
 
@@ -39,6 +51,34 @@ export function CoachingPodcast() {
       setError((e as Error).message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function generateBabylon() {
+    if (!url.trim()) return;
+    setBabylonLoading(true);
+    setError(null);
+    setPodcast(null);
+    setBabylonEpisode(null);
+    setActiveIdx(-1);
+    stopTts();
+
+    try {
+      const res = await fetch("/api/podcast/generate-babylon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: url.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setError(data.error ?? "Erreur inconnue.");
+      } else {
+        setBabylonEpisode(data as BabylonEpisode);
+      }
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBabylonLoading(false);
     }
   }
 
@@ -110,12 +150,14 @@ export function CoachingPodcast() {
         On génère un dialogue en français entre un coach et un investisseur — comme un podcast privé.
       </p>
 
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <input
           type="url"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
+          onKeyDown={(e) =>
+            e.key === "Enter" && !loading && !babylonLoading && generate()
+          }
           placeholder="https://www.youtube.com/watch?v=..."
           className="min-w-0 flex-1 rounded-lg border px-3.5 py-2.5 text-[14px] outline-none transition-colors focus:border-[var(--forest-600)]"
           style={{
@@ -124,11 +166,24 @@ export function CoachingPodcast() {
             borderColor: "var(--border)",
             color: "var(--fg)",
           }}
-          disabled={loading}
+          disabled={loading || babylonLoading}
         />
         <button
           onClick={generate}
-          disabled={loading || !url.trim()}
+          disabled={loading || babylonLoading || !url.trim()}
+          className="shrink-0 rounded-lg px-4 py-2.5 text-[14px] font-medium transition-colors disabled:opacity-50"
+          style={{
+            fontFamily: "var(--font-display)",
+            background: "var(--paper-200)",
+            color: "var(--fg)",
+            border: "1px solid var(--border)",
+          }}
+        >
+          {loading ? "Génération…" : "Court · 4 min"}
+        </button>
+        <button
+          onClick={generateBabylon}
+          disabled={loading || babylonLoading || !url.trim()}
           className="shrink-0 rounded-lg px-4 py-2.5 text-[14px] font-medium transition-colors disabled:opacity-50"
           style={{
             fontFamily: "var(--font-display)",
@@ -136,7 +191,7 @@ export function CoachingPodcast() {
             color: "var(--paper-50)",
           }}
         >
-          {loading ? "Génération…" : "Générer"}
+          {babylonLoading ? "Production…" : "Épisode · 20 min"}
         </button>
       </div>
 
@@ -157,6 +212,51 @@ export function CoachingPodcast() {
             style={{ fontFamily: "var(--font-serif)", color: "var(--fg-muted)" }}
           >
             Gemini regarde la vidéo et écrit le script… (60-90 secondes)
+          </p>
+        </div>
+      )}
+
+      {babylonLoading && (
+        <div className="mt-6 flex items-center gap-3">
+          <Spinner />
+          <p
+            className="text-[13px] italic"
+            style={{ fontFamily: "var(--font-serif)", color: "var(--fg-muted)" }}
+          >
+            Production de l&apos;épisode 20 minutes · extraction vidéo, écriture
+            du script en 3 actes, synthèse vocale ElevenLabs… (4-6 minutes,
+            tu peux laisser tourner)
+          </p>
+        </div>
+      )}
+
+      {babylonEpisode && (
+        <div className="mt-6">
+          <div className="cap-eyebrow mb-1">Épisode · style Babylon</div>
+          <h3
+            className="mb-1 text-[18px] font-semibold"
+            style={{ fontFamily: "var(--font-display)", color: "var(--fg)" }}
+          >
+            {babylonEpisode.title}
+          </h3>
+          <p
+            className="mb-4 text-[13px] italic"
+            style={{ fontFamily: "var(--font-serif)", color: "var(--fg-muted)" }}
+          >
+            {babylonEpisode.summary}
+          </p>
+          <audio
+            controls
+            preload="metadata"
+            src={babylonEpisode.audioUrl}
+            className="mb-3 w-full"
+          />
+          <p
+            className="text-[11px]"
+            style={{ fontFamily: "var(--font-mono)", color: "var(--fg-subtle)" }}
+          >
+            {babylonEpisode.durationEstimateMin} min · {babylonEpisode.wordCount} mots ·
+            source : {babylonEpisode.source.creator} · IA, pas un conseil en investissement
           </p>
         </div>
       )}

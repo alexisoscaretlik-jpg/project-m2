@@ -9,6 +9,7 @@ const TABS = [
   { href: "/watchlist", label: "Watchlist" },
   { href: "/simulation", label: "Simulateur" },
   { href: "/articles", label: "Guides" },
+  { href: "/podcast", label: "Podcast" },
   { href: "/tax", label: "Fiscalité" },
   { href: "/bank", label: "Banque" },
 ];
