@@ -1,162 +1,139 @@
-# Babylon podcast demo — runbook
+# Money-coaching podcast — operating runbook
 
-**Goal:** generate one real 20-minute French podcast episode from a YouTube source, on your Mac, using ElevenLabs voices.
+This is the playbook for shipping a new episode of the Invest Coach podcast.
+The editorial spec (why the prompt is shaped this way) lives separately in
+[`podcast-prompt-spec.md`](podcast-prompt-spec.md). Don't change either one
+without reading both.
 
-**Total time:** ~10 minutes (5 min setup + ~5 min for the pipeline to run).
+## What "an episode" means today
 
-**Where to run this:** Terminal on your Mac, inside the project directory. You can also paste this whole file into your desktop Claude Code session and ask it to do the steps for you.
+| Field | Value |
+|---|---|
+| Format | 2-voice conversation, Coach (~80 %) + Investisseur (~20 %), no narrator |
+| Length | ~12-18 min (target band; QA accepts 2 000-3 600 words) |
+| Theme | `money` (only theme today, more later — see `EpisodeTheme` in `babylon-prompt.ts`) |
+| Source | One YouTube URL per episode (Alux longform was the inaugural source) |
+| Engine | Gemini 2.5 Flash → Claude Opus 4.7 → ElevenLabs multilingual_v2 → Supabase Storage |
+| Distribution | `https://project-m2.alexisoscaretlik.workers.dev/podcast` + Spotify for Creators (manual upload, free) |
+| Cost | ~$3.85 / episode in API spend (vs Jellypod $5/ep — see comparison below) |
 
----
+## Pre-flight (one-time)
 
-## Pre-flight — do these once
+1. Be on `main` (or any branch with the latest `babylon-prompt.ts`).
+2. `cd invest-coach/web && npm install`. If you ever see "tsx not found" later, also `npm install --save-dev tsx`.
+3. `.env.local` must have these keys — values not placeholders:
 
-### 1. Get on the right branch
+   ```
+   GEMINI_API_KEY=…
+   GEMINI_VIDEO_MODEL_PRO=gemini-2.5-flash    # free-tier killed Pro quota
+   ANTHROPIC_API_KEY=…
+   ANTHROPIC_PODCAST_MODEL=claude-opus-4-7    # Sonnet under-writes
+   ELEVENLABS_API_KEY=sk_…                    # Use the rotated key, not any leaked one
+   ELEVENLABS_VOICE_COACH=…                   # Optional but strongly recommended (native French voice)
+   ELEVENLABS_VOICE_INVESTISSEUR=…            # Same — pick from elevenlabs.io/app/voice-library, filter Primary Language = French
+   NEXT_PUBLIC_SUPABASE_URL=…
+   SUPABASE_SERVICE_ROLE_KEY=sb_secret_…
+   ```
 
-```bash
-cd ~/path/to/project-m2          # adjust to wherever the repo lives on your Mac
-git fetch origin
-git checkout claude/general-session-M0FqT
-git pull
-```
+4. Supabase Storage bucket `podcasts` must exist, public-read. `scripts/publish-babylon.ts` will create it on first run if missing.
 
-### 2. Install dependencies (first time only)
+## Make a new episode
 
-```bash
+```sh
 cd invest-coach/web
-npm install
+npm run podcast:demo -- 'https://www.youtube.com/watch?v=YYYYYYYYYYY'
 ```
 
-If you get a "tsx not found" later, also run:
+This is **one command, end-to-end**:
 
-```bash
-npm install --save-dev tsx
+1. Gemini 2.5 Flash watches the YouTube video and extracts a structured brief — title, character, money-law, 5 key insights, target action. (~60-90 s)
+2. Claude Opus 4.7 writes the script as a JSON document with `lines: [{speaker, text}]`. QA gate runs as a `console.warn` (currently). (~30 s)
+3. ElevenLabs `eleven_multilingual_v2` synthesizes each line one by one with the configured voices, then concatenates — ID3 tags are stripped between segments to keep player duration correct. (~3-4 min)
+4. Supabase Storage upload + public URL printed.
+
+The local MP3 lives at `/tmp/babylon-<timestamp>.mp3`. The script JSON at `/tmp/babylon-<timestamp>.json`. Both stay there until you reboot.
+
+## Listen and decide
+
+```sh
+open -a "QuickTime Player" /tmp/babylon-*.mp3       # most recent
+# or hit the Audio URL printed by the runner in any browser
 ```
 
-### 3. Make sure your `.env.local` has all five keys
+If you like it, it's already on the live `/podcast` page (uploaded by the runner). If you want to bin it, just don't link to it — it'll sit in Supabase, nothing references it.
 
-Open `invest-coach/web/.env.local` and confirm these lines exist (values, not placeholders):
+## Re-publish a manually edited MP3
 
-```
-GEMINI_API_KEY=<your Gemini key>
-ANTHROPIC_API_KEY=<your Anthropic key>
-ELEVENLABS_API_KEY=<your rotated ElevenLabs key — NOT the one leaked in chat>
-NEXT_PUBLIC_SUPABASE_URL=<your Supabase project URL>
-SUPABASE_SERVICE_ROLE_KEY=<your Supabase service role key>
+If you tweaked the audio externally (Descript, Audacity, ffmpeg) and have a fresh `.mp3` + a `.json` metadata file:
+
+```sh
+npx tsx scripts/publish-babylon.ts /path/to/edited.mp3 /path/to/metadata.json
 ```
 
-If you don't have an `.env.local`, copy from `.env.example` if it exists, or create one with the lines above.
+The script up-serts both files; same path overwrites silently. If `metadata.json` lacks a `theme` field, it'll default to `money`.
 
-### 4. Pick three French ElevenLabs voices (recommended, optional)
+## Spotify for Creators (manual, web UI)
 
-Default voices in `lib/podcast/elevenlabs.ts` may be English. To swap to French:
+Spotify for Creators (formerly Anchor) is **free** — no monthly fee, no upload cost. RSS feed auto-generated, syndicates to Apple Podcasts via the same feed.
 
-1. Log in to https://elevenlabs.io/app/voice-library
-2. Filter by language: French
-3. Pick three voices — one warm/slow for **Coach**, one curious/mid-30s for **Investisseur**, one for **Narrateur** (can be the same as Coach)
-4. For each voice, click the "..." menu → **Copy voice ID**
-5. Add to `.env.local`:
+1. Go to https://creators.spotify.com → Log in with Spotify account.
+2. First time only: "Create a new show" with name `Invest Coach`, French-language, category `Business → Investing`. Show art lives at `~/Desktop/invest-coach-cover.jpg` — drag-drop to upload. (Generated by `make_cover.py`; regenerate if you change brand colors.)
+3. For each episode: "New episode" → drag the MP3 from `~/Downloads/` (or wherever you saved it) → set title and description (see `podcast-prompt-spec.md` for the marketing template) → save as draft, then publish.
+4. First episode goes through ~24 h Spotify review. Subsequent episodes are typically near-instant.
 
-```
-ELEVENLABS_VOICE_COACH=<voice id 1>
-ELEVENLABS_VOICE_INVESTISSEUR=<voice id 2>
-ELEVENLABS_VOICE_NARRATEUR=<voice id 3>
-```
+Computer-use can't trigger native file picker dialogs reliably, so the upload step is faster done by hand.
 
-If you skip this step the demo will still run, just possibly with English-leaning voices on French text.
+## Themes
 
-### 5. Create the Supabase Storage bucket
+`EpisodeTheme` in `babylon-prompt.ts` is currently `"money"` only. The site treats it as the public-facing shelf:
 
-In your Supabase dashboard:
-- **Storage** → **New bucket**
-- Name: `podcasts`
-- Public: ✅ **yes** (so the audio plays without signed URLs)
-- Save
+- `app/page.tsx` Landing renders one card per theme in `<ThemesSection />`. Add a new theme by appending to the `THEMES` array.
+- `app/podcast/page.tsx` accepts `?theme=money` (or any other slug) as a filter.
+- Episode metadata JSON written by `script.ts` includes `theme`. Old episodes with no theme field fall back to `money`.
 
-If you skip this step the upload step at the end will fail — but the local MP3 file at `/tmp/babylon-*.mp3` is still produced and playable.
+To add a new theme later:
+1. Add the slug to `EpisodeTheme` in `babylon-prompt.ts`.
+2. Add a new entry to `THEMES` in `app/page.tsx`.
+3. Set `theme` on the episode brief (or hand-edit the metadata JSON before re-publish).
 
----
+## Cost benchmarks (April 2026)
 
-## Run
+Per episode, ~12 min, ~11k chars of TTS:
 
-One command:
-
-```bash
-cd ~/path/to/project-m2/invest-coach/web
-npm run podcast:demo -- https://www.youtube.com/watch?v=ZyYQgZ1tnWM
-```
-
-Replace the URL if you want a different source video. Otherwise it uses the demo URL you sent.
-
----
-
-## What you'll see
-
-Roughly 4–6 minutes of step-by-step output:
-
-```
-[20:12:01] ━━━ Step 1: Gemini Pro extracts the video insight    (60–90s)
-[20:13:15] ━━━ Step 2: Claude Sonnet 4.6 writes the 3-act script (~30s)
-[20:13:48] ━━━ Step 3: ElevenLabs synthesizes 28 lines           (~3–4 min)
-[20:18:30] ━━━ Step 4: Uploading to Supabase Storage             (~5s)
-
-━━━ DONE ━━━
-Audio URL: https://...supabase.co/.../podcasts/babylon/2026-04-26/<slug>.mp3
-Local MP3: /tmp/babylon-1717...mp3
-```
-
-## Listen
-
-Two options, either works:
-
-```bash
-# Option A — open the MP3 locally in QuickTime / your default player
-open /tmp/babylon-*.mp3
-
-# Option B — open the public URL in any browser (works on phone too)
-# Just paste the "Audio URL" line into Safari.
-```
-
----
-
-## If something fails
-
-| Error you see | What it means | Fix |
+| Engine | Cost per ep | Best monthly cadence |
 |---|---|---|
-| `Could not read .env.local` | You're not in `invest-coach/web/` | `cd invest-coach/web` |
-| `GEMINI_API_KEY non configurée` | Key missing in `.env.local` | Add it, save, re-run |
-| `ANTHROPIC_API_KEY not set` | Key missing in `.env.local` | Add it, save, re-run |
-| `ELEVENLABS_API_KEY non configurée` | Key missing in `.env.local` | Add the **rotated** key, save, re-run |
-| `ElevenLabs 401: invalid_api_key` | Key is wrong, expired, or revoked | Generate a new one at elevenlabs.io/app/settings/api-keys, update `.env.local` |
-| `ElevenLabs 422: voice_not_found` | A voice ID in `.env.local` is wrong | Re-copy from voice library, or remove the env line to use defaults |
-| `QA script échoué: Trop court / Trop long` | Claude returned a script outside 2,500–3,400 words | Just re-run — non-deterministic, usually fine on retry |
-| `Upload MP3 échoué: bucket not found` | `podcasts` bucket doesn't exist in Supabase | Create it (see pre-flight step 5). The local MP3 is still saved at `/tmp/babylon-*.mp3` |
-| `Upload MP3 échoué: row-level security` | Bucket exists but isn't public | In Supabase, edit the bucket → toggle public → save |
-| Hangs at Step 1 for >3 min | Gemini is rate-limiting or video is private | Try a different YouTube URL; verify the video is public |
-| Hangs at Step 3 for >10 min | ElevenLabs is overloaded or voice is wrong | Check status.elevenlabs.io; cancel and retry |
+| **Our pipeline** (ElevenLabs Creator $22 + Anthropic API + Gemini free) | ~$3.85 | 9 eps/mo on Creator ($26/mo total). Pro $99/mo unlocks 45 eps/mo. |
+| **Jellypod** | ~$5.00 (1 000 credits ÷ 11 000-credit Creator plan @ $47) | 11 eps/mo on Creator ($47/mo). Business $150/mo for 30 eps. |
 
-If it fails halfway through, the script JSON from Step 2 is saved at `/tmp/babylon-<timestamp>.json` — useful for debugging without paying for TTS again.
+Decision (April 2026): primary = our pipeline (cheaper, automatable, IP-stable). Jellypod stays as a quality benchmark — run an episode through it occasionally to check we're not drifting in writing quality.
 
----
+## What can go wrong
 
-## After you've heard it
+| Symptom | Cause | Fix |
+|---|---|---|
+| `GEMINI_API_KEY non configurée` | Key missing or empty in `.env.local` | Add it; restart shell |
+| Gemini 429 free-tier quota | Pro model not allowed on free tier | Set `GEMINI_VIDEO_MODEL_PRO=gemini-2.5-flash` |
+| `ANTHROPIC_API_KEY non configurée` despite key set | Empty pre-existing var in shell | Loader now overrides empty values; if still seeing it, `unset ANTHROPIC_API_KEY` before running |
+| Sonnet 400 "doesn't support assistant prefill" | We removed prefill in `lib/podcast/script.ts:31` — should be fine now | If it returns: keep the no-prefill version |
+| `QA script échoué` warning | Word count or speaker ratio outside band | Re-run; QA is a warning, not a throw. If it persists 3 times, tune the prompt |
+| Player shows ~2 min for a 12-min file | ID3 tags between concatenated segments | Already fixed in `lib/podcast/elevenlabs.ts` (stripId3); if it returns, check that fix is intact |
+| `Bucket not found` | `podcasts` Supabase bucket missing | `publish-babylon.ts` creates it on first run; run that helper once |
+| Default voices sound English | Voice IDs in `elevenlabs.ts` are placeholders | Set `ELEVENLABS_VOICE_COACH/INVESTISSEUR` env vars to French native IDs |
 
-Reply with one of:
+## Files of interest
 
-- **"Voice good, story good, ship it"** → I merge Track A + Track B (cron + episode list + this pipeline) and we're production-ready.
-- **"Voice bad"** → tell me which one (Coach / Investisseur / Narrateur), I'll adjust voice IDs or stability settings.
-- **"Story flat"** → tell me what felt off (too academic? not enough story? too much jargon?) and I'll tune the prompt.
-- **"Failed at step X"** → paste the error, I'll fix.
+- [`lib/podcast/babylon-prompt.ts`](../invest-coach/web/lib/podcast/babylon-prompt.ts) — the prompt, types, QA gate
+- [`lib/podcast/extract-video.ts`](../invest-coach/web/lib/podcast/extract-video.ts) — Gemini video → brief
+- [`lib/podcast/script.ts`](../invest-coach/web/lib/podcast/script.ts) — Anthropic call + JSON parse + QA
+- [`lib/podcast/synth.ts`](../invest-coach/web/lib/podcast/synth.ts) — ElevenLabs orchestration
+- [`lib/podcast/elevenlabs.ts`](../invest-coach/web/lib/podcast/elevenlabs.ts) — TTS client + ID3 stripping
+- [`lib/podcast/storage.ts`](../invest-coach/web/lib/podcast/storage.ts) — Supabase upload
+- [`scripts/run-babylon-demo.ts`](../invest-coach/web/scripts/run-babylon-demo.ts) — the end-to-end runner
+- [`scripts/publish-babylon.ts`](../invest-coach/web/scripts/publish-babylon.ts) — re-publish helper
+- [`app/podcast/page.tsx`](../invest-coach/web/app/podcast/page.tsx) — public episode list, theme filter
+- [`app/page.tsx`](../invest-coach/web/app/page.tsx) — Landing's `<ThemesSection />`
+- [`docs/podcast-prompt-spec.md`](podcast-prompt-spec.md) — editorial intent
 
----
+## How a future Claude Code session should pick this up
 
-## File reference (for your desktop Claude Code session)
-
-If you want to ask desktop Claude to do this for you, point it at these files:
-
-- `invest-coach/web/scripts/run-babylon-demo.ts` — the runner
-- `invest-coach/web/lib/podcast/babylon-prompt.ts` — the script-generation prompt
-- `invest-coach/web/lib/podcast/extract-video.ts` — Gemini video extraction
-- `invest-coach/web/lib/podcast/script.ts` — Claude script generation
-- `invest-coach/web/lib/podcast/synth.ts` — ElevenLabs line-by-line synthesis
-- `invest-coach/web/lib/podcast/storage.ts` — Supabase Storage upload
-- `docs/reference/richest-man-of-babylon.md` — book reference (lives on branch `claude/pedantic-cerf-609ffa`)
+`MEMORY.md` for project-m2 already points at `project_podcast_pipeline.md`, which links here and to the spec. Reading those two files plus `babylon-prompt.ts` is enough context to ship a new episode in ~5 min.

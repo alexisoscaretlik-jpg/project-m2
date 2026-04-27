@@ -65,10 +65,16 @@ export type ScriptLine = {
   text: string;
 };
 
+// Themes are the top-level shelves on the public site. "money" is the
+// only one shipped today; future themes (career, health, taxes…) get
+// their own slug and their own /[theme] page.
+export type EpisodeTheme = "money";
+
 export type BabylonScript = {
   title: string;
   summary: string;
   law: BabylonianLaw;
+  theme: EpisodeTheme;
   character: BabylonBrief["character"];
   source: { url: string; creator: string };
   lines: ScriptLine[];
