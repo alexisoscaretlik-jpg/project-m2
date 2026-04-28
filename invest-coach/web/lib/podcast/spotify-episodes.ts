@@ -16,10 +16,10 @@ export type SpotifyEpisode = {
 };
 
 export const SPOTIFY_EPISODES: SpotifyEpisode[] = [
-  // Add as Spotify approves each episode. Example shape:
-  // {
-  //   id: "5tD7kJxXyZabc123XyZ",
-  //   slug: "trois-regles-d-argent-qui-changent-tout",
-  //   title: "Trois règles d'argent qui changent tout",
-  // },
+  {
+    id: "7ib7lIC37k2csGiJN3h85p",
+    slug: "trois-regles-d-argent-qui-changent-tout",
+    title: "Trois règles d'argent qui changent tout",
+  },
+  // Add new entries above this line as Spotify approves each episode.
 ];
