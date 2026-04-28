@@ -1,7 +1,7 @@
 # JELLYPOD — Prompt Maître "Coach × Investisseur"
 **Version 3.0 (FR) — bâtie pour l'oreille, ancrée dans le quotidien français**
 
-> **Mode d'emploi.** Le pipeline `scripts/build-jellypod-prompt-v2.ts` lit ce fichier, remplace `{{SOURCE}}` par l'extraction Gemini, et envoie le tout à Claude Opus 4.7. Opus livre un dialogue propre Camille / Thomas, qu'on importe ensuite dans Jellypod (Script Editor) pour la TTS.
+> **Mode d'emploi.** Le pipeline `scripts/build-jellypod-prompt-v3.ts` lit ce fichier, remplace `{{SOURCE}}` par l'extraction Gemini, et envoie le tout à Claude Opus 4.7. Opus livre un dialogue propre Camille / Thomas, qu'on importe ensuite dans Jellypod (Script Editor) pour la TTS.
 
 ---
 
