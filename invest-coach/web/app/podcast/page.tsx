@@ -1,5 +1,6 @@
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
+import { SpotifyEpisodeList } from "@/components/spotify-episode-card";
 import { serviceClient } from "@/lib/supabase/service";
 
 export const metadata = {
@@ -104,6 +105,8 @@ export default async function PodcastIndexPage({
             minutes, une action concrète à la fin.
           </p>
         </div>
+
+        <SpotifyEpisodeList />
 
         {episodes.length === 0 && (
           <p
