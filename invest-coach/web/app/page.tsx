@@ -4,6 +4,7 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { SubscribeForm } from "@/app/newsletter/subscribe-form";
 import { CoachingPodcast } from "@/components/coaching-podcast";
+import { SpotifyEpisodeList } from "@/components/spotify-episode-card";
 import { createClient } from "@/lib/supabase/server";
 import { supabase } from "@/lib/supabase";
 
@@ -54,6 +55,9 @@ export default async function Home() {
         >
           Apprends à faire travailler ton argent.
         </h1>
+
+        {/* Spotify episodes — renders nothing until SPOTIFY_EPISODES has entries */}
+        <SpotifyEpisodeList />
 
         {/* Podcast generator */}
         <CoachingPodcast />
