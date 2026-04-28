@@ -18,7 +18,7 @@
 //   - stderr: progress + token usage
 //
 // Usage:
-//   npx tsx scripts/build-jellypod-prompt-v2.ts <youtube_url>
+//   npx tsx scripts/build-jellypod-prompt-v3.ts <youtube_url>
 
 import { readFileSync } from "fs";
 import { dirname, resolve } from "path";
@@ -119,7 +119,7 @@ async function geminiExtract(url: string): Promise<FullExtraction> {
 async function main() {
   const url = process.argv[2];
   if (!url) {
-    console.error("Usage: build-jellypod-prompt-v2.ts <youtube_url>");
+    console.error("Usage: build-jellypod-prompt-v3.ts <youtube_url>");
     process.exit(1);
   }
 

@@ -50,7 +50,7 @@ cd invest-coach/web
 # Stage 1: Gemini watches the YouTube video → structured rules JSON.
 # Stage 2: Claude Opus 4.7 reads prompts/coach-thomas-master-v3.md
 #          + extraction → emits the final CAMILLE × THOMAS dialogue.
-npx tsx scripts/build-jellypod-prompt-v2.ts \
+npx tsx scripts/build-jellypod-prompt-v3.ts \
   'https://www.youtube.com/watch?v=YYYYYYYYYYY' \
   > /tmp/script.txt 2> /tmp/script.log
 
@@ -155,7 +155,7 @@ So as of April 2026 we:
 - Keep `extract-video.ts` (Gemini stage 1).
 - Keep `scripts/publish-babylon.ts` (Supabase upload).
 - Keep `app/podcast/page.tsx` and the Money theme card.
-- Add `scripts/build-jellypod-prompt.ts` (the new Opus-stage-2 brief author).
+- Add `scripts/build-jellypod-prompt-v3.ts` (the new Opus-stage-2 brief author).
 - Treat the rest of `lib/podcast/*` and `scripts/run-babylon-demo.ts` / `resynth-babylon.ts` as **dead code** — slated for cleanup in a separate PR. Don't add features to those files.
 
 ## What can go wrong
@@ -165,7 +165,7 @@ So as of April 2026 we:
 | `GEMINI_API_KEY non configurée` | Key missing/empty in `.env.local` | Add it; restart shell |
 | Gemini 429 free-tier quota | Pro model not allowed on free tier | Set `GEMINI_VIDEO_MODEL_PRO=gemini-2.5-flash` |
 | `ANTHROPIC_API_KEY non configurée` despite key set | Empty pre-existing var in shell | Loader overrides empty values; if still seeing it, `unset ANTHROPIC_API_KEY` before running |
-| Opus 4.7 brief leaks "Babylone" / "Arkad" / "Alux" / "abonnez-vous" | Meta-prompt got tweaked | grep the brief before pasting; if hits, regenerate. The meta-prompt in `build-jellypod-prompt.ts` lists the bans verbatim |
+| Opus 4.7 brief leaks "Babylone" / "Arkad" / "Alux" / "abonnez-vous" | Meta-prompt got tweaked | grep the brief before pasting; if hits, regenerate. The meta-prompt in `build-jellypod-prompt-v3.ts` lists the bans verbatim |
 | Brief is generic / template-y | Opus didn't use the Babylon book context | Confirm `docs/reference/richest-man-of-babylon.md` exists and is non-empty; the script `readFileSync`s it |
 | Jellypod paste creates `default-text-file.txt` instead of inline text | Expected — Jellypod treats >X chars as a file source | Use the one-line top-level prompt that points to it |
 | Jellypod 0 hosts after submit | Hosts aren't auto-bound to a new episode in the new flow | Click `Hosts (0)` → tick Coach + Investisseur → close modal → submit |
@@ -173,7 +173,7 @@ So as of April 2026 we:
 
 ## Files of interest
 
-- [`scripts/build-jellypod-prompt.ts`](../invest-coach/web/scripts/build-jellypod-prompt.ts) — Gemini → Opus → Jellypod-ready brief
+- [`scripts/build-jellypod-prompt-v3.ts`](../invest-coach/web/scripts/build-jellypod-prompt-v3.ts) — Gemini → Opus → Jellypod-ready brief
 - [`lib/podcast/extract-video.ts`](../invest-coach/web/lib/podcast/extract-video.ts) — Gemini video extraction (used by stage 1)
 - [`lib/podcast/storage.ts`](../invest-coach/web/lib/podcast/storage.ts) — Supabase Storage upload helper
 - [`scripts/publish-babylon.ts`](../invest-coach/web/scripts/publish-babylon.ts) — upload an MP3 + metadata to the `podcasts` bucket
@@ -190,4 +190,4 @@ So as of April 2026 we:
 
 ## How a future Claude Code session should pick this up
 
-`MEMORY.md` for project-m2 points at `project_podcast_pipeline.md`, which links here. Reading this runbook + `docs/podcast-prompt-spec.md` + the meta-prompt inside `scripts/build-jellypod-prompt.ts` is enough context to ship a new episode in ~10 min.
+`MEMORY.md` for project-m2 points at `project_podcast_pipeline.md`, which links here. Reading this runbook + `docs/podcast-prompt-spec.md` + the meta-prompt inside `scripts/build-jellypod-prompt-v3.ts` is enough context to ship a new episode in ~10 min.
