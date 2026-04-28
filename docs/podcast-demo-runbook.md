@@ -40,50 +40,64 @@ without reading both.
 
 6. Two Jellypod hosts saved (Coach + Investisseur, native French voices). The current ones were created from voice-design backstories matching the prompt-spec personas.
 
-## Make a new episode
+## Make a new episode (v3.0 — Camille × Thomas)
 
-The new flow is **two-stage**: Gemini → Opus produce a bespoke Jellypod brief, then Jellypod runs the production. Each episode gets its own Opus-authored brief — no template, no shared prompt — because the larger context of every Alux video differs.
+Two-stage pipeline that outputs a **finished dialogue script** (not a brief). Jellypod just TTSes it line by line, no rewrite.
 
 ```sh
 cd invest-coach/web
 
-# Stage 1+2: Gemini watches the video, Opus writes the Jellypod brief.
-# Brief lands on stdout, progress on stderr.
-npx tsx scripts/build-jellypod-prompt.ts \
+# Stage 1: Gemini watches the YouTube video → structured rules JSON.
+# Stage 2: Claude Opus 4.7 reads prompts/coach-thomas-master-v3.md
+#          + extraction → emits the final CAMILLE × THOMAS dialogue.
+npx tsx scripts/build-jellypod-prompt-v2.ts \
   'https://www.youtube.com/watch?v=YYYYYYYYYYY' \
-  > /tmp/brief.txt 2> /tmp/brief.log
+  > /tmp/script.txt 2> /tmp/script.log
 
 # Inspect before pasting
-cat /tmp/brief.log     # Gemini summary + Opus token usage
-cat /tmp/brief.txt     # the brief Jellypod will consume
+cat /tmp/script.log     # Gemini extraction summary + Opus token usage
+cat /tmp/script.txt     # the dialogue (CAMILLE: ... / THOMAS: ...)
+
+# Rename speakers to match Jellypod hosts
+sed -i '' -e 's/^CAMILLE :/Coach :/g' -e 's/^THOMAS :/Investisseur :/g' /tmp/script.txt
+cat /tmp/script.txt | pbcopy
 ```
 
-Then in Jellypod (web UI):
+Then in Jellypod web UI:
 
-1. `/studio/new` → click `+` → YouTube → paste the same URL.
-2. Click into the prompt area → paste the brief from `/tmp/brief.txt` (Jellypod will attach it as `default-text-file.txt`).
-3. Add a one-line top-level prompt: *"Suis strictement le brief éditorial dans default-text-file.txt. La vidéo YouTube est la matière source que tu illustres. Ne nomme jamais la source."*
-4. Click "Create a Podcast Episode" → set Hosts (2) to Coach + Investisseur → submit (up arrow).
-5. Wait ~5 min. Listen via Jellypod's player.
+1. `/studio/new` → click `+` → **Paste Text** → cmd+v (the dialogue) → Add Text. Jellypod attaches it as `default-text-file.txt`.
+2. Click into the main prompt → write: *"Le fichier joint contient le SCRIPT FINAL déjà écrit ligne par ligne avec les locuteurs Coach et Investisseur. Utilise ce script TEL QUEL, sans le ré-écrire, sans le résumer, sans en changer l'ordre. Mappe les lignes 'Coach :' à l'hôte Coach et les lignes 'Investisseur :' à l'hôte Investisseur."*
+3. Click **Create a Podcast Episode** → set Hosts (2) to Coach + Investisseur → submit (up arrow).
+4. Jellypod's chat will respond *"Je ne peux pas générer un nouvel épisode sans réécrire le contenu…"* — this is normal. Click the suggested action **"Colle Le Script Dans L'Éditeur"** → then click **Generate Script**. Jellypod logs *"Reading Script"* and produces a single chapter with N segments matching your line count. No rewrite.
+5. Wait ~3-5 min. Listen via Jellypod's player.
 
-If you like it, download MP3 → upload to Supabase:
+When it's right:
 
 ```sh
-# Audio-Only download from Jellypod's web UI lands in ~/Downloads/.
+# 1. Audio-Only download from Jellypod's web UI lands in ~/Downloads/.
+# 2. Build a small metadata JSON with title/summary/theme.
 npx tsx scripts/publish-babylon.ts \
   ~/Downloads/<title>.mp3 \
-  /tmp/<metadata>.json     # craft a small JSON with title/summary/source/theme; see publish-babylon.ts
+  /tmp/<metadata>.json
 ```
 
-Then it appears at https://project-m2.alexisoscaretlik.workers.dev/podcast?theme=money.
+Episode appears at https://project-m2.alexisoscaretlik.workers.dev/podcast?theme=money in ~2 min (no CF rebuild — page reads from Supabase live).
 
-## Listen and decide
+### About the master prompt
 
-Listen via Jellypod's web player while the episode is open at
-`https://www.jellypod.com/studio/artifact/<id>`. Iterate hosts there
-(Jellypod re-renders TTS only — that costs credits but no Opus call).
-Once the audio is right, download Audio-Only MP3 from the Jellypod UI
-and run `scripts/publish-babylon.ts` with a metadata JSON.
+The master prompt lives at [`invest-coach/web/prompts/coach-thomas-master-v3.md`](../invest-coach/web/prompts/coach-thomas-master-v3.md). It defines:
+
+- Personas Camille (coach) and Thomas (investisseur), with locked personalities, lore, voice tics.
+- Frameworks applied invisibly: SUCCESs, ABT, Pixar Story Spine, Story Circle, Feynman triplet, Driveway Moment.
+- Hard structure: cold open ≤ 45 s in medias res → Acte 1 (≈ 15 %) → Acte 2 (≈ 65 %, 3 idées + 1 retournement) → Acte 3 (≈ 20 %, 2-3 actions précises + callback à l'Acte 1).
+- Hard interdits: no "Bienvenue dans", no framework names, no monologue > 4 phrases without reaction, no chiffres > 2 décimales.
+- Output format: `CAMILLE : ...` / `THOMAS : ...` lines with `[rit]` `[silence]` `[temps]` indications.
+
+To iterate, edit the Markdown file and re-run. No code change needed.
+
+### 3-rules-deep tradeoff
+
+The master prompt deliberately picks **3 rules** from the source video, not all 15. Listening test verdict: 15-rules-in-12-min is forgettable; 3-deep wins the memory test. To cover all 15 of an Alux video, ship a **multi-episode series** (3 + 3 + 3 + 3 + 3) — don't rewrite the prompt to bump back up.
 
 ## Re-publish a manually edited MP3
 
