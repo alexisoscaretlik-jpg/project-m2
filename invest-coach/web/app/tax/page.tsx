@@ -105,18 +105,46 @@ export default async function TaxPage() {
   const hasWizard = !!wizardRes.data;
 
   return (
-    <main className="min-h-screen bg-muted">
+    <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/tax" />
 
-      <div className="mx-auto max-w-2xl px-4 py-6">
-        <h1 className="text-xl font-bold text-foreground">
-          Fiscalité personnelle
-        </h1>
-        <p className="text-xs text-muted-foreground">
-          Pour les résidents fiscaux français. Salariés, freelances,
-          retraités — payez moins d&apos;impôts, légalement.
-        </p>
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background:
+            "radial-gradient(120% 60% at 50% 0%, var(--lavender-100) 0%, var(--paper-50) 60%, var(--paper-50) 100%)",
+        }}
+      >
+        <div
+          className="mx-auto px-6 pt-16 pb-8 text-center sm:px-8 sm:pt-20"
+          style={{ maxWidth: "880px" }}
+        >
+          <div className="mb-6 flex justify-center">
+            <span className="ic-pill">
+              <span className="ic-pill-badge">Fiscalité</span>
+              IR · PEA · AV · PER · revenus fonciers
+            </span>
+          </div>
+          <h1 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
+            Économiser de l&apos;impôt, <em>c&apos;est gagner de l&apos;argent.</em>
+          </h1>
+          <p
+            className="mx-auto mt-5 text-[17px]"
+            style={{
+              maxWidth: "560px",
+              fontFamily: "var(--font-display)",
+              color: "var(--fg-muted)",
+              lineHeight: 1.55,
+            }}
+          >
+            Pour résidents fiscaux français. Salariés, freelances, retraités.
+            Trois à cinq leviers chiffrés en euros · pas de jargon · pas de
+            promesses.
+          </p>
+        </div>
+      </section>
 
+      <div className="mx-auto max-w-2xl px-6 py-8 sm:px-8">
         {/* Educational banner — links to the levers catalog */}
         <Link
           href="/tax/levers"
