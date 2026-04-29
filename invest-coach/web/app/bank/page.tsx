@@ -120,14 +120,46 @@ export default async function BankPage({
   }
 
   return (
-    <main className="min-h-screen bg-muted">
+    <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/bank" />
 
-      <div className="mx-auto max-w-2xl px-4 py-6">
-        <h1 className="text-xl font-bold text-foreground">Bank &amp; spending</h1>
-        <p className="text-xs text-muted-foreground">
-          PSD2 via GoCardless. Read-only, regulated, up to 2,500+ EU banks.
-        </p>
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background:
+            "radial-gradient(120% 60% at 50% 0%, var(--lavender-100) 0%, var(--paper-50) 60%, var(--paper-50) 100%)",
+        }}
+      >
+        <div
+          className="mx-auto px-6 pt-16 pb-8 text-center sm:px-8 sm:pt-20"
+          style={{ maxWidth: "880px" }}
+        >
+          <div className="mb-6 flex justify-center">
+            <span className="ic-pill">
+              <span className="ic-pill-badge">Banque</span>
+              PSD2 · lecture seule · GoCardless
+            </span>
+          </div>
+          <h1 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
+            Voir où passe ton argent, <em>sans excuser personne.</em>
+          </h1>
+          <p
+            className="mx-auto mt-5 text-[17px]"
+            style={{
+              maxWidth: "560px",
+              fontFamily: "var(--font-display)",
+              color: "var(--fg-muted)",
+              lineHeight: 1.55,
+            }}
+          >
+            Connecte ta banque française via PSD2 · réglementé · lecture seule.
+            On classe tes dépenses, on calcule ton taux d&apos;épargne, et on te
+            dit si tu peux ouvrir un PEA ce mois-ci.
+          </p>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-2xl px-6 py-8 sm:px-8">
 
         {error ? (
           <p className="mt-3 rounded-lg bg-[color:var(--terracotta-50)] p-3 text-sm text-[color:var(--terracotta-600)]">

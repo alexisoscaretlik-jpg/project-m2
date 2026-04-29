@@ -24,9 +24,70 @@ const jetBrainsMono = JetBrains_Mono({
   weight: ["400", "500", "600"],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://project-m2.alexisoscaretlik.workers.dev";
+
 export const metadata: Metadata = {
-  title: "Invest Coach",
-  description: "Personalized investment coaching for France",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Invest Coach · Le coaching d'investissement pour les épargnants français",
+    template: "%s — Invest Coach",
+  },
+  description:
+    "Coaching d'investissement pour épargnants français : PEA, assurance-vie, PER, fiscalité IR. La même méthode pour chaque empreinte fiscale. Économiser de l'impôt, c'est gagner de l'argent.",
+  keywords: [
+    "PEA",
+    "assurance-vie",
+    "PER",
+    "fiscalité",
+    "investissement France",
+    "épargne",
+    "ETF",
+    "déclaration impôts",
+    "TMI",
+    "PFU",
+    "coaching financier",
+  ],
+  authors: [{ name: "Invest Coach" }],
+  creator: "Invest Coach",
+  publisher: "Invest Coach",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    url: SITE_URL,
+    siteName: "Invest Coach",
+    title: "Invest Coach · Le coaching d'investissement pour les épargnants français",
+    description:
+      "PEA, assurance-vie, PER, fiscalité IR : la même méthode pour chaque empreinte fiscale. Économiser de l'impôt, c'est gagner de l'argent.",
+    // TODO: drop a static 1200×630 PNG at public/og-image.png and add it
+    // here as `images: [{ url: "/og-image.png", width: 1200, height: 630 }]`.
+    // We tried a dynamic next/og generator (app/opengraph-image.tsx) but it
+    // doesn't build under @opennextjs/cloudflare on Next 16 — Cloudflare
+    // Workers Build fails on the WASM bundle. Removed for now.
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Invest Coach · Coaching d'investissement français",
+    description:
+      "PEA, AV, PER, fiscalité IR. Économiser de l'impôt, c'est gagner de l'argent.",
+    // Same TODO: add `images: ["/og-image.png"]` once the static asset is in place.
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  formatDetection: {
+    email: false,
+    telephone: false,
+  },
 };
 
 // Every page talks to Supabase or Stripe at request time — nothing here

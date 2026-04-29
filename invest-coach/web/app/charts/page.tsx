@@ -95,10 +95,23 @@ export default async function ChartsIndexPage() {
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/charts" />
 
-      <div className="mx-auto max-w-[820px] px-6 py-12">
-        <div className="mb-12">
+      <div
+        className="relative overflow-hidden"
+        style={{
+          background:
+            "radial-gradient(120% 60% at 50% 0%, var(--lavender-100) 0%, var(--paper-50) 60%, var(--paper-50) 100%)",
+        }}
+      >
+        <div className="mx-auto max-w-[820px] px-6 pt-12 sm:pt-16">
           <div className="cap-eyebrow">Vue technique · revue continue</div>
-          <h1 className="cap-h1 mt-3">Lecture des graphiques</h1>
+          <h1 className="cap-h1 mt-3">
+            Lecture des graphiques, <em>chaque jour, en français.</em>
+          </h1>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-[820px] px-6 pb-12">
+        <div className="mb-12">
           <p className="cap-lede mt-4 max-w-[640px]">
             On lit chaque jour l&apos;analyse publique de{" "}
             <a
