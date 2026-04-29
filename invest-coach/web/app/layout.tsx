@@ -61,18 +61,21 @@ export const metadata: Metadata = {
     title: "Invest Coach · Le coaching d'investissement pour les épargnants français",
     description:
       "PEA, assurance-vie, PER, fiscalité IR : la même méthode pour chaque empreinte fiscale. Économiser de l'impôt, c'est gagner de l'argent.",
-    // TODO: drop a static 1200×630 PNG at public/og-image.png and add it
-    // here as `images: [{ url: "/og-image.png", width: 1200, height: 630 }]`.
-    // We tried a dynamic next/og generator (app/opengraph-image.tsx) but it
-    // doesn't build under @opennextjs/cloudflare on Next 16 — Cloudflare
-    // Workers Build fails on the WASM bundle. Removed for now.
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Invest Coach — Économiser de l'impôt, c'est gagner de l'argent.",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Invest Coach · Coaching d'investissement français",
     description:
       "PEA, AV, PER, fiscalité IR. Économiser de l'impôt, c'est gagner de l'argent.",
-    // Same TODO: add `images: ["/og-image.png"]` once the static asset is in place.
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
