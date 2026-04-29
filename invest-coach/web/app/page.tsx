@@ -6,6 +6,8 @@ import { SubscribeForm } from "@/app/newsletter/subscribe-form";
 import { CoachingPodcast } from "@/components/coaching-podcast";
 import { PodcastEpisodeList } from "@/components/podcast-episode-list";
 import { SpotifyEpisodeList } from "@/components/spotify-episode-card";
+import { PricingTable } from "@/components/pricing-table";
+import { ProductTabsNav } from "@/components/product-tabs-nav";
 import { createClient } from "@/lib/supabase/server";
 import { serviceClient } from "@/lib/supabase/service";
 
@@ -174,7 +176,7 @@ function Landing() {
       <IntegrationsSection />
       <ProductPreviewGrid />
       <SavingsEqualsEarningsSection />
-      <PricingSection />
+      <PricingTable />
       <Footer />
     </main>
   );
@@ -664,11 +666,14 @@ function ProductPreviewGrid() {
         </p>
       </div>
 
+      <ProductTabsNav />
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
         {/* 1. Fiscalité — wide card with form mockup */}
         <Link
+          id="product-fiscalite"
           href="/tax"
-          className="ic-card-pastel-lavender block md:col-span-2 lg:col-span-4"
+          className="ic-card-pastel-lavender block scroll-mt-24 md:col-span-2 lg:col-span-4"
           style={{
             borderRadius: "var(--r-2xl)",
             padding: "32px",
@@ -713,8 +718,9 @@ function ProductPreviewGrid() {
 
         {/* 2. Watchlist mockup */}
         <Link
+          id="product-watchlist"
           href="/watchlist"
-          className="block lg:col-span-2"
+          className="block scroll-mt-24 lg:col-span-2"
           style={{
             background: "var(--bg-elevated)",
             borderRadius: "var(--r-2xl)",
@@ -759,8 +765,9 @@ function ProductPreviewGrid() {
 
         {/* 3. Simulateur mockup */}
         <Link
+          id="product-simulateur"
           href="/simulation"
-          className="ic-card-pastel-peach block lg:col-span-2"
+          className="ic-card-pastel-peach block scroll-mt-24 lg:col-span-2"
           style={{
             borderRadius: "var(--r-2xl)",
             padding: "32px",
@@ -804,8 +811,9 @@ function ProductPreviewGrid() {
 
         {/* 4. Podcast mockup */}
         <Link
+          id="product-podcast"
           href="/podcast"
-          className="ic-card-pastel-mint block md:col-span-2 lg:col-span-4"
+          className="ic-card-pastel-mint block scroll-mt-24 md:col-span-2 lg:col-span-4"
           style={{
             borderRadius: "var(--r-2xl)",
             padding: "32px",
@@ -1364,206 +1372,6 @@ function CompoundingChart() {
         </span>
       </div>
     </div>
-  );
-}
-
-const TIERS: {
-  id: string;
-  name: string;
-  price: string;
-  period: string;
-  tag: string;
-  features: string[];
-  cta: string;
-  href: string;
-  featured: boolean;
-}[] = [
-  {
-    id: "decouverte",
-    name: "Découverte",
-    price: "0",
-    period: "€ / mois",
-    tag: "Gratuit, pour toujours.",
-    features: [
-      "Le journal du dimanche",
-      "3 brèves par semaine",
-      "Glossaire complet",
-      "Communauté de lecteurs",
-    ],
-    cta: "Commencer · gratuit",
-    href: "/login",
-    featured: false,
-  },
-  {
-    id: "investisseur",
-    name: "Investisseur",
-    price: "14",
-    period: "€ / mois",
-    tag: "Pour passer à l'acte.",
-    features: [
-      "Tout Découverte",
-      "Alertes éprouvées",
-      "Coach IA illimité",
-      "Notes de recherche",
-      "Simulateur PEA / CTO",
-    ],
-    cta: "Essayer 14 jours",
-    href: "/subscription",
-    featured: true,
-  },
-  {
-    id: "patrimoine",
-    name: "Patrimoine",
-    price: "39",
-    period: "€ / mois",
-    tag: "Pour piloter l'ensemble.",
-    features: [
-      "Tout Investisseur",
-      "Optimisation fiscale avancée",
-      "Suivi multi-enveloppes",
-      "Rapports trimestriels en deux pages",
-      "Coach IA prioritaire",
-    ],
-    cta: "Essayer 14 jours",
-    href: "/subscription",
-    featured: false,
-  },
-];
-
-function PricingSection() {
-  return (
-    <section id="tarifs" className="py-24" style={{ background: "var(--paper-100)" }}>
-      <div className="mx-auto px-6 text-center sm:px-8" style={{ maxWidth: "720px" }}>
-        <h2 className="ic-h1 mx-auto">
-          Trois formules. Annulable en un clic.
-        </h2>
-        <p
-          className="mx-auto mt-5 text-[17px]"
-          style={{
-            maxWidth: "520px",
-            fontFamily: "var(--font-display)",
-            color: "var(--fg-muted)",
-            lineHeight: 1.55,
-          }}
-        >
-          Découverte est gratuite, pour toujours. Tu passes payant seulement quand tu en veux plus.
-        </p>
-      </div>
-      <div
-        className="mx-auto mt-14 grid gap-6 px-6 sm:px-8 md:grid-cols-3"
-        style={{ maxWidth: "1080px" }}
-      >
-        {TIERS.map((t) => (
-          <article
-            key={t.id}
-            className={`ic-tier ${t.featured ? "ic-tier-featured" : ""}`}
-            style={t.featured ? { transform: "translateY(-8px)" } : undefined}
-          >
-            {t.featured ? (
-              <div className="ic-tier-ribbon">La plus choisie</div>
-            ) : null}
-            <h3
-              className="m-0 text-[22px] font-bold"
-              style={{
-                fontFamily: "var(--font-display)",
-                letterSpacing: "-0.02em",
-                color: "var(--ink-700)",
-              }}
-            >
-              {t.name}
-            </h3>
-            <p
-              className="m-0 text-[14px]"
-              style={{
-                fontFamily: "var(--font-display)",
-                color: "var(--fg-muted)",
-              }}
-            >
-              {t.tag}
-            </p>
-            <div
-              className="flex items-baseline gap-1.5 py-3"
-              style={{
-                borderTop: "1px solid var(--border)",
-                borderBottom: "1px solid var(--border)",
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "56px",
-                  fontWeight: 700,
-                  letterSpacing: "-0.035em",
-                  lineHeight: 1,
-                  color: "var(--ink-700)",
-                }}
-              >
-                {t.price}
-              </span>
-              <span
-                className="text-[13px]"
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  color: "var(--fg-muted)",
-                }}
-              >
-                {t.period}
-              </span>
-            </div>
-            <ul className="m-0 flex flex-1 list-none flex-col gap-2.5 p-0">
-              {t.features.map((f) => (
-                <li
-                  key={f}
-                  className="flex items-start gap-2.5 text-[14px]"
-                  style={{ color: "var(--fg)", lineHeight: 1.45, fontFamily: "var(--font-display)" }}
-                >
-                  <CheckIcon />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href={t.href}
-              className="mt-2 inline-flex items-center justify-center rounded-full px-5 py-3 text-[14px] font-semibold transition-all hover:translate-y-[-1px] hover:shadow-md"
-              style={{
-                fontFamily: "var(--font-display)",
-                background: t.featured
-                  ? "var(--ink-700)"
-                  : "var(--bg-elevated)",
-                color: t.featured ? "var(--paper-0)" : "var(--ink-700)",
-                border: t.featured
-                  ? "1px solid var(--ink-700)"
-                  : "1px solid var(--paper-300)",
-              }}
-            >
-              {t.cta}
-            </Link>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width="16"
-      height="16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      style={{
-        color: "var(--lavender-600)",
-        marginTop: "3px",
-        flexShrink: 0,
-      }}
-    >
-      <path d="M4 12 L10 18 L20 6" />
-    </svg>
   );
 }
 

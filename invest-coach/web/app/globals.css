@@ -352,14 +352,19 @@
   color: var(--fg);
   text-wrap: balance;
 }
+/* Editorial italic accent — Source Serif 4 in italic, used on `<em>` inside
+   any display heading. Inspired by White & Case / NYT-style editorial sites
+   where one or two words in a headline switch to a contrasting serif italic
+   for a magazine feel without going full serif body. */
 .ic-display em,
-.cap-display em {
-  font-style: normal;
-  background: linear-gradient(135deg, var(--lavender-600) 0%, var(--terracotta-500) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
+.cap-display em,
+.ic-h1 em,
+.ic-h2 em {
+  font-family: var(--font-source-serif), Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--lavender-700);
 }
 
 .ic-h1,
