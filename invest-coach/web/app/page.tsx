@@ -174,11 +174,298 @@ function Landing() {
       <HeroSection />
       <WorldPlaygroundSection />
       <IntegrationsSection />
+      <HowItWorksSection />
       <ProductPreviewGrid />
       <SavingsEqualsEarningsSection />
       <PricingTable />
+      <TrustStatsBar />
       <Footer />
     </main>
+  );
+}
+
+// ─────────────────────── How It Works · 3-step isometric ───────────────────────
+
+const HOW_STEPS: {
+  index: string;
+  title: string;
+  body: string;
+  illustration: "scan" | "gears" | "sign";
+}[] = [
+  {
+    index: "01",
+    title: "Connecte ton avis d'imposition",
+    body: "PDF, photo, ou copie-colle. On lit ton TMI, tes revenus, tes parts. Aucune donnée ne quitte la France.",
+    illustration: "scan",
+  },
+  {
+    index: "02",
+    title: "On chiffre tes leviers",
+    body: "PEA, AV, PER, dons, frais réels. Trois à cinq actions classées par euros gagnés, pas par buzz.",
+    illustration: "gears",
+  },
+  {
+    index: "03",
+    title: "Tu signes ta déclaration",
+    body: "On pré-remplit ton 2042. Tu vérifies, tu signes, tu envoies à impots.gouv. Cinq minutes en mai.",
+    illustration: "sign",
+  },
+];
+
+function HowItWorksSection() {
+  return (
+    <section className="mx-auto px-6 py-24 sm:px-8" style={{ maxWidth: "1080px" }}>
+      <div className="mb-14 text-center">
+        <div
+          className="mb-3 text-[12px] font-semibold uppercase"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--lavender-700)",
+            letterSpacing: "0.16em",
+          }}
+        >
+          Comment ça marche
+        </div>
+        <h2 className="ic-h1 mx-auto" style={{ maxWidth: "640px" }}>
+          Trois étapes. <em>Quinze minutes au total.</em>
+        </h2>
+        <p
+          className="mx-auto mt-5 text-[17px]"
+          style={{
+            maxWidth: "560px",
+            fontFamily: "var(--font-display)",
+            color: "var(--fg-muted)",
+            lineHeight: 1.55,
+          }}
+        >
+          Pas de rendez-vous, pas de jargon de conseiller, pas de revente
+          de ta data. Tu pilotes, on chiffre.
+        </p>
+      </div>
+
+      <ol className="grid gap-6 md:grid-cols-3">
+        {HOW_STEPS.map((s) => (
+          <li
+            key={s.index}
+            className="flex flex-col rounded-2xl p-6"
+            style={{
+              background: "var(--bg-elevated)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <div
+              className="mb-5 flex h-32 items-center justify-center rounded-xl"
+              style={{
+                background:
+                  "linear-gradient(160deg, var(--lavender-50) 0%, var(--paper-100) 100%)",
+                border: "1px solid var(--border)",
+              }}
+            >
+              <IsoIllustration kind={s.illustration} />
+            </div>
+            <div
+              className="mb-2 text-[11px] font-bold uppercase"
+              style={{
+                fontFamily: "var(--font-mono)",
+                color: "var(--lavender-700)",
+                letterSpacing: "0.12em",
+              }}
+            >
+              Étape {s.index}
+            </div>
+            <h3
+              className="text-[20px] font-bold"
+              style={{
+                fontFamily: "var(--font-display)",
+                letterSpacing: "-0.02em",
+                color: "var(--ink-700)",
+                lineHeight: 1.25,
+              }}
+            >
+              {s.title}
+            </h3>
+            <p
+              className="mt-3 text-[14px]"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--fg-muted)",
+                lineHeight: 1.55,
+              }}
+            >
+              {s.body}
+            </p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+function IsoIllustration({ kind }: { kind: "scan" | "gears" | "sign" }) {
+  if (kind === "scan") {
+    // Isometric document with a scanning beam.
+    return (
+      <svg width="120" height="100" viewBox="0 0 120 100" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="isoPaperA" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--paper-0)" />
+            <stop offset="100%" stopColor="var(--lavender-50)" />
+          </linearGradient>
+        </defs>
+        {/* Document — isometric face */}
+        <path d="M 30 26 L 75 14 L 100 30 L 55 42 Z" fill="url(#isoPaperA)" stroke="var(--lavender-400)" strokeWidth="1.2" />
+        <path d="M 55 42 L 100 30 L 100 78 L 55 90 Z" fill="var(--lavender-100)" stroke="var(--lavender-400)" strokeWidth="1.2" />
+        <path d="M 30 26 L 55 42 L 55 90 L 30 74 Z" fill="var(--lavender-200)" stroke="var(--lavender-400)" strokeWidth="1.2" />
+        {/* Lines on the front face */}
+        <line x1="62" y1="55" x2="92" y2="47" stroke="var(--lavender-500)" strokeWidth="1" />
+        <line x1="62" y1="63" x2="86" y2="56" stroke="var(--lavender-400)" strokeWidth="1" opacity="0.8" />
+        <line x1="62" y1="71" x2="80" y2="66" stroke="var(--lavender-400)" strokeWidth="1" opacity="0.8" />
+        {/* Scan beam */}
+        <line x1="20" y1="50" x2="110" y2="50" stroke="var(--terracotta-500)" strokeWidth="1.5" strokeDasharray="2 3" opacity="0.9" />
+      </svg>
+    );
+  }
+  if (kind === "gears") {
+    // Two interlocked isometric gears + a stack of coins.
+    return (
+      <svg width="120" height="100" viewBox="0 0 120 100" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="isoCoin" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--lavender-200)" />
+            <stop offset="100%" stopColor="var(--lavender-400)" />
+          </linearGradient>
+        </defs>
+        {/* Coin stack (isometric) */}
+        <g>
+          <ellipse cx="38" cy="78" rx="22" ry="8" fill="var(--lavender-300)" />
+          <rect x="16" y="62" width="44" height="16" fill="url(#isoCoin)" />
+          <ellipse cx="38" cy="62" rx="22" ry="8" fill="var(--lavender-200)" stroke="var(--lavender-500)" strokeWidth="0.8" />
+          <ellipse cx="38" cy="58" rx="22" ry="8" fill="var(--lavender-100)" stroke="var(--lavender-500)" strokeWidth="0.8" />
+          <ellipse cx="38" cy="54" rx="22" ry="8" fill="var(--paper-0)" stroke="var(--lavender-500)" strokeWidth="0.8" />
+          <text x="38" y="58" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="10" fontWeight="700" fill="var(--lavender-700)">€</text>
+        </g>
+        {/* Big gear */}
+        <g transform="translate(86 38)">
+          <circle r="20" fill="var(--lavender-100)" stroke="var(--lavender-500)" strokeWidth="1.2" />
+          <circle r="6"  fill="var(--paper-0)"     stroke="var(--lavender-500)" strokeWidth="1" />
+          {[0, 60, 120, 180, 240, 300].map((angle) => (
+            <rect
+              key={angle}
+              x="-3"
+              y="-24"
+              width="6"
+              height="6"
+              fill="var(--lavender-400)"
+              transform={`rotate(${angle})`}
+            />
+          ))}
+        </g>
+        {/* Small gear */}
+        <g transform="translate(98 76)">
+          <circle r="11" fill="var(--lavender-200)" stroke="var(--lavender-500)" strokeWidth="1" />
+          <circle r="3"  fill="var(--paper-0)"     stroke="var(--lavender-500)" strokeWidth="0.8" />
+          {[0, 72, 144, 216, 288].map((angle) => (
+            <rect
+              key={angle}
+              x="-2"
+              y="-14"
+              width="4"
+              height="4"
+              fill="var(--lavender-500)"
+              transform={`rotate(${angle})`}
+            />
+          ))}
+        </g>
+      </svg>
+    );
+  }
+  // sign
+  return (
+    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="isoSheet" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--paper-0)" />
+          <stop offset="100%" stopColor="var(--paper-100)" />
+        </linearGradient>
+      </defs>
+      {/* Folder back */}
+      <path d="M 24 30 L 70 18 L 100 32 L 54 44 Z" fill="var(--lavender-200)" stroke="var(--lavender-500)" strokeWidth="1" />
+      {/* Sheet on top, isometric */}
+      <path d="M 30 38 L 76 26 L 96 38 L 50 50 Z"  fill="url(#isoSheet)" stroke="var(--lavender-500)" strokeWidth="1.2" />
+      <path d="M 50 50 L 96 38 L 96 80 L 50 92 Z"  fill="var(--paper-0)"  stroke="var(--lavender-500)" strokeWidth="1.2" />
+      <path d="M 30 38 L 50 50 L 50 92 L 30 80 Z"  fill="var(--paper-100)" stroke="var(--lavender-500)" strokeWidth="1.2" />
+      {/* Form rows */}
+      <line x1="56" y1="60" x2="88" y2="51" stroke="var(--lavender-400)" strokeWidth="1" />
+      <line x1="56" y1="68" x2="84" y2="60" stroke="var(--lavender-300)" strokeWidth="1" opacity="0.7" />
+      {/* Signature swoosh */}
+      <path d="M 58 80 Q 68 70 78 78 T 92 76" stroke="var(--terracotta-500)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      {/* Check mark */}
+      <g transform="translate(94 22)">
+        <circle r="10" fill="var(--forest-500)" />
+        <path d="M -4 0 L -1 4 L 5 -3" stroke="var(--paper-0)" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </g>
+    </svg>
+  );
+}
+
+// ─────────────────────── Trust Stats Bar (above footer) ───────────────────────
+
+function TrustStatsBar() {
+  return (
+    <section
+      className="border-y"
+      style={{ background: "var(--paper-100)", borderColor: "var(--border)" }}
+    >
+      <div
+        className="mx-auto grid gap-6 px-6 py-12 sm:px-8 md:grid-cols-3"
+        style={{ maxWidth: "1080px" }}
+      >
+        {[
+          { num: "Depuis 2024", label: "Newsletter du dimanche, sans interruption." },
+          { num: "5 articles", label: "Tous fact-checkés, mis à jour à chaque réforme." },
+          { num: "1 podcast", label: "Premier épisode sur Spotify · trois par mois à venir." },
+        ].map((s) => (
+          <div key={s.label} className="text-center md:text-left">
+            <div
+              className="text-[28px] font-bold"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--ink-700)",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.1,
+              }}
+            >
+              {s.num}
+            </div>
+            <p
+              className="mt-2 text-[13px]"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--fg-muted)",
+                lineHeight: 1.55,
+              }}
+            >
+              {s.label}
+            </p>
+          </div>
+        ))}
+      </div>
+      <div
+        className="mx-auto px-6 pb-10 text-center sm:px-8"
+        style={{ maxWidth: "720px" }}
+      >
+        <p
+          className="text-[11px] uppercase"
+          style={{
+            fontFamily: "var(--font-mono)",
+            color: "var(--fg-subtle)",
+            letterSpacing: "0.12em",
+          }}
+        >
+          Données hébergées en France · Pas de revente · Désabonnement en un clic
+        </p>
+      </div>
+    </section>
   );
 }
 

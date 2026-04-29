@@ -56,23 +56,28 @@ export default function ArticlesIndexPage() {
             gagner du temps — pas pour te vendre un produit.
           </p>
 
-          {/* Decorative stacked-pages illustration. */}
-          <svg
-            aria-hidden="true"
-            className="mx-auto mt-10"
-            width="120"
-            height="48"
-            viewBox="0 0 120 48"
-            fill="none"
+          {/* Atmospheric photo strip — Unsplash CDN.
+              Container has a brand-color backdrop so the layout stays intact
+              if the external hotlink ever fails. */}
+          <div
+            className="mx-auto mt-10 overflow-hidden rounded-2xl"
+            style={{
+              maxWidth: "640px",
+              aspectRatio: "16 / 5",
+              background:
+                "linear-gradient(135deg, var(--lavender-200) 0%, var(--lavender-100) 100%)",
+              border: "1px solid var(--border)",
+            }}
           >
-            <rect x="14" y="6"  width="92" height="36" rx="4" fill="var(--paper-0)"     stroke="var(--border)" />
-            <rect x="10" y="10" width="92" height="36" rx="4" fill="var(--paper-0)"     stroke="var(--border)" />
-            <rect x="6"  y="14" width="92" height="36" rx="4" fill="var(--lavender-50)" stroke="var(--lavender-300)" />
-            <line x1="14" y1="22" x2="80" y2="22" stroke="var(--lavender-400)" strokeWidth="1.4" strokeLinecap="round" />
-            <line x1="14" y1="28" x2="68" y2="28" stroke="var(--lavender-300)" strokeWidth="1.2" strokeLinecap="round" />
-            <line x1="14" y1="34" x2="58" y2="34" stroke="var(--lavender-300)" strokeWidth="1.2" strokeLinecap="round" />
-            <line x1="14" y1="40" x2="44" y2="40" stroke="var(--lavender-300)" strokeWidth="1.2" strokeLinecap="round" />
-          </svg>
+            <img
+              src="https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1280&h=400&q=80"
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover"
+              style={{ display: "block" }}
+            />
+          </div>
         </div>
       </section>
 

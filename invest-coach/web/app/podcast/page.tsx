@@ -130,15 +130,37 @@ export default async function PodcastIndexPage({
             exactement ce qu&apos;il faut faire cette semaine.
           </p>
 
-          {/* Decorative animated waveform — visual signature for the audio theme. */}
+          {/* Atmospheric photo strip — Unsplash CDN.
+              Container has a brand-color backdrop so the layout stays intact
+              if the external hotlink ever fails. */}
+          <div
+            className="mx-auto mt-10 overflow-hidden rounded-2xl"
+            style={{
+              maxWidth: "640px",
+              aspectRatio: "16 / 5",
+              background:
+                "linear-gradient(135deg, var(--lavender-200) 0%, var(--lavender-100) 100%)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <img
+              src="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1280&h=400&q=80"
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover"
+              style={{ display: "block" }}
+            />
+          </div>
+
+          {/* Animated waveform under the photo — keeps the audio signature. */}
           <div
             aria-hidden="true"
-            className="mx-auto mt-10 flex h-12 items-center justify-center gap-[3px]"
+            className="mx-auto mt-5 flex h-10 items-center justify-center gap-[3px]"
             style={{ maxWidth: "320px" }}
           >
             {Array.from({ length: 32 }).map((_, i) => {
-              // Pseudo-random heights, deterministic per index so SSR matches.
-              const h = 10 + ((i * 13) % 28) + (i % 5) * 4;
+              const h = 8 + ((i * 13) % 22) + (i % 5) * 3;
               return (
                 <span
                   key={i}
