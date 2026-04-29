@@ -26,9 +26,19 @@ Ship one episode per cycle that passes the four mission tests of the master prom
 Two stages, one pipeline:
 
 - **Stage 1 — Gemini 2.5 Flash** (`GEMINI_VIDEO_MODEL_PRO=gemini-2.5-flash`). Reads the YouTube URL natively. Pro tier is paid-only — don't try Pro on a free key.
-- **Stage 2 — Claude Opus 4.7** (`ANTHROPIC_PODCAST_MODEL=claude-opus-4-7`). Reads [`invest-coach/web/prompts/coach-thomas-master-v3.md`](../../../invest-coach/web/prompts/coach-thomas-master-v3.md) (v3.2), substitutes `{{SOURCE}}` with the Gemini extraction, emits `CAMILLE :` / `THOMAS :` lines.
+- **Stage 2 — Claude Opus 4.7** (`ANTHROPIC_PODCAST_MODEL=claude-opus-4-7`). Reads the master prompt at [`./PROMPT.md`](./PROMPT.md) (a self-contained copy of v3.2), substitutes `{{SOURCE}}` with the Gemini extraction, emits `CAMILLE :` / `THOMAS :` lines.
 
 TTS = Jellypod (manual paste-and-render in their UI; Spotify upload is also manual). Supabase Storage = via [`scripts/publish-babylon.ts`](../../../invest-coach/web/scripts/publish-babylon.ts).
+
+### Master prompt — sync rule
+
+[`./PROMPT.md`](./PROMPT.md) is a **mirror** of the canonical Claude Code spec at `invest-coach/web/prompts/coach-thomas-master-v3.md`. The canonical version is the source of truth for editorial decisions; this Paperclip copy is the agent's runtime input. **The two MUST stay in sync.** When the canonical version bumps (v3.2 → v3.3 etc.):
+
+1. `cp invest-coach/web/prompts/coach-thomas-master-v3.md paperclip-team/agents/podcast-producer/PROMPT.md`
+2. Verify the v-tag in line 2 matches between the two files.
+3. Commit both in the same PR with `chore(podcast): sync v3.x prompt → paperclip mirror`.
+
+Drift between the two = silent quality regression. CI will eventually fail-fast on a mismatch (todo).
 
 ## Budget
 

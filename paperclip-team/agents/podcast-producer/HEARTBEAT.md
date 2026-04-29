@@ -1,5 +1,11 @@
 # HEARTBEAT.md -- Podcast Producer Heartbeat Checklist
 
+## Primary trigger: a YouTube URL
+
+Most invocations look like the user (or `@ceo`) handing you `https://www.youtube.com/watch?v=...`. When you see that, jump directly to step 5 (Generate the script) and execute the linear path through step 11. The wake-flow below is for cron-driven background runs (source curation, health checks). The full URL-triggered execution recipe lives in the canonical Claude Code spec at [`.claude/agents/podcast-producer.md`](../../../.claude/agents/podcast-producer.md) under "## When the user shares a YouTube URL" — that is the source of truth; mirror its steps.
+
+## Wake checklist
+
 Run on every wake.
 
 ## 1. Identity & Context
