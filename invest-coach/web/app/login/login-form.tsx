@@ -40,18 +40,43 @@ export function LoginForm({ next }: { next: string }) {
         placeholder="ton@email.fr"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full rounded-md border border-border bg-card px-3 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-        style={{ fontFamily: "var(--font-display)" }}
+        className="w-full rounded-full focus:outline-none"
+        style={{
+          fontFamily: "var(--font-display)",
+          background: "var(--paper-0)",
+          color: "var(--ink-700)",
+          border: "1px solid var(--paper-300)",
+          padding: "14px 20px",
+          fontSize: "15px",
+          boxShadow: "var(--sh-sm)",
+        }}
       />
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-primary px-4 py-2.5 font-medium text-primary-foreground transition-colors hover:opacity-90 disabled:opacity-50"
-        style={{ fontFamily: "var(--font-display)" }}
+        className="w-full rounded-full font-semibold transition-all hover:translate-y-[-1px] hover:shadow-md disabled:opacity-60"
+        style={{
+          fontFamily: "var(--font-display)",
+          background: "var(--ink-700)",
+          color: "var(--paper-0)",
+          padding: "14px 20px",
+          fontSize: "15px",
+          letterSpacing: "-0.005em",
+        }}
       >
         {pending ? "Envoi…" : "Recevoir le lien magique"}
       </button>
-      {error ? <p className="text-sm text-[color:var(--terracotta-500)]">{error}</p> : null}
+      {error ? (
+        <p
+          className="mt-2 text-[13px]"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--terracotta-500)",
+          }}
+        >
+          {error}
+        </p>
+      ) : null}
     </form>
   );
 }

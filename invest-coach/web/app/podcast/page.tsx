@@ -1,6 +1,7 @@
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { SpotifyEpisodeList } from "@/components/spotify-episode-card";
+import { EpisodePlayer } from "@/components/episode-player";
 import { serviceClient } from "@/lib/supabase/service";
 
 export const metadata = {
@@ -95,63 +96,124 @@ export default async function PodcastIndexPage({
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/podcast" />
 
-      <div className="mx-auto max-w-3xl px-6 py-12">
-        <div className="mb-10">
-          <div className="cap-eyebrow">Thème · Argent</div>
-          <h1 className="cap-h1 mt-3">Le podcast Invest Coach</h1>
-          <p className="cap-lede mt-4 max-w-[640px]">
-            Une seule loi de l&apos;argent par épisode, appliquée à ton vrai
-            salaire. Coach + Investisseur, conversation naturelle de vingt
-            minutes, une action concrète à la fin.
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background:
+            "radial-gradient(120% 60% at 50% 0%, var(--lavender-100) 0%, var(--paper-50) 60%, var(--paper-50) 100%)",
+        }}
+      >
+        <div
+          className="mx-auto px-6 pt-16 pb-10 text-center sm:px-8 sm:pt-20"
+          style={{ maxWidth: "880px" }}
+        >
+          <div className="mb-6 flex justify-center">
+            <span className="ic-pill">
+              <span className="ic-pill-badge">Podcast</span>
+              Une loi de l&apos;argent par épisode
+            </span>
+          </div>
+          <h1 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
+            Podcast
+          </h1>
+          <p
+            className="mx-auto mt-5 text-[17px]"
+            style={{
+              maxWidth: "560px",
+              fontFamily: "var(--font-display)",
+              color: "var(--fg-muted)",
+              lineHeight: 1.55,
+            }}
+          >
+            Coach + Investisseur creusent une seule loi de l&apos;argent par
+            épisode, appliquée à un vrai salaire français. Vingt minutes, une
+            action concrète à la fin.
           </p>
         </div>
+      </section>
 
+      <div className="mx-auto max-w-3xl px-6 pt-4 pb-16 sm:px-8">
         <SpotifyEpisodeList />
 
-        {episodes.length === 0 && (
-          <p
-            className="text-[14px] italic"
-            style={{ fontFamily: "var(--font-serif)", color: "var(--fg-muted)" }}
+        {episodes.length === 0 ? (
+          <div
+            className="ic-card-pastel-lavender"
+            style={{
+              borderRadius: "var(--r-2xl)",
+              padding: "32px 28px",
+              border: "1px solid rgba(124,91,250,0.14)",
+            }}
           >
-            Pas encore d&apos;épisode publié. Reviens bientôt.
-          </p>
-        )}
+            <div
+              className="text-[11px] font-semibold uppercase"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--lavender-700)",
+                letterSpacing: "0.12em",
+              }}
+            >
+              Premier épisode bientôt
+            </div>
+            <p
+              className="mt-2 text-[16px]"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--ink-700)",
+                lineHeight: 1.45,
+              }}
+            >
+              On enregistre un épisode neuf chaque semaine. Abonne-toi à la
+              newsletter pour ne pas le rater.
+            </p>
+          </div>
+        ) : null}
 
-        <ul className="space-y-6">
+        <ul className="mt-2 space-y-4">
           {episodes.map((ep, idx) => (
             <li key={ep.slug}>
-              <article className="cap-card">
-                <div className="cap-eyebrow mb-2">
+              <article
+                className="rounded-2xl px-6 py-6"
+                style={{
+                  background: "var(--bg-elevated)",
+                  border: "1px solid var(--border)",
+                }}
+              >
+                <div
+                  className="text-[11px] font-semibold uppercase"
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    color: "var(--lavender-700)",
+                    letterSpacing: "0.12em",
+                  }}
+                >
                   Épisode {episodes.length - idx} · {formatDate(ep.date)}
                 </div>
                 <h2
-                  className="text-[22px] font-semibold leading-snug"
+                  className="mt-2 text-[22px] font-bold"
                   style={{
                     fontFamily: "var(--font-display)",
-                    letterSpacing: "-0.01em",
-                    color: "var(--fg)",
+                    letterSpacing: "-0.02em",
+                    color: "var(--ink-700)",
+                    lineHeight: 1.25,
                   }}
                 >
                   {ep.meta.title}
                 </h2>
                 <p
-                  className="mt-2 text-[15px]"
+                  className="mt-3 text-[15px]"
                   style={{
-                    fontFamily: "var(--font-serif)",
+                    fontFamily: "var(--font-display)",
                     lineHeight: 1.55,
                     color: "var(--fg-muted)",
                   }}
                 >
                   {ep.meta.summary}
                 </p>
-                <audio
-                  controls
-                  preload="metadata"
-                  src={ep.audioUrl}
-                  className="mt-4 w-full"
-                />
+                <div className="mt-5">
+                  <EpisodePlayer src={ep.audioUrl} />
+                </div>
                 <p
-                  className="mt-3 text-[11px]"
+                  className="mt-4 text-[11px]"
                   style={{
                     fontFamily: "var(--font-mono)",
                     color: "var(--fg-subtle)",

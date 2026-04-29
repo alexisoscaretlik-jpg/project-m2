@@ -23,32 +23,118 @@ export default function ArticlesIndexPage() {
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/articles" />
 
-      <div className="mx-auto max-w-3xl px-6 py-12">
-        <div className="mb-10">
-          <div className="cap-eyebrow">Le journal</div>
-          <h1 className="cap-h1 mt-3">Guides</h1>
-          <p className="cap-lede mt-4 max-w-[640px]">
-            Les bases, sans jargon. Chaque guide est pensé pour te faire gagner
-            du temps — pas pour te vendre un produit.
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background:
+            "radial-gradient(120% 60% at 50% 0%, var(--lavender-100) 0%, var(--paper-50) 60%, var(--paper-50) 100%)",
+        }}
+      >
+        <div
+          className="mx-auto px-6 pt-16 pb-10 text-center sm:px-8 sm:pt-20"
+          style={{ maxWidth: "880px" }}
+        >
+          <div className="mb-6 flex justify-center">
+            <span className="ic-pill">
+              <span className="ic-pill-badge">Le journal</span>
+              Édité chaque semaine
+            </span>
+          </div>
+          <h1 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
+            Articles
+          </h1>
+          <p
+            className="mx-auto mt-5 text-[17px]"
+            style={{
+              maxWidth: "560px",
+              fontFamily: "var(--font-display)",
+              color: "var(--fg-muted)",
+              lineHeight: 1.55,
+            }}
+          >
+            Les bases, sans jargon. Chaque article est pensé pour te faire
+            gagner du temps — pas pour te vendre un produit.
           </p>
         </div>
+      </section>
 
-        <ul className="space-y-4">
-          {ARTICLES.map((a) => (
+      <div className="mx-auto max-w-3xl px-6 pt-4 pb-12 sm:px-8">
+        {ARTICLES.length > 0 ? (
+          <Link
+            href={`/articles/${ARTICLES[0].slug}`}
+            className="mb-8 block ic-card-pastel-lavender"
+            style={{
+              borderRadius: "var(--r-2xl)",
+              padding: "32px",
+              border: "1px solid rgba(124,91,250,0.14)",
+              transition: "all 200ms var(--ease-standard)",
+            }}
+          >
+            <div
+              className="text-[11px] font-semibold uppercase"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--lavender-700)",
+                letterSpacing: "0.12em",
+              }}
+            >
+              À la une · {ARTICLES[0].readMinutes} min de lecture
+            </div>
+            <h2
+              className="mt-3 text-[28px] font-bold"
+              style={{
+                fontFamily: "var(--font-display)",
+                letterSpacing: "-0.025em",
+                color: "var(--ink-700)",
+                lineHeight: 1.15,
+              }}
+            >
+              {ARTICLES[0].title}
+            </h2>
+            <p
+              className="mt-3 text-[16px]"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--fg-muted)",
+                lineHeight: 1.55,
+              }}
+            >
+              {ARTICLES[0].teaser}
+            </p>
+            <p
+              className="mt-5 text-[13px] font-semibold"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--lavender-700)",
+              }}
+            >
+              Lire l&apos;article →
+            </p>
+          </Link>
+        ) : null}
+
+        <ul className="space-y-3">
+          {ARTICLES.slice(1).map((a) => (
             <li key={a.slug}>
               <Link href={`/articles/${a.slug}`} className="block">
-                <article className="cap-card">
+                <article
+                  className="rounded-2xl px-6 py-5 transition-all"
+                  style={{
+                    background: "var(--bg-elevated)",
+                    border: "1px solid var(--border)",
+                  }}
+                >
                   <div className="flex items-baseline justify-between gap-3">
-                    <h2
-                      className="text-[22px] font-semibold leading-snug"
+                    <h3
+                      className="text-[19px] font-bold leading-snug"
                       style={{
                         fontFamily: "var(--font-display)",
-                        letterSpacing: "-0.01em",
-                        color: "var(--fg)",
+                        letterSpacing: "-0.015em",
+                        color: "var(--ink-700)",
                       }}
                     >
                       {a.title}
-                    </h2>
+                    </h3>
                     <span
                       className="shrink-0 text-[11px]"
                       style={{
@@ -60,9 +146,9 @@ export default function ArticlesIndexPage() {
                     </span>
                   </div>
                   <p
-                    className="mt-2 text-[15px]"
+                    className="mt-2 text-[14px]"
                     style={{
-                      fontFamily: "var(--font-serif)",
+                      fontFamily: "var(--font-display)",
                       lineHeight: 1.55,
                       color: "var(--fg-muted)",
                     }}
@@ -70,13 +156,13 @@ export default function ArticlesIndexPage() {
                     {a.teaser}
                   </p>
                   <p
-                    className="mt-4 text-[12px]"
+                    className="mt-3 text-[12px]"
                     style={{
                       fontFamily: "var(--font-mono)",
                       color: "var(--fg-subtle)",
                     }}
                   >
-                    Mis à jour le {formatDate(a.updated)}
+                    {formatDate(a.updated)}
                   </p>
                 </article>
               </Link>

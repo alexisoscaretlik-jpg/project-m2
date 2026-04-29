@@ -1,10 +1,8 @@
 import Link from "next/link";
 
 import { Nav } from "@/components/nav";
-import { TvMini } from "@/components/tv-mini";
-import { TvTickerTape } from "@/components/tv-ticker-tape";
+import { Footer } from "@/components/footer";
 import { requireUser } from "@/lib/supabase/require-auth";
-import { toTvSymbol } from "@/lib/tradingview";
 
 import { addToWatchlist, removeFromWatchlist } from "./actions";
 
@@ -20,16 +18,40 @@ type FeedCard = {
   companies: Company | Company[] | null;
 };
 
-const toneStyles: Record<string, string> = {
-  bullish: "bg-[color:var(--forest-100)] text-[color:var(--forest-700)] border-[color:var(--forest-200)]",
-  cautious: "bg-[color:var(--warning-soft)] text-[color:var(--warning)] border-[color:var(--warning)]",
-  red_flag: "bg-[color:var(--terracotta-100)] text-[color:var(--terracotta-700)] border-[color:var(--terracotta-200)]",
-  educational: "bg-muted text-foreground border-border",
+const toneStyles: Record<string, { bg: string; fg: string; label: string }> = {
+  bullish: {
+    bg: "var(--forest-50)",
+    fg: "var(--forest-700)",
+    label: "Solide",
+  },
+  cautious: {
+    bg: "var(--warning-soft)",
+    fg: "var(--warning)",
+    label: "À surveiller",
+  },
+  red_flag: {
+    bg: "var(--terracotta-50)",
+    fg: "var(--terracotta-700)",
+    label: "Signal rouge",
+  },
+  educational: {
+    bg: "var(--lavender-50)",
+    fg: "var(--lavender-700)",
+    label: "Pédagogique",
+  },
 };
 
 function first<T>(v: T | T[] | null): T | null {
   if (!v) return null;
   return Array.isArray(v) ? v[0] ?? null : v;
+}
+
+function formatFrenchDate(iso: string) {
+  return new Date(iso).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export default async function WatchlistPage() {
@@ -68,74 +90,164 @@ export default async function WatchlistPage() {
   }
 
   return (
-    <main className="min-h-screen bg-muted">
+    <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/watchlist" />
-      <TvTickerTape
-        symbols={
-          watched.length > 0
-            ? watched.map((c) => ({
-                proName: toTvSymbol(c.ticker),
-                title: c.name,
-              }))
-            : undefined
-        }
-      />
 
-      <div className="mx-auto max-w-2xl px-4 py-6">
-        <h1 className="text-xl font-bold text-foreground">Ta watchlist</h1>
-        <p className="text-xs text-muted-foreground">
-          Les cartes des entreprises que tu suis apparaissent ici en priorité.
-        </p>
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background:
+            "radial-gradient(120% 60% at 50% 0%, var(--lavender-100) 0%, var(--paper-50) 60%, var(--paper-50) 100%)",
+        }}
+      >
+        <div
+          className="mx-auto px-6 pt-16 pb-10 text-center sm:px-8 sm:pt-20"
+          style={{ maxWidth: "880px" }}
+        >
+          <div className="mb-6 flex justify-center">
+            <span className="ic-pill">
+              <span className="ic-pill-badge">Suivi</span>
+              {watched.length} entreprise{watched.length === 1 ? "" : "s"} suivie{watched.length === 1 ? "" : "s"}
+            </span>
+          </div>
+          <h1 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
+            Watchlist
+          </h1>
+          <p
+            className="mx-auto mt-5 text-[17px]"
+            style={{
+              maxWidth: "560px",
+              fontFamily: "var(--font-display)",
+              color: "var(--fg-muted)",
+              lineHeight: 1.55,
+            }}
+          >
+            Suis les entreprises qui te concernent. Pas de prix en temps réel —
+            on te ping quand une publication compte vraiment.
+          </p>
+        </div>
+      </section>
 
-        <section className="mt-6">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Tu suis ({watched.length})
-          </h2>
-          {watched.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Tu ne suis encore personne. Ajoute un ticker ci-dessous.
-            </p>
-          ) : (
+      <div className="mx-auto max-w-3xl px-6 pt-4 pb-16 sm:px-8">
+        {watched.length > 0 ? (
+          <section>
+            <div
+              className="mb-3 text-[11px] font-semibold uppercase"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--lavender-700)",
+                letterSpacing: "0.12em",
+              }}
+            >
+              Tu suis
+            </div>
             <ul className="space-y-2">
               {watched.map((c) => (
                 <li
                   key={c.id}
-                  className="rounded-lg border border-border bg-card p-3"
+                  className="flex items-center justify-between rounded-2xl px-5 py-4"
+                  style={{
+                    background: "var(--bg-elevated)",
+                    border: "1px solid var(--border)",
+                  }}
                 >
-                  <div className="flex items-center justify-between">
-                    <Link
-                      href={`/ticker/${encodeURIComponent(c.ticker)}`}
-                      className="flex items-baseline gap-2 hover:underline"
+                  <Link
+                    href={`/ticker/${encodeURIComponent(c.ticker)}`}
+                    className="flex items-baseline gap-3"
+                  >
+                    <span
+                      className="text-[14px] font-semibold"
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        color: "var(--ink-700)",
+                        letterSpacing: "0.02em",
+                      }}
                     >
-                      <span className="font-mono text-sm font-semibold text-foreground">
-                        {c.ticker}
-                      </span>
-                      <span className="text-sm text-foreground">{c.name}</span>
-                    </Link>
-                    <form action={removeFromWatchlist}>
-                      <input type="hidden" name="company_id" value={c.id} />
-                      <button
-                        type="submit"
-                        className="text-xs text-muted-foreground hover:text-[color:var(--terracotta-500)]"
-                      >
-                        Retirer
-                      </button>
-                    </form>
-                  </div>
-                  <div className="mt-2">
-                    <TvMini symbol={toTvSymbol(c.ticker)} />
-                  </div>
+                      {c.ticker}
+                    </span>
+                    <span
+                      className="text-[14px]"
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        color: "var(--fg)",
+                      }}
+                    >
+                      {c.name}
+                    </span>
+                  </Link>
+                  <form action={removeFromWatchlist}>
+                    <input type="hidden" name="company_id" value={c.id} />
+                    <button
+                      type="submit"
+                      className="text-[12px] transition-colors hover:text-[var(--terracotta-500)]"
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        color: "var(--fg-muted)",
+                      }}
+                    >
+                      Retirer
+                    </button>
+                  </form>
                 </li>
               ))}
             </ul>
-          )}
-        </section>
+          </section>
+        ) : (
+          <section
+            className="ic-card-pastel-lavender"
+            style={{
+              borderRadius: "var(--r-2xl)",
+              padding: "32px 28px",
+              border: "1px solid rgba(124,91,250,0.14)",
+            }}
+          >
+            <div
+              className="text-[11px] font-semibold uppercase"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--lavender-700)",
+                letterSpacing: "0.12em",
+              }}
+            >
+              Ta liste est vide
+            </div>
+            <h2
+              className="mt-2 text-[22px] font-bold"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--ink-700)",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              Ajoute ta première action.
+            </h2>
+            <p
+              className="mt-2 text-[15px]"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--fg-muted)",
+                lineHeight: 1.55,
+              }}
+            >
+              Choisis une entreprise dans la liste ci-dessous. On t&apos;enverra
+              les coachings dès qu&apos;elle publie un événement public —
+              rapport trimestriel, alerte AMF, changement de direction.
+            </p>
+          </section>
+        )}
 
         {addable.length > 0 ? (
-          <section className="mt-8">
-            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Ajouter un ticker
-            </h2>
+          <section className="mt-10">
+            <div
+              className="mb-3 text-[11px] font-semibold uppercase"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--lavender-700)",
+                letterSpacing: "0.12em",
+              }}
+            >
+              Ajouter une entreprise
+            </div>
             <ul className="flex flex-wrap gap-2">
               {addable.map((c) => (
                 <li key={c.id}>
@@ -143,12 +255,28 @@ export default async function WatchlistPage() {
                     <input type="hidden" name="ticker" value={c.ticker} />
                     <button
                       type="submit"
-                      className="rounded-full border border-border bg-card px-3 py-1 text-xs hover:border-primary hover:bg-accent"
+                      className="rounded-full px-4 py-2 transition-all hover:translate-y-[-1px]"
+                      style={{
+                        background: "var(--bg-elevated)",
+                        border: "1px solid var(--paper-300)",
+                        fontFamily: "var(--font-display)",
+                      }}
                     >
-                      <span className="font-mono font-semibold">
+                      <span
+                        className="text-[13px] font-semibold"
+                        style={{
+                          fontFamily: "var(--font-mono)",
+                          color: "var(--ink-700)",
+                        }}
+                      >
                         {c.ticker}
                       </span>
-                      <span className="ml-1 text-muted-foreground">{c.name}</span>
+                      <span
+                        className="ml-2 text-[13px]"
+                        style={{ color: "var(--fg-muted)" }}
+                      >
+                        {c.name}
+                      </span>
                     </button>
                   </form>
                 </li>
@@ -158,36 +286,73 @@ export default async function WatchlistPage() {
         ) : null}
 
         {feed.length > 0 ? (
-          <section className="mt-10">
-            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Ton fil
-            </h2>
+          <section className="mt-12">
+            <div
+              className="mb-3 text-[11px] font-semibold uppercase"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--lavender-700)",
+                letterSpacing: "0.12em",
+              }}
+            >
+              Coachings récents
+            </div>
             <ul className="space-y-3">
               {feed.map((card) => {
                 const company = first(card.companies);
+                const tone = card.tone ?? "educational";
+                const toneStyle = toneStyles[tone] ?? toneStyles.educational;
                 return (
                   <li key={card.id}>
                     <Link
                       href={`/ticker/${company ? encodeURIComponent(company.ticker) : ""}`}
-                      className="block rounded-xl border border-border bg-card p-4 shadow-sm transition hover:border-border hover:shadow"
+                      className="block rounded-2xl px-5 py-5 transition-all hover:translate-y-[-1px] hover:shadow-md"
+                      style={{
+                        background: "var(--bg-elevated)",
+                        border: "1px solid var(--border)",
+                      }}
                     >
-                      <div className="mb-1 flex items-center justify-between gap-3">
-                        <span className="font-mono text-sm font-semibold text-foreground">
+                      <div className="mb-2 flex items-center gap-3">
+                        <span
+                          className="text-[13px] font-semibold"
+                          style={{
+                            fontFamily: "var(--font-mono)",
+                            color: "var(--ink-700)",
+                          }}
+                        >
                           {company?.ticker ?? "?"}
                         </span>
-                        {card.tone ? (
-                          <span
-                            className={`rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${
-                              toneStyles[card.tone] ?? toneStyles.educational
-                            }`}
-                          >
-                            {card.tone.replace("_", " ")}
-                          </span>
-                        ) : null}
+                        <span
+                          className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
+                          style={{
+                            fontFamily: "var(--font-display)",
+                            background: toneStyle.bg,
+                            color: toneStyle.fg,
+                            letterSpacing: "0.06em",
+                          }}
+                        >
+                          {toneStyle.label}
+                        </span>
                       </div>
-                      <p className="text-sm text-foreground">{card.title}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {new Date(card.published_at).toLocaleDateString()}
+                      <p
+                        className="text-[16px] font-semibold"
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          color: "var(--ink-700)",
+                          lineHeight: 1.4,
+                          letterSpacing: "-0.015em",
+                        }}
+                      >
+                        {card.title}
+                      </p>
+                      <p
+                        className="mt-1.5 text-[12px]"
+                        style={{
+                          fontFamily: "var(--font-mono)",
+                          color: "var(--fg-subtle)",
+                        }}
+                      >
+                        {formatFrenchDate(card.published_at)}
                       </p>
                     </Link>
                   </li>
@@ -197,6 +362,7 @@ export default async function WatchlistPage() {
           </section>
         ) : null}
       </div>
+      <Footer />
     </main>
   );
 }

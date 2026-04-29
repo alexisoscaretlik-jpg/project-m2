@@ -417,9 +417,14 @@ export default async function TaxPage() {
                 ) : (
                   <Link
                     href="/subscription"
-                    className="rounded-lg border border-[color:var(--warning)] bg-[color:var(--warning-soft)] px-4 py-2 text-sm font-medium text-[color:var(--warning)] hover:bg-[color:var(--warning-soft)]"
+                    className="rounded-full px-5 py-2 text-sm font-semibold transition-all hover:translate-y-[-1px] hover:shadow-md"
+                    style={{
+                      background: "var(--lavender-50)",
+                      color: "var(--lavender-700)",
+                      border: "1px solid var(--lavender-300)",
+                    }}
                   >
-                    Télécharger (réservé Plus) →
+                    Passer à Investisseur →
                   </Link>
                 )
               ) : null}
