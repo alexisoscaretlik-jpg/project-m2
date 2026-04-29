@@ -171,11 +171,104 @@ function Landing() {
       <Nav active="/" />
       <HeroSection />
       <WorldPlaygroundSection />
+      <IntegrationsSection />
       <ProductPreviewGrid />
       <SavingsEqualsEarningsSection />
       <PricingSection />
       <Footer />
     </main>
+  );
+}
+
+// ─────────────────────── Integrations Section ───────────────────────
+
+const INTEGRATIONS: { name: string; bg: string; fg: string }[] = [
+  { name: "Boursorama",     bg: "#fef2f2", fg: "#e11d48" },
+  { name: "Fortuneo",       bg: "#fff7ed", fg: "#ea580c" },
+  { name: "Trade Republic", bg: "#f5f5f4", fg: "#1c1917" },
+  { name: "Bourse Direct",  bg: "#eff6ff", fg: "#1d4ed8" },
+  { name: "Linxea",         bg: "#ecfeff", fg: "#0e7490" },
+  { name: "Saxo Bank",      bg: "#eff6ff", fg: "#1e3a8a" },
+  { name: "DEGIRO",         bg: "#fefce8", fg: "#a16207" },
+  { name: "BoursoBank",     bg: "#fdf2f8", fg: "#be185d" },
+];
+
+function IntegrationsSection() {
+  return (
+    <section className="mx-auto px-6 py-20 sm:px-8" style={{ maxWidth: "1080px" }}>
+      <div className="mb-10 text-center">
+        <div
+          className="mb-3 text-[12px] font-semibold uppercase"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--lavender-700)",
+            letterSpacing: "0.16em",
+          }}
+        >
+          Compatible avec ton écosystème
+        </div>
+        <h2
+          className="mx-auto text-[28px] font-bold sm:text-[32px]"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--ink-700)",
+            letterSpacing: "-0.02em",
+            lineHeight: 1.2,
+            maxWidth: "560px",
+          }}
+        >
+          Tu changes de courtier ? On t&apos;y suit.
+        </h2>
+        <p
+          className="mx-auto mt-4 text-[15px]"
+          style={{
+            maxWidth: "520px",
+            fontFamily: "var(--font-display)",
+            color: "var(--fg-muted)",
+            lineHeight: 1.55,
+          }}
+        >
+          Que ton PEA soit chez Bourso, ton AV chez Linxea ou ton CTO chez
+          Trade Republic, on parle leur langue. Et on connaît leurs frais.
+        </p>
+      </div>
+
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {INTEGRATIONS.map((it) => (
+          <li
+            key={it.name}
+            className="flex h-16 items-center justify-center rounded-2xl px-4 transition-transform"
+            style={{
+              background: it.bg,
+              border: "1px solid var(--border)",
+            }}
+          >
+            <span
+              className="text-[15px] font-bold"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: it.fg,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {it.name}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <p
+        className="mx-auto mt-6 text-center text-[12px]"
+        style={{
+          fontFamily: "var(--font-mono)",
+          color: "var(--fg-subtle)",
+          maxWidth: "560px",
+        }}
+      >
+        Marques citées à titre informatif. Aucun partenariat commercial avec
+        ces établissements.
+      </p>
+    </section>
   );
 }
 
@@ -324,7 +417,7 @@ function WorldPlaygroundSection() {
             boxShadow: "var(--sh-md)",
           }}
         >
-          {/* Dotted world map (stylized via SVG) */}
+          {/* Particle world map — Stripe-style dense dot field, lavender tinted. */}
           <svg
             viewBox="0 0 920 520"
             className="absolute inset-0 h-full w-full"
@@ -332,44 +425,92 @@ function WorldPlaygroundSection() {
             aria-hidden="true"
           >
             <defs>
-              <pattern id="dots" x="0" y="0" width="14" height="14" patternUnits="userSpaceOnUse">
-                <circle cx="2" cy="2" r="1.2" fill="var(--paper-200)" />
+              {/* Two staggered dot patterns for a denser, more organic particle field. */}
+              <pattern id="dots-a" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+                <circle cx="1.5" cy="1.5" r="0.85" fill="var(--lavender-400)" opacity="0.55" />
+              </pattern>
+              <pattern id="dots-b" x="4" y="4" width="8" height="8" patternUnits="userSpaceOnUse">
+                <circle cx="1.5" cy="1.5" r="0.55" fill="var(--lavender-300)" opacity="0.45" />
               </pattern>
               <radialGradient id="globeGlow" cx="50%" cy="50%" r="60%">
                 <stop offset="0%" stopColor="var(--lavender-100)" stopOpacity="0.7" />
                 <stop offset="100%" stopColor="var(--paper-0)" stopOpacity="0" />
               </radialGradient>
+              <linearGradient id="arcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"  stopColor="var(--lavender-600)" stopOpacity="0" />
+                <stop offset="50%" stopColor="var(--lavender-600)" stopOpacity="0.85" />
+                <stop offset="100%" stopColor="var(--lavender-600)" stopOpacity="0" />
+              </linearGradient>
             </defs>
             <rect width="920" height="520" fill="url(#globeGlow)" />
-            {/* Continent silhouettes (very stylized — large blobs) */}
-            <g fill="url(#dots)" opacity="0.95">
+            {/* Continent silhouettes filled with the dense particle field. */}
+            <g opacity="0.95">
               {/* North America */}
-              <path d="M 80 130 Q 100 100 160 105 T 280 130 Q 305 180 280 230 Q 240 270 200 280 Q 150 270 110 240 Q 80 200 80 130 Z" />
+              <path d="M 80 130 Q 100 100 160 105 T 280 130 Q 305 180 280 230 Q 240 270 200 280 Q 150 270 110 240 Q 80 200 80 130 Z" fill="url(#dots-a)" />
+              <path d="M 80 130 Q 100 100 160 105 T 280 130 Q 305 180 280 230 Q 240 270 200 280 Q 150 270 110 240 Q 80 200 80 130 Z" fill="url(#dots-b)" />
               {/* South America */}
-              <path d="M 240 290 Q 260 285 280 310 Q 290 360 280 410 Q 260 440 240 430 Q 220 400 230 350 Z" />
+              <path d="M 240 290 Q 260 285 280 310 Q 290 360 280 410 Q 260 440 240 430 Q 220 400 230 350 Z" fill="url(#dots-a)" />
+              <path d="M 240 290 Q 260 285 280 310 Q 290 360 280 410 Q 260 440 240 430 Q 220 400 230 350 Z" fill="url(#dots-b)" />
               {/* Europe */}
-              <path d="M 420 140 Q 460 115 510 130 Q 535 165 525 200 Q 490 220 450 215 Q 420 195 415 165 Z" />
+              <path d="M 420 140 Q 460 115 510 130 Q 535 165 525 200 Q 490 220 450 215 Q 420 195 415 165 Z" fill="url(#dots-a)" />
+              <path d="M 420 140 Q 460 115 510 130 Q 535 165 525 200 Q 490 220 450 215 Q 420 195 415 165 Z" fill="url(#dots-b)" />
               {/* Africa */}
-              <path d="M 460 230 Q 510 230 540 270 Q 555 340 520 400 Q 480 425 450 410 Q 420 360 430 290 Z" />
+              <path d="M 460 230 Q 510 230 540 270 Q 555 340 520 400 Q 480 425 450 410 Q 420 360 430 290 Z" fill="url(#dots-a)" />
+              <path d="M 460 230 Q 510 230 540 270 Q 555 340 520 400 Q 480 425 450 410 Q 420 360 430 290 Z" fill="url(#dots-b)" />
               {/* Asia */}
-              <path d="M 555 130 Q 640 105 740 135 Q 800 170 800 215 Q 760 240 700 240 Q 620 235 565 215 Q 540 175 555 130 Z" />
+              <path d="M 555 130 Q 640 105 740 135 Q 800 170 800 215 Q 760 240 700 240 Q 620 235 565 215 Q 540 175 555 130 Z" fill="url(#dots-a)" />
+              <path d="M 555 130 Q 640 105 740 135 Q 800 170 800 215 Q 760 240 700 240 Q 620 235 565 215 Q 540 175 555 130 Z" fill="url(#dots-b)" />
               {/* India */}
-              <path d="M 640 240 Q 670 245 685 280 Q 685 320 660 330 Q 635 320 630 285 Z" />
+              <path d="M 640 240 Q 670 245 685 280 Q 685 320 660 330 Q 635 320 630 285 Z" fill="url(#dots-a)" />
+              <path d="M 640 240 Q 670 245 685 280 Q 685 320 660 330 Q 635 320 630 285 Z" fill="url(#dots-b)" />
               {/* Australia */}
-              <path d="M 740 360 Q 790 350 820 380 Q 820 410 785 420 Q 745 415 730 390 Z" />
+              <path d="M 740 360 Q 790 350 820 380 Q 820 410 785 420 Q 745 415 730 390 Z" fill="url(#dots-a)" />
+              <path d="M 740 360 Q 790 350 820 380 Q 820 410 785 420 Q 745 415 730 390 Z" fill="url(#dots-b)" />
             </g>
-            {/* Connection arcs between cities */}
-            <g
-              fill="none"
-              stroke="var(--lavender-300)"
-              strokeWidth="1"
-              opacity="0.7"
-              strokeDasharray="3 4"
-            >
-              <path d="M 248 198 Q 380 60 423 167" />
-              <path d="M 423 167 Q 470 90 469 154" />
-              <path d="M 469 154 Q 600 60 773 203" />
-              <path d="M 423 167 Q 460 80 469 158" />
+            {/* Animated transaction arcs — lavender pulse traveling along each curve. */}
+            <g fill="none" strokeWidth="1.5" strokeLinecap="round">
+              {/* NY → London */}
+              <path
+                className="ic-arc-trail"
+                d="M 200 200 Q 350 70 470 165"
+                stroke="var(--lavender-200)"
+                strokeWidth="1"
+                opacity="0.6"
+                strokeDasharray="3 5"
+              />
+              <path
+                className="ic-arc-pulse ic-arc-pulse-a"
+                d="M 200 200 Q 350 70 470 165"
+                stroke="url(#arcGradient)"
+              />
+              {/* London → Tokyo */}
+              <path
+                className="ic-arc-trail"
+                d="M 470 165 Q 620 60 770 195"
+                stroke="var(--lavender-200)"
+                strokeWidth="1"
+                opacity="0.6"
+                strokeDasharray="3 5"
+              />
+              <path
+                className="ic-arc-pulse ic-arc-pulse-b"
+                d="M 470 165 Q 620 60 770 195"
+                stroke="url(#arcGradient)"
+              />
+              {/* Paris → Frankfurt */}
+              <path
+                className="ic-arc-trail"
+                d="M 442 197 Q 480 130 525 175"
+                stroke="var(--lavender-200)"
+                strokeWidth="1"
+                opacity="0.5"
+                strokeDasharray="3 5"
+              />
+              <path
+                className="ic-arc-pulse ic-arc-pulse-c"
+                d="M 442 197 Q 480 130 525 175"
+                stroke="url(#arcGradient)"
+              />
             </g>
           </svg>
 
