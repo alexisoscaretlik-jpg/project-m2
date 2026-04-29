@@ -562,33 +562,55 @@ function IntegrationsSection() {
 }
 
 function HeroSection() {
+  // White & Case-style full-bleed atmospheric hero.
+  // Real photography (Unsplash CDN, free commercial use) layered behind a
+  // dark gradient that ensures headline contrast and fades to lavender at
+  // the bottom for a smooth transition into the next (light) section.
+  // Solid `--ink-700` is the ultimate fallback if the hotlink ever dies.
   return (
     <section
       className="relative overflow-hidden"
       style={{
-        background:
-          "radial-gradient(120% 70% at 50% 0%, var(--lavender-100) 0%, var(--paper-50) 55%, var(--paper-50) 100%)",
+        background: "var(--ink-700)",
       }}
     >
+      {/* Photo layer — calm misty mountains. */}
+      <img
+        src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2000&q=85"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{ display: "block" }}
+      />
+      {/* Dark + lavender-fade overlay for text contrast and bottom transition. */}
       <div
-        className="relative mx-auto px-6 pt-20 pb-24 text-center sm:px-8 sm:pt-28 sm:pb-32"
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(20,16,40,0.78) 0%, rgba(20,16,40,0.62) 55%, rgba(245,243,255,0.92) 92%, var(--paper-50) 100%)",
+        }}
+      />
+
+      <div
+        className="relative mx-auto px-6 pt-20 pb-32 text-center sm:px-8 sm:pt-32 sm:pb-44"
         style={{ maxWidth: "880px" }}
       >
         <div className="mb-6 flex justify-center">
           <Link
             href="/podcast"
-            className="group inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12px] transition-colors"
+            className="group inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12px] backdrop-blur transition-colors"
             style={{
               fontFamily: "var(--font-display)",
-              background: "var(--paper-0)",
-              border: "1px solid var(--border)",
-              color: "var(--ink-700)",
+              background: "rgba(245,243,255,0.10)",
+              border: "1px solid rgba(245,243,255,0.25)",
+              color: "var(--paper-0)",
             }}
           >
             <span
               className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase"
               style={{
-                background: "var(--lavender-600)",
+                background: "var(--lavender-500)",
                 color: "var(--paper-0)",
                 letterSpacing: "0.06em",
               }}
@@ -598,7 +620,7 @@ function HeroSection() {
             <span>Premier épisode du podcast est sorti</span>
             <span
               className="transition-transform group-hover:translate-x-0.5"
-              style={{ color: "var(--lavender-700)" }}
+              style={{ color: "var(--lavender-200)" }}
               aria-hidden="true"
             >
               →
@@ -606,17 +628,38 @@ function HeroSection() {
           </Link>
         </div>
         <div className="mb-8 flex justify-center">
-          <span className="ic-pill">
-            <span className="ic-pill-badge">Pour épargnants français</span>
-            PEA · AV · PER · IR
+          <span
+            className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12px] backdrop-blur"
+            style={{
+              fontFamily: "var(--font-display)",
+              background: "rgba(245,243,255,0.08)",
+              border: "1px solid rgba(245,243,255,0.20)",
+              color: "var(--paper-0)",
+            }}
+          >
+            <span
+              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase"
+              style={{
+                background: "var(--lavender-500)",
+                color: "var(--paper-0)",
+                letterSpacing: "0.06em",
+              }}
+            >
+              Pour épargnants français
+            </span>
+            <span>PEA · AV · PER · IR</span>
           </span>
         </div>
-        <h1 className="ic-display mb-6">
-          Ton empreinte fiscale est unique. <em>La méthode, non.</em>
+        <h1
+          className="ic-display mb-6"
+          style={{ color: "var(--paper-0)" }}
+        >
+          Ton empreinte fiscale est unique.{" "}
+          <em style={{ color: "var(--lavender-200)" }}>La méthode, non.</em>
         </h1>
         <p
           className="mx-auto mb-10 max-w-[600px] ic-lede"
-          style={{ color: "var(--fg-muted)" }}
+          style={{ color: "rgba(245,243,255,0.82)" }}
         >
           Tu paies un impôt français, mais tes ETF sont mondiaux. On t&apos;apprend
           à voir les deux — et à les piloter ensemble. Économiser de l&apos;impôt,
@@ -629,7 +672,7 @@ function HeroSection() {
             className="text-[12px]"
             style={{
               fontFamily: "var(--font-display)",
-              color: "var(--fg-subtle)",
+              color: "rgba(245,243,255,0.65)",
               letterSpacing: "0.02em",
             }}
           >
