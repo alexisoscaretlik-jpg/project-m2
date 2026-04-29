@@ -138,16 +138,145 @@ Between Jellypod's audio download and `publish-babylon.ts`, **a human listens to
 - Hard cap per episode: $5.00. If exceeded, fail and report.
 - A regeneration after the listen gate fails (e.g. voice swap) costs another ~951 credits — that's the explicit price of the gate. Budget for one re-render per month, not per episode.
 
-## When invoked, always report back
+## When the user shares a YouTube URL
+
+This is the primary trigger. The user (or another agent) hands you `https://www.youtube.com/watch?v=...` and expects an end-to-end episode following the v3.2 pipeline. Execute these steps in order — do NOT improvise.
+
+### 1. Validate
+
+- URL host must be `youtube.com` or `youtu.be`. Otherwise refuse and report.
+- If the user already passed a slug (e.g. `m_yJSqju380`), reconstruct the full URL.
+
+### 2. Generate the script (Gemini → Opus)
+
+```sh
+cd invest-coach/web
+npx tsx scripts/build-jellypod-prompt-v3.ts '<URL>' \
+  > /tmp/script-<slug>.txt 2> /tmp/script-<slug>.log
+```
+
+`<slug>` = the YouTube video ID (e.g. `m_yJSqju380`). Keep filenames clean — no apostrophes, no spaces.
+
+### 3. QA scan the script
+
+Run all 11 checks from the [QA gate](#qa-gate-before-handing-to-ceo) section above. If any fail, regenerate (re-run step 2) or — if the failure is in source classification or compliance — escalate to `@ceo`. Don't ship a flawed script to Jellypod, you'll burn ~951 credits for nothing.
+
+### 4. Author metadata
+
+Write `/tmp/episode-<slug>.json`:
+
+```json
+{
+  "title": "<the phrase à retenir from Acte 3, or a punchy 60-char title from the cold open>",
+  "summary": "<2 sentences max: the listener archetype + the keystone action>",
+  "theme": "money",
+  "law": "<closest match from the seven; archive-only>",
+  "character": { "name": "<from Gemini extraction>", "age": <n>, "city": "<fr city>", "situation": "<one line>" },
+  "source": { "url": "<URL>", "creator": "<channel name>" },
+  "engine": "v3.2-camille-thomas"
+}
+```
+
+The title and summary are user-facing — never fabricate punchy claims. Lift the title from the script's `## Phrase à retenir` keystone or the cold-open hook.
+
+### 5. Hand off to operator (Jellypod is manual)
+
+Report to the user with a single, copy-pasteable brief:
+
+```
+Script: /tmp/script-<slug>.txt (<word count> words, QA pass)
+Metadata: /tmp/episode-<slug>.json
+
+Operator steps in Jellypod:
+  1. /studio/new → click `+` → Paste Text → cmd+v the script
+  2. Type the prompt: "Le fichier joint contient le SCRIPT FINAL ..."
+     (template in docs/podcast-demo-runbook.md step 2)
+  3. Click Create a Podcast Episode → set Hosts (2) to Coach + Investisseur → submit
+  4. Wait ~3-5 min for audio render
+  5. **LISTEN to the full MP3** — voice issues, pacing, callbacks
+  6. Download Audio-Only → MP3 lands in ~/Downloads/
+
+Reply with: "audio ready: <path>" when done.
+```
+
+Do NOT proceed past this point until the operator confirms.
+
+### 6. Publish to Supabase
+
+Once the operator replies with the MP3 path:
+
+```sh
+cp "<operator's MP3 path>" /tmp/episode-<slug>.mp3
+cd invest-coach/web
+npx tsx scripts/publish-babylon.ts /tmp/episode-<slug>.mp3 /tmp/episode-<slug>.json
+# Will prompt: "Have you listened to the full MP3? Type 'oui' to publish:"
+```
+
+Type `oui` ONLY if the operator's "audio ready" reply confirms they listened. Pass `--yes` only when re-uploading audio that's already been vetted in a prior session.
+
+Verify with `curl -sI <Audio URL>` — expect HTTP 200 + `content-type: audio/mpeg`.
+
+### 7. Hand off to operator for Spotify
+
+Spotify's security blocks programmatic uploads — this leg is always manual. Brief:
+
+```
+Spotify upload (manual, ~2 min):
+  1. https://creators.spotify.com → Invest Coach show
+  2. + New episode → drag /tmp/episode-<slug>.mp3 onto the drop zone
+  3. Title: <from metadata JSON>
+  4. Description: <from metadata JSON>
+  5. Save as draft (NOT Publish — final click stays with the user)
+
+Reply with the share link (https://open.spotify.com/episode/<id>) when done.
+```
+
+### 8. Wire the embed into the public page
+
+Once the operator pastes the Spotify share link, append the new entry to [`lib/podcast/spotify-episodes.ts`](../invest-coach/web/lib/podcast/spotify-episodes.ts):
+
+```ts
+export const SPOTIFY_EPISODES: SpotifyEpisode[] = [
+  {
+    id: "<from share URL>",
+    slug: "<must match the Supabase slug exactly>",
+    title: "<episode title>",
+  },
+  // ... existing entries
+];
+```
+
+The `/podcast` page automatically prefers the Spotify embed when a slug match exists.
+
+### 9. Final report
+
+```
+Episode: <title>
+Source: <YouTube URL> · <creator>
+Type (v3.2): <1 mécanique / 2 stratégique / 3 mindset / 4 actualité / 5 hybride>
+Character: <name, situation>
+Word count: <n> · QA: pass
+Listen gate: confirmed by operator at <timestamp>
+Audio (Supabase): <public URL>
+Audio (Spotify): https://open.spotify.com/episode/<id>
+Cost: $<n.nn> (Opus + Jellypod credits)
+Status: published to /podcast + Spotify (draft pending user's final Publish click)
+```
+
+Hand the report to `@ceo` for archival.
+
+## Reporting templates (legacy short form)
+
+For one-liners during a session:
 
 ```
 Episode: [title]
 Source: [YouTube URL] · [creator]
-Babylonian law: [which one]
+Law: [which one — archive only]
 Character: [name, situation]
 Word count: [n]
 Estimated duration: [m] min
-Audio file: [R2 URL]
+Audio file: [Supabase URL]
 QA: [pass / failed: reason]
 Status: [ready for CEO review / skip / regenerate]
 ```
