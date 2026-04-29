@@ -9,6 +9,138 @@ export type Article = {
 
 export const ARTICLES: Article[] = [
   {
+    slug: "per-rentable-quelle-tmi",
+    title: "Le PER est-il vraiment intéressant ? Ça dépend de ta TMI.",
+    teaser:
+      "Le PER (Plan Épargne Retraite) déduit tes versements du revenu imposable. Mais l'avantage net dépend d'un seul chiffre : ta TMI aujourd'hui vs ta TMI à la retraite.",
+    readMinutes: 7,
+    updated: "2026-04-29",
+    body: `## Le résumé en 30 secondes
+
+Tu verses 1 000 € sur un **PER** (Plan Épargne Retraite). Tu déduis
+ces 1 000 € de ton revenu imposable. Si tu es à la **TMI 30 %**, tu
+récupères 300 € d'impôt l'année suivante — ton effort réel n'est
+que de 700 €.
+
+À la sortie (retraite), tu paies l'impôt sur ce que tu retires. Donc
+le **vrai gain** du PER, c'est l'écart entre ta TMI **maintenant** et
+ta TMI **à la retraite**. Si l'écart est nul, le PER ne sert à rien
+fiscalement. S'il est de 19 points (41 % maintenant → 22 % à la
+retraite, par exemple), c'est un des meilleurs placements légaux en
+France.
+
+## Comment fonctionne la déduction
+
+Tu peux déduire chaque année jusqu'à **10 % de ton revenu pro net**,
+plafonné à environ **35 194 € en 2026** (8 PASS). Pour un cadre à
+60 000 € net imposable, ça fait un plafond de 6 000 €/an de versement
+déductible.
+
+Exemple concret pour Pierre, 38 ans, cadre à Lyon, 55 000 € net
+imposable, célibataire 1 part :
+
+- Sa TMI est de **30 %** (tranche 29 315 € → 83 823 €).
+- Il verse **5 500 €** sur un PER (10 % de son revenu net).
+- L'année suivante, son IR baisse de **5 500 € × 30 % = 1 650 €**.
+- Effort réel : **3 850 €** pour un capital placé de 5 500 €.
+
+Sur 25 ans, à 5 % de rendement net, ces 5 500 € deviennent ~18 600 €
+au moment où Pierre liquide son PER.
+
+## L'arbitrage qui fait tout
+
+Au moment de la sortie (à 64 ans pour Pierre), il a deux options :
+**rente** ou **capital**. Le **capital** (sortie en une fois ou
+fractionnée) est désormais autorisé sur les versements déduits ·
+c'est ce que choisit ~80 % des épargnants.
+
+À la sortie en capital, le **capital lui-même** est imposé à ta TMI
+**de l'année de retrait**. Les **gains** sont taxés à 30 %
+(prélèvement forfaitaire unique).
+
+Si à 64 ans Pierre est à la **TMI 11 %** (revenu retraite plus bas),
+il aura :
+
+- Récupéré **30 %** d'IR à l'entrée
+- Payé **11 %** d'IR à la sortie sur le capital
+- Net : **+19 points** sur le capital initial
+
+Ça, c'est l'argent que la fiscalité lui a fait gagner. Sur 5 500 €
+versés, ça fait **1 045 €** de cadeau fiscal net. Sans rien d'autre.
+
+## Quand le PER est une mauvaise idée
+
+**1. TMI à 0 ou 11 %.** Si tu es non imposable ou en bas de tranche,
+le PER ne déduit rien d'intéressant. Mets ton épargne sur un PEA
+(croissance long terme exonérée d'IR après 5 ans, hors PS 17,2 %).
+
+**2. Tu vas avoir besoin de l'argent avant la retraite.** Le PER est
+**bloqué jusqu'à la retraite**, sauf cas exceptionnels (achat
+résidence principale, invalidité, décès du conjoint, fin de droits
+chômage, surendettement). Si tu épargnes pour un projet à 5-10 ans,
+prends une assurance-vie.
+
+**3. Tu prévois une TMI plus élevée à la retraite.** Cas rare mais
+réel : dirigeant qui prépare une vente d'entreprise, héritier qui
+attend un déclenchement fiscal lourd. Dans ces cas, l'avantage
+s'inverse — le PER devient un piège.
+
+**4. Tu veux faire du levier patrimonial sur l'immobilier.** Le PER
+n'aide pas à emprunter. Pour ça, c'est l'épargne mobilisable (compte
+courant + livrets) qui compte aux yeux du banquier.
+
+## Les pièges à éviter
+
+- **PER bancaire à frais 1,5-2 %/an.** Le PER de ta banque est
+  presque toujours médiocre. Compare sur Linxea Spirit PER, Yomoni
+  Retraite, Nalo PER, Goodvest PER · frais < 0,8 %/an, ETF monde
+  diversifiés. La différence sur 25 ans = entre 30 et 50 % du capital
+  final. Pas un détail.
+- **Verser sans saturer son TMI.** Ne déduis pas plus que ce qui te
+  fait économiser à la TMI **la plus haute**. Si verser 6 000 € te
+  fait basculer en TMI 11 % (parce que tu déduis trop), les derniers
+  euros ne te font économiser que 11 % · pas 30 %.
+- **Oublier les versements antérieurs.** Le plafond de déduction se
+  reporte 3 ans. Si tu n'as rien versé en 2023-24-25, tu peux verser
+  4 ans de plafond cumulés en 2026.
+- **Sortie en rente automatique.** Beaucoup de PER bancaires sont
+  paramétrés sortie en rente par défaut. La rente est taxée et perdue
+  au décès. Vérifie que ton contrat permet la sortie en capital.
+
+## Combiner PER + PEA + AV
+
+La hiérarchie standard pour un cadre à TMI 30 % :
+
+1. **Épargne de précaution** : 3 à 6 mois de dépenses sur Livret A
+   et LDDS · liquide, sécurisé.
+2. **PEA** : croissance long terme · ETF Europe ou ETF World CW8 ·
+   frais < 0,30 %/an · plafond 150 000 €.
+3. **PER** : à hauteur de ta TMI · ne dépasse pas le plafond annuel
+   de déduction · sortie en capital prévue.
+4. **Assurance-vie** : tout le reste · ETF monde + un peu de fonds
+   euros pour la souplesse · transmission optimisée après 8 ans.
+
+Tu peux abonder le PER **au mois** ou **en une fois en décembre**.
+Décembre permet de calibrer : tu connais ta TMI réelle de l'année,
+tu verses exactement ce qu'il faut pour saturer la tranche haute.
+
+## Le mot de la fin
+
+Le PER n'est pas un placement, c'est une **enveloppe fiscale**.
+Il rapporte uniquement ce que ton **arbitrage TMI maintenant / TMI
+plus tard** te rapporte, plus le rendement de ce que tu y mets
+dedans. Pose ces deux questions avant d'ouvrir un PER, dans cet
+ordre :
+
+1. **Ma TMI sera-t-elle plus basse à la retraite ?** Si oui d'au
+   moins 10 points, c'est intéressant.
+2. **Ai-je déjà saturé mon PEA ?** Si non, ouvre le PEA d'abord ·
+   son enveloppe est encore plus avantageuse en croissance.
+
+Si tu réponds non aux deux, le PER attendra. Et c'est très bien
+comme ça.`,
+  },
+  {
     slug: "pea-vs-assurance-vie",
     title: "PEA ou assurance-vie : lequel choisir quand on débute ?",
     teaser:
