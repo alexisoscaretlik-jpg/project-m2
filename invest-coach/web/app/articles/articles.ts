@@ -9,6 +9,163 @@ export type Article = {
 
 export const ARTICLES: Article[] = [
   {
+    slug: "etf-world-cw8-wpea-ese",
+    title: "ETF MSCI World : CW8, WPEA ou ESE — lequel choisir ?",
+    teaser:
+      "L'ETF MSCI World est le placement boursier que la plupart des épargnants français devraient garder à vie. Reste à choisir lequel — et dans quelle enveloppe le loger.",
+    readMinutes: 7,
+    updated: "2026-04-29",
+    body: `## Le résumé en 30 secondes
+
+L'**ETF MSCI World** réplique un indice de ~1 500 grandes capitalisations
+de **23 pays développés** (États-Unis ~70 %, Japon ~6 %, France ~3 %,
+etc.). En l'achetant, tu deviens en une seule ligne actionnaire de
+Apple, Microsoft, LVMH, Nestlé, Toyota et 1 495 autres.
+
+Les trois ETF World **éligibles au PEA** que tu croises chez les
+courtiers français en 2026 :
+
+- **CW8** — Amundi MSCI World UCITS ETF · TER ~0,38 %/an
+- **WPEA** — iShares MSCI World Swap PEA UCITS ETF · TER ~0,25 %/an
+- **ESE** — BNP Paribas Easy MSCI World UCITS ETF · TER ~0,30 %/an
+
+Tous les trois sont **synthétiques** (réplication par swap) — c'est ce
+qui leur permet d'être PEA-éligibles malgré leur exposition mondiale
+non européenne. Sur 30 ans, **0,13 % de TER en moins = ~4 % de capital
+final en plus**. Pas un détail.
+
+## Pourquoi c'est presque toujours le bon choix
+
+Trois raisons :
+
+1. **Diversification automatique.** 1 500 lignes en une seule, dans 23
+   pays, dans 11 secteurs. Aucun stock-picking individuel ne bat
+   statistiquement un indice mondial sur 20 ans.
+2. **Frais bas.** Un fonds actif facture 1,5 à 2,5 %/an. Un ETF
+   indiciel facture 0,25 à 0,40 %. Sur 30 ans, l'écart représente
+   ~30 % du capital final.
+3. **Pas de gestion mentale.** Tu n'as pas à arbitrer mensuellement,
+   à suivre Apple ou Tesla, à savoir si l'IA est une bulle. Tu
+   verses, tu attends, tu ne regardes pas.
+
+## CW8 vs WPEA vs ESE — quoi regarder vraiment
+
+**Le TER (frais courants annuels).** WPEA mène à 0,25 %, ESE suit à
+0,30 %, CW8 ferme à 0,38 %. Sur un versement unique de 10 000 € à
+6 %/an pendant 25 ans :
+
+- À 0,25 % de frais : **40 200 €**
+- À 0,30 % de frais : **39 700 €** (−500 €)
+- À 0,38 % de frais : **38 900 €** (−1 300 €)
+
+Ça paraît marginal — c'est en réalité le coût de l'inertie.
+
+**La taille (AUM).** Plus c'est gros, plus c'est liquide à
+l'achat/vente, plus l'écart entre le prix d'achat et le prix de vente
+(spread) est faible. CW8 historiquement le plus gros (~€5-7 Md), WPEA
+en croissance rapide depuis son éligibilité PEA en 2024.
+
+**La capitalisation des dividendes.** Tous les trois sont **Acc**
+(accumulating) — les dividendes sont automatiquement réinvestis dans
+l'ETF, tu ne reçois rien en cash, et tu n'as **rien à déclarer
+fiscalement** tant que tu ne vends pas. Le PEA fait le reste : aucun
+IR pendant 5 ans, exonération totale après.
+
+**La réplication.** Les trois sont **synthétiques** — tu ne possèdes
+pas réellement les 1 500 actions, tu détiens un swap avec une
+contrepartie qui te garantit la performance de l'indice. C'est
+imposé par la règle PEA (qui exige 75 % d'actions UE ; le swap
+contourne cette contrainte). Risque de contrepartie quasi nul en
+pratique pour ces émetteurs.
+
+## Quelle enveloppe pour ton ETF World
+
+**PEA** : le meilleur choix pour la plupart des épargnants français.
+Plafond 150 000 €, exonération d'IR après 5 ans (il reste 17,2 % de
+prélèvements sociaux sur les gains). Tu mets WPEA, CW8 ou ESE et tu
+oublies.
+
+**Assurance-vie** : utile si tu satures déjà ton PEA, ou si tu veux
+optimiser la transmission (152 500 € exonérés de droits de succession
+par bénéficiaire, versements avant 70 ans). Privilégie une AV en ligne
+(Linxea Spirit, Lucya Cardif, Placement-direct Vie, Evolution Vie) qui
+propose un ETF World en UC à frais ≤ 0,60 %. Évite les AV bancaires
+classiques · frais de gestion 1-2 %/an = saignée.
+
+**CTO (compte-titres ordinaire)** : utile uniquement quand le PEA
+**et** l'AV sont saturés, ou si tu veux des ETF non-UCITS (rare). Pas
+d'avantage fiscal, PFU 30 % sur les gains à la vente.
+
+**PER** : oui, tu peux y mettre un ETF World — voir
+[notre article PER](/articles/per-rentable-quelle-tmi). Vérifie que ton
+PER ne facture pas 1 %/an de frais d'unité de compte en plus du TER de
+l'ETF (cas fréquent chez les PER bancaires).
+
+## Les pièges à éviter
+
+- **Acheter via la banque traditionnelle.** Frais de courtage souvent
+  10-20 €/ordre + droits de garde. Préfère un courtier en ligne :
+  Bourse Direct, BoursoBank, Trade Republic, Fortuneo, Saxo. Frais
+  d'ordre 0-5 €.
+- **Confondre MSCI World et MSCI ACWI.** ACWI (All Country World
+  Index) inclut les marchés émergents (~10 % d'ajout). Si tu veux les
+  émergents, choisis volontairement un ETF ACWI (rare en PEA) ou
+  complète avec un ETF Emerging Markets séparé.
+- **Faire du "stock-picking sur ETF".** Acheter un mois CW8, le mois
+  suivant ESE, puis WPEA · tu paies trois ordres pour rien. Choisis
+  une fois, garde 20 ans.
+- **Vendre lors d'une baisse.** Le MSCI World a connu **−40 % en
+  2008, −34 % en mars 2020**. Ceux qui ont gardé ont récupéré tout
+  en 18-24 mois. Ceux qui ont vendu ont matérialisé la perte.
+- **Croire que "World" = sans risque.** L'ETF World a une volatilité
+  annuelle ~14-16 %. Sur un horizon de moins de 5 ans, c'est trop
+  risqué. Sur 20+ ans, l'historique montre une probabilité
+  extrêmement faible de perte.
+
+## Le portefeuille minimal pour un débutant français
+
+Si tu lis cet article et que tu veux **arrêter de procrastiner** sur
+le PEA, voici la version la plus simple :
+
+1. Ouvre un PEA chez Bourse Direct ou BoursoBank (frais d'ordre
+   < 1 €).
+2. Verse 100 €/mois en virement automatique le 5 du mois.
+3. Achète **un seul ETF** : WPEA si tu veux les frais les plus bas,
+   CW8 si tu veux la liquidité maximale.
+4. Ne touche plus rien pendant 10 ans.
+
+Ce portefeuille bat statistiquement **80 % des fonds gérés
+activement** sur 10 ans. Et il te coûte 1 000 € de versements +
+~3 €/an de frais.
+
+## Et après les 150 000 € du PEA ?
+
+Si tu as la chance de saturer ton PEA — bravo, tu fais partie des
+~5 % d'épargnants français qui y arrivent — la suite logique :
+
+1. **Ouvre une AV en ligne** et y verse jusqu'à 152 500 € en pensant
+   transmission.
+2. **Y loger un ETF World en UC** avec frais < 0,60 %/an.
+3. **Une part en fonds euros** (~20-30 %) pour la souplesse · pas la
+   performance.
+
+Tu as alors un portefeuille **300 000 €+** entièrement diversifié
+sur l'économie mondiale, optimisé fiscalement à la fois pour le
+revenu (PEA) et pour la transmission (AV).
+
+## Le mot de la fin
+
+L'ETF World n'est pas la décision la plus excitante que tu prendras
+cette année — mais c'est probablement la plus rentable, sur 30 ans.
+Le bon réflexe : **ouvrir le PEA aujourd'hui, choisir un ETF
+parmi les trois, automatiser le virement, et passer à autre chose**.
+
+Le seul truc qui bat l'ETF World en performance long terme, c'est
+**l'ETF World qu'on garde 30 ans sans toucher**. Personne ne te
+parlera de ce placement à un dîner. C'est précisément pour ça qu'il
+fonctionne.`,
+  },
+  {
     slug: "per-rentable-quelle-tmi",
     title: "Le PER est-il vraiment intéressant ? Ça dépend de ta TMI.",
     teaser:
