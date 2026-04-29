@@ -177,6 +177,7 @@ function Landing() {
       <HowItWorksSection />
       <ProductPreviewGrid />
       <SavingsEqualsEarningsSection />
+      <PhilosophySection />
       <PricingTable />
       <TrustStatsBar />
       <Footer />
@@ -405,6 +406,78 @@ function IsoIllustration({ kind }: { kind: "scan" | "gears" | "sign" }) {
         <path d="M -4 0 L -1 4 L 5 -3" stroke="var(--paper-0)" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       </g>
     </svg>
+  );
+}
+
+// ─────────────────────── Philosophy section (dark editorial pull-quote) ───────────────────────
+
+function PhilosophySection() {
+  return (
+    <section
+      className="relative overflow-hidden"
+      style={{ background: "var(--ink-700)" }}
+    >
+      <img
+        src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2000&q=85"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{ display: "block" }}
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(20,16,40,0.85) 0%, rgba(20,16,40,0.78) 100%)",
+        }}
+      />
+
+      <div
+        className="relative mx-auto px-6 py-28 text-center sm:px-8 sm:py-36"
+        style={{ maxWidth: "880px" }}
+      >
+        <div
+          className="mb-6 text-[12px] font-bold uppercase"
+          style={{
+            fontFamily: "var(--font-mono)",
+            color: "var(--lavender-300)",
+            letterSpacing: "0.20em",
+          }}
+        >
+          La méthode
+        </div>
+        <p
+          className="mx-auto"
+          style={{
+            fontFamily: "var(--font-source-serif), Georgia, serif",
+            fontStyle: "italic",
+            fontWeight: 500,
+            fontSize: "clamp(28px, 4.2vw, 48px)",
+            lineHeight: 1.2,
+            letterSpacing: "-0.015em",
+            color: "var(--paper-0)",
+            maxWidth: "720px",
+            textWrap: "balance",
+          }}
+        >
+          Le temps est l&apos;allié de l&apos;épargnant patient.{" "}
+          <span style={{ color: "var(--lavender-200)" }}>
+            Pas le marché. Pas le timing. Pas la chance.
+          </span>
+        </p>
+        <p
+          className="mx-auto mt-8 text-[13px]"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "rgba(245,243,255,0.65)",
+            letterSpacing: "0.04em",
+          }}
+        >
+          Une règle qu&apos;on rabâche · parce qu&apos;elle marche depuis 1900.
+        </p>
+      </div>
+    </section>
   );
 }
 

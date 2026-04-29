@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
+import { NavDrawer } from "@/components/nav-drawer";
 
 const TABS = [
   { href: "/articles", label: "Articles" },
@@ -81,12 +82,13 @@ export async function Nav({ active }: { active: string }) {
           ) : (
             <Link
               href="/login"
-              className="rounded-lg px-3 py-2 text-[14px] font-medium transition-colors hover:bg-[var(--paper-100)]"
+              className="hidden rounded-lg px-3 py-2 text-[14px] font-medium transition-colors hover:bg-[var(--paper-100)] md:inline-flex"
               style={{ color: "var(--fg-muted)" }}
             >
               Connexion
             </Link>
           )}
+          <NavDrawer userEmail={user?.email ?? null} signOutAction={signOut} />
         </div>
       </div>
     </header>
