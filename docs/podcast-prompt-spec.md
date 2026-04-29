@@ -97,10 +97,13 @@ flip `console.warn` → `throw` in
 [`lib/podcast/script.ts`](../invest-coach/web/lib/podcast/script.ts).
 
 Checks:
-- Word count 2 000 – 3 600
+- Word count 3 000 – 4 500 (v3.2; the v3.0 band of 2 000–3 600 is obsolete)
 - Both `Coach` and `Investisseur` appear, no other speakers
-- Coach speaking-time ratio between 70 % and 90 %
+- Coach speaking-time ratio between 60 % and 75 % (v3.2 lowered Coach dominance from the 80/20 of v3.0; conversation is more balanced now)
 - No banned phrase substring (case-insensitive)
+- Mandatory compliance mentions present: "éducation, pas du conseil" (or paraphrase) AND "risque de perte en capital"
+
+The programmatic gate above runs in `script.ts` and is non-blocking (warning, not throw). The **listen gate** in the runbook (step 6 of "Make a new episode") is the load-bearing checkpoint — a human must listen to the full MP3 before `publish-babylon.ts` will accept the upload.
 
 ## Models
 

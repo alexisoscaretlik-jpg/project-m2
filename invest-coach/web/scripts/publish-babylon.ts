@@ -1,10 +1,19 @@
 #!/usr/bin/env tsx
 // One-off: take an existing /tmp/babylon-*.mp3 + .json, ensure the
 // `podcasts` bucket exists in Supabase, upload, return public URL.
+//
+// LISTEN GATE: by default this script refuses to upload until the
+// operator confirms they have listened to the full MP3. Pass --yes
+// to skip the prompt (use sparingly, e.g. automated re-uploads of
+// already-vetted audio).
+//
+// Usage:
+//   npx tsx scripts/publish-babylon.ts <mp3> <metadata.json> [--yes]
 
 import { readFileSync } from "fs";
 import { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";
+import { createInterface } from "readline";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const envPath = resolve(here, "..", ".env.local");
@@ -24,10 +33,37 @@ for (const line of readFileSync(envPath, "utf8").split(/\r?\n/)) {
 import { serviceClient } from "../lib/supabase/service";
 import { uploadEpisode } from "../lib/podcast/storage";
 
-const MP3 = process.argv[2] ?? "/tmp/babylon-1777244066495.mp3";
-const META = process.argv[3] ?? "/tmp/babylon-1777243947191.json";
+const args = process.argv.slice(2).filter((a) => !a.startsWith("--"));
+const flags = new Set(process.argv.slice(2).filter((a) => a.startsWith("--")));
+const MP3 = args[0] ?? "/tmp/babylon-1777244066495.mp3";
+const META = args[1] ?? "/tmp/babylon-1777243947191.json";
+
+async function confirmListened(): Promise<void> {
+  if (flags.has("--yes")) {
+    console.error("Listen gate skipped via --yes flag.");
+    return;
+  }
+  if (!process.stdin.isTTY) {
+    throw new Error(
+      "Listen gate requires an interactive TTY. Re-run from a terminal, " +
+        "or pass --yes if you have already listened to the full MP3.",
+    );
+  }
+  const rl = createInterface({ input: process.stdin, output: process.stderr });
+  const ans = await new Promise<string>((resolve) =>
+    rl.question(
+      "Have you listened to the full MP3 end-to-end? Type 'oui' (or 'yes') to publish: ",
+      resolve,
+    ),
+  );
+  rl.close();
+  if (!/^(oui|yes|y)$/i.test(ans.trim())) {
+    throw new Error("Aborted: listen gate not confirmed.");
+  }
+}
 
 async function main() {
+  await confirmListened();
   const sb = serviceClient();
 
   console.log("Ensuring 'podcasts' bucket exists (public)…");

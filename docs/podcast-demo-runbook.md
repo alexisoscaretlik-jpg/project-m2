@@ -10,7 +10,7 @@ without reading both.
 | Field | Value |
 |---|---|
 | Format | 2-voice conversation, Coach (~80 %) + Investisseur (~20 %), no narrator |
-| Length | ~12-18 min (target band; QA accepts 2 000-3 600 words) |
+| Length | 20-30 min (target band; QA accepts 3 000-4 500 words on v3.2) |
 | Theme | `money` (only theme today, more later — see `EpisodeTheme` in `babylon-prompt.ts`) |
 | Source | One YouTube URL per episode (Alux longform was the inaugural source) |
 | Engine | Gemini 2.5 Flash → Claude Opus 4.7 → ElevenLabs multilingual_v2 → Supabase Storage |
@@ -40,7 +40,7 @@ without reading both.
 
 6. Two Jellypod hosts saved (Coach + Investisseur, native French voices). The current ones were created from voice-design backstories matching the prompt-spec personas.
 
-## Make a new episode (v3.0 — Camille × Thomas)
+## Make a new episode (v3.2 — Camille × Thomas, AMF/MiCA-aware, 20–30 min)
 
 Two-stage pipeline that outputs a **finished dialogue script** (not a brief). Jellypod just TTSes it line by line, no rewrite.
 
@@ -69,13 +69,35 @@ Then in Jellypod web UI:
 2. Click into the main prompt → write: *"Le fichier joint contient le SCRIPT FINAL déjà écrit ligne par ligne avec les locuteurs Coach et Investisseur. Utilise ce script TEL QUEL, sans le ré-écrire, sans le résumer, sans en changer l'ordre. Mappe les lignes 'Coach :' à l'hôte Coach et les lignes 'Investisseur :' à l'hôte Investisseur."*
 3. Click **Create a Podcast Episode** → set Hosts (2) to Coach + Investisseur → submit (up arrow).
 4. Jellypod's chat will respond *"Je ne peux pas générer un nouvel épisode sans réécrire le contenu…"* — this is normal. Click the suggested action **"Colle Le Script Dans L'Éditeur"** → then click **Generate Script**. Jellypod logs *"Reading Script"* and produces a single chapter with N segments matching your line count. No rewrite.
-5. Wait ~3-5 min. Listen via Jellypod's player.
+5. Wait ~3-5 min. The audio renders, then Jellypod surfaces a player in the studio panel.
 
-When it's right:
+### 6. Listen gate (mandatory — DO NOT SKIP)
+
+**STOP. Listen to the full MP3 end-to-end before going anywhere near `publish-babylon.ts`.**
+
+The programmatic QA in `script.ts` catches word count, banned phrases, and speaker structure — it does NOT catch:
+- TTS mispronunciations of French names (Antoine → "Antuhayne", PEA → letter-spelled out wrong, etc.)
+- Pauses that wreck a punchline timing
+- An Acte 3 keystone that doesn't land in the voice it ended up with
+- A missing callback to the cold open
+- Energy that flatlines between minute 12 and 18 (classic v3.2 risk)
+
+Use Jellypod's in-studio player OR open the downloaded MP3 in your default audio app. Listen at 1× the first time.
+
+If anything's off:
+- **Wrong voices?** Open `Hosts → Coach` (or `Investisseur`), reassign voice, then back to the artifact → click **Regenerate Audio**. Costs another ~951 credits. Cheaper than retracting an episode from a public RSS feed.
+- **Wrong content?** Don't re-render — fix the prompt or source. Run `build-jellypod-prompt-v3.ts` again, paste the new script, re-render.
+- **Edge-case TTS slip?** Use the Script Editor's per-line emotion tag (`nervous`, `calm`, `silence`, etc.) to coax a different read.
+
+Only when you'd happily play the full episode for an investor without flinching, proceed.
+
+### 7. Download + publish (post-gate)
 
 ```sh
 # 1. Audio-Only download from Jellypod's web UI lands in ~/Downloads/.
 # 2. Build a small metadata JSON with title/summary/theme.
+# 3. publish-babylon.ts will INTERACTIVELY prompt to confirm you've listened
+#    — type 'oui' to proceed. Pass --yes to skip the prompt for automated reruns.
 npx tsx scripts/publish-babylon.ts \
   ~/Downloads/<title>.mp3 \
   /tmp/<metadata>.json
