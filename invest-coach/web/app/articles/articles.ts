@@ -9,6 +9,177 @@ export type Article = {
 
 export const ARTICLES: Article[] = [
   {
+    slug: "or-vs-sp500-etf",
+    title: "Or ou ETF S&P 500 ? La vraie question, c'est combien de chaque.",
+    teaser:
+      "Tout les oppose : un actif productif vs un actif sans rendement. Pourtant, les portefeuilles qui ont tenu 50 ans sans paniquer en avaient des deux. Voici pourquoi — et combien.",
+    readMinutes: 7,
+    updated: "2026-04-29",
+    body: `## Le résumé en 30 secondes
+
+L'**ETF S&P 500** te rend propriétaire des 500 plus grandes
+entreprises américaines : Apple, Microsoft, NVIDIA, JP Morgan, Exxon.
+Il **produit** : ces entreprises génèrent des bénéfices, paient des
+salaires, payent des dividendes, croissent. Sur 30 ans, il a fait
+**~10 % par an en moyenne** (en USD).
+
+L'**or** ne produit rien. Il ne paye pas de dividende, ne génère pas
+de bénéfice, ne crée pas d'emploi. Sa valeur tient à une seule chose :
+ce que les autres sont prêts à payer pour en avoir, surtout quand le
+reste leur fait peur. Sur 30 ans, il a fait **~6 % par an** (en USD).
+
+L'or perd, donc ? Pas si vite. **Sur les 5 pires années du S&P 500
+des 50 dernières années** (1973, 1981, 2002, 2008, 2022), l'or a fait
+en moyenne **+15 %**. C'est le rôle qu'il joue : assurance contre le
+moment où l'économie productive vacille.
+
+## Pourquoi on les compare souvent (à tort)
+
+Les deux sont vendus comme "valeurs refuges". Le terme est paresseux —
+ils n'ont presque rien à voir.
+
+| | ETF S&P 500 | Or |
+|---|---|---|
+| Type d'actif | Productif (entreprises) | Réserve de valeur |
+| Rendement à long terme | ~10 %/an | ~6 %/an |
+| Volatilité annuelle | ~16 % | ~15 % |
+| Corrélation avec les actions | 1,0 (lui-même) | ~0,1 (très faible) |
+| Comportement en crise majeure | Baisse 20-50 % | Hausse 10-30 % |
+| Comportement en hausse de l'inflation | Variable | Hausse |
+| Comportement en bull market normal | +20-30 %/an | Plat ou en baisse |
+
+Le bon réflexe : **comparer leur usage**, pas leur performance brute.
+Le S&P 500 fait le boulot 80 % du temps. L'or fait le boulot pendant
+les 20 % qui font mal.
+
+## Comment loger les deux quand on est résident fiscal français
+
+### S&P 500 — PEA-éligible via synthétique
+
+L'ETF **PE500** (Amundi PEA S&P 500 UCITS ETF, TER ~0,15 %) est
+**éligible au PEA** grâce à la réplication par swap. C'est le plus
+simple, le moins cher, et le plus avantageux fiscalement :
+
+- TER ~0,15 %/an (parmi les plus bas du marché)
+- PEA après 5 ans → exonération d'IR sur les gains (il reste 17,2 %
+  de prélèvements sociaux)
+- Acc (les dividendes US sont automatiquement réinvestis)
+
+Les ETF S&P 500 **non synthétiques** (CSPX, SPY) ne sont pas
+PEA-éligibles · à acheter en CTO ou en AV en UC.
+
+### Or — pas PEA-éligible, plusieurs voies
+
+**1. Physique (pièces, lingots)**
+
+- Boutique : Aurum, Comptoir de l'Or, Numiscoach, CPoR.
+- TVA : **0 %** sur les pièces et lingots d'investissement (or
+  monétaire, pureté ≥ 995 ‰).
+- Frais : prime à l'achat 2-5 % (selon poids), commission de revente
+  1-3 %.
+- Stockage : coffre bancaire (~120 €/an), coffre maison (chez toi,
+  ton risque).
+- **Fiscalité à la revente** : tu choisis entre la **taxe sur les
+  métaux précieux** (11 % du prix de vente, sans calcul de
+  plus-value) ou le **régime des plus-values de biens meubles** (PFU
+  36,2 % sur la plus-value, abattement 5 %/an après 2 ans, exonération
+  totale après 22 ans). Pour la plupart des cas, le 1er régime est
+  plus simple.
+
+**2. ETC (Exchange Traded Commodity)**
+
+- Tickers populaires : **4GLD** (Xtrackers IE Physical Gold), **PHAU**
+  (WisdomTree Physical Gold), **SGLD** (Invesco Physical Gold).
+- TER 0,12 à 0,25 %/an.
+- Adossé à de l'or physique stocké en coffre (Londres, Zurich).
+- **Pas PEA-éligible** (matière première, pas action).
+- Logeable sur **CTO** (le plus simple) ou **AV** en UC (vérifier que
+  le contrat propose un ETC or — souvent le cas chez Linxea Spirit).
+- Fiscalité CTO : **PFU 30 %** sur la plus-value à la revente.
+- Fiscalité AV : abattement 4 600 €/9 200 € après 8 ans, puis PFL
+  ou PFU.
+
+**3. Gold mining stocks (à éviter pour la plupart)**
+
+Les actions de minières d'or (Newmont, Barrick) sont **2 à 3 fois
+plus volatiles** que l'or physique. Elles répondent à l'or **plus**
+au risque opérationnel des compagnies. Sauf si tu as une thèse
+spécifique, reste sur l'or pur.
+
+## Combien d'or, combien de S&P 500 ?
+
+Trois portefeuilles documentés sur 50+ ans :
+
+### Le 100 % S&P 500
+
+Performance brute la plus élevée. Drawdown maximum **−54 % (2008)**
+sur 18 mois. Tu as récupéré ton point haut en **5 ans**. Si tu peux
+encaisser ça mentalement et que tu ne touches pas, c'est rentable.
+Si tu vends pendant le creux, tu matérialises la perte.
+
+### Le 90 % S&P 500 + 10 % or
+
+Performance presque identique sur 30 ans (~9,5 % vs 10 %), mais
+**drawdown maximum réduit à −47 %**. Tu sors les 7 points qui font
+le plus mal mentalement, sans payer beaucoup en performance. Pour la
+plupart des épargnants, c'est le ratio le plus pratique.
+
+### Le "Permanent Portfolio" de Harry Browne
+
+25 % actions / 25 % obligations long terme / 25 % or / 25 % cash. Sur
+50 ans, ~6 %/an avec un drawdown maximum de **~−15 %**. Trois fois
+moins de panique, deux fois moins de performance. Bien si tu retraites
+dans 5 ans, mauvais si tu épargnes pour 30 ans.
+
+**Recommandation pratique pour un cadre français de 30-45 ans :**
+
+- **PEA saturé d'ETF World ou S&P 500** (90 % de ton allocation
+  bourse).
+- **AV avec un ETC or 4GLD** (10 % de ton allocation bourse), ou
+  quelques pièces physiques (Napoléons 20 F, Krugerrand) que tu
+  achètes une fois et oublies.
+
+Tu n'as pas besoin de plus. Tu n'as surtout pas besoin de **rebalancer
+chaque trimestre** : une fois par an suffit largement.
+
+## Les pièges à éviter
+
+- **L'or "investissement" via assurance-vie bancaire** avec frais de
+  gestion 1,5 %/an + frais de l'ETC 0,25 %/an. Tu paies 1,75 %/an pour
+  un actif qui fait 6 %/an : tu en gardes ~4 %. À éviter.
+- **Le S&P 500 acheté au plus haut, vendu au plus bas.** L'historique
+  des flux retail montre que la plupart achètent en 2021 (au pic) et
+  vendent en mars 2022 (au creux). Le DCA mensuel évite ça.
+- **L'or physique en grand volume sans coffre.** Au-delà de 5 000 €
+  de pièces chez toi, le risque de cambriolage > le bénéfice de
+  diversification. Coffre bancaire ou ETC.
+- **Croire que l'or "ne perd jamais".** Il a perdu **−45 % entre 1980
+  et 2001**. Vingt et un ans à plat avec inflation cumulée. C'est un
+  diversificateur, pas une rente.
+- **Ignorer la corrélation.** Le grand atout de l'or, c'est sa
+  corrélation **proche de zéro** avec les actions. C'est ce qui fait
+  qu'il **ajoute du rendement par unité de risque**, pas qu'il bat
+  les actions.
+
+## Le mot de la fin
+
+La vraie question n'est jamais "or **ou** S&P 500". C'est "**combien**
+de chaque, et pour quel horizon".
+
+Pour la majorité des épargnants français qui investissent à 20-30 ans,
+la formule la plus simple :
+
+- **90 % en ETF actions** (S&P 500 ou World) dans le PEA.
+- **10 % en or** (ETC ou pièces physiques) dans une AV ou un CTO.
+- **Pas de rebalancement plus d'une fois par an.**
+- **Pas de regard quotidien sur les cours.**
+
+Le S&P 500 te paie de croire en l'économie productive. L'or te paie
+quand cette croyance vacille. Avoir les deux, c'est admettre que tu
+ne sais pas dans laquelle des deux situations tu seras dans 10 ans —
+et que c'est ok.`,
+  },
+  {
     slug: "etf-world-cw8-wpea-ese",
     title: "ETF MSCI World : CW8, WPEA ou ESE — lequel choisir ?",
     teaser:
