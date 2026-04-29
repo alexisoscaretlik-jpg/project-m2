@@ -114,7 +114,7 @@ export default async function PodcastIndexPage({
             </span>
           </div>
           <h1 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
-            Podcast
+            Vingt minutes, une loi de l&apos;argent, <em>une action concrète.</em>
           </h1>
           <p
             className="mx-auto mt-5 text-[17px]"
@@ -125,10 +125,37 @@ export default async function PodcastIndexPage({
               lineHeight: 1.55,
             }}
           >
-            Coach + Investisseur creusent une seule loi de l&apos;argent par
-            épisode, appliquée à un vrai salaire français. Vingt minutes, une
-            action concrète à la fin.
+            Coach et Investisseur creusent une seule règle d&apos;argent par
+            épisode, appliquée à un vrai salaire français. À la fin, tu sais
+            exactement ce qu&apos;il faut faire cette semaine.
           </p>
+
+          {/* Decorative animated waveform — visual signature for the audio theme. */}
+          <div
+            aria-hidden="true"
+            className="mx-auto mt-10 flex h-12 items-center justify-center gap-[3px]"
+            style={{ maxWidth: "320px" }}
+          >
+            {Array.from({ length: 32 }).map((_, i) => {
+              // Pseudo-random heights, deterministic per index so SSR matches.
+              const h = 10 + ((i * 13) % 28) + (i % 5) * 4;
+              return (
+                <span
+                  key={i}
+                  className="ic-podcast-bar block"
+                  style={{
+                    width: "3px",
+                    height: `${h}px`,
+                    background: "var(--lavender-500)",
+                    borderRadius: "2px",
+                    opacity: 0.55,
+                    // @ts-expect-error animation delay CSS var
+                    "--bar-delay": `${(i % 8) * 0.08}s`,
+                  }}
+                />
+              );
+            })}
+          </div>
         </div>
       </section>
 

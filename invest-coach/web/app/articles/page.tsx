@@ -41,7 +41,7 @@ export default function ArticlesIndexPage() {
             </span>
           </div>
           <h1 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
-            Articles
+            Le journal de <em>l&apos;épargnant français.</em>
           </h1>
           <p
             className="mx-auto mt-5 text-[17px]"
@@ -55,6 +55,24 @@ export default function ArticlesIndexPage() {
             Les bases, sans jargon. Chaque article est pensé pour te faire
             gagner du temps — pas pour te vendre un produit.
           </p>
+
+          {/* Decorative stacked-pages illustration. */}
+          <svg
+            aria-hidden="true"
+            className="mx-auto mt-10"
+            width="120"
+            height="48"
+            viewBox="0 0 120 48"
+            fill="none"
+          >
+            <rect x="14" y="6"  width="92" height="36" rx="4" fill="var(--paper-0)"     stroke="var(--border)" />
+            <rect x="10" y="10" width="92" height="36" rx="4" fill="var(--paper-0)"     stroke="var(--border)" />
+            <rect x="6"  y="14" width="92" height="36" rx="4" fill="var(--lavender-50)" stroke="var(--lavender-300)" />
+            <line x1="14" y1="22" x2="80" y2="22" stroke="var(--lavender-400)" strokeWidth="1.4" strokeLinecap="round" />
+            <line x1="14" y1="28" x2="68" y2="28" stroke="var(--lavender-300)" strokeWidth="1.2" strokeLinecap="round" />
+            <line x1="14" y1="34" x2="58" y2="34" stroke="var(--lavender-300)" strokeWidth="1.2" strokeLinecap="round" />
+            <line x1="14" y1="40" x2="44" y2="40" stroke="var(--lavender-300)" strokeWidth="1.2" strokeLinecap="round" />
+          </svg>
         </div>
       </section>
 

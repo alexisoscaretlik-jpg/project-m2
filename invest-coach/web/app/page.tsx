@@ -192,6 +192,37 @@ function HeroSection() {
         className="relative mx-auto px-6 pt-20 pb-24 text-center sm:px-8 sm:pt-28 sm:pb-32"
         style={{ maxWidth: "880px" }}
       >
+        <div className="mb-6 flex justify-center">
+          <Link
+            href="/podcast"
+            className="group inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12px] transition-colors"
+            style={{
+              fontFamily: "var(--font-display)",
+              background: "var(--paper-0)",
+              border: "1px solid var(--border)",
+              color: "var(--ink-700)",
+            }}
+          >
+            <span
+              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase"
+              style={{
+                background: "var(--lavender-600)",
+                color: "var(--paper-0)",
+                letterSpacing: "0.06em",
+              }}
+            >
+              Nouveau
+            </span>
+            <span>Premier épisode du podcast est sorti</span>
+            <span
+              className="transition-transform group-hover:translate-x-0.5"
+              style={{ color: "var(--lavender-700)" }}
+              aria-hidden="true"
+            >
+              →
+            </span>
+          </Link>
+        </div>
         <div className="mb-8 flex justify-center">
           <span className="ic-pill">
             <span className="ic-pill-badge">Pour épargnants français</span>
@@ -366,7 +397,7 @@ function WorldPlaygroundSection() {
                 aria-hidden="true"
               />
               <div
-                className="ic-globe-card absolute"
+                className="ic-globe-card absolute hidden sm:block"
                 style={{
                   // @ts-expect-error animation delay CSS var
                   "--float-delay": `${i * 0.4}s`,
@@ -404,6 +435,42 @@ function WorldPlaygroundSection() {
             </div>
           ))}
         </div>
+
+        {/* Mobile-only legend — the floating cards are hidden < sm to avoid overlap. */}
+        <ul
+          className="mx-auto mt-5 grid grid-cols-2 gap-2 sm:hidden"
+          style={{ maxWidth: "560px" }}
+        >
+          {PLAYGROUND_CITIES.map((c) => (
+            <li
+              key={c.city}
+              className="flex items-center justify-between rounded-lg px-3 py-2"
+              style={{
+                background: "var(--paper-0)",
+                border: "1px solid var(--border)",
+                fontFamily: "var(--font-display)",
+                fontSize: "12px",
+              }}
+            >
+              <span>
+                <span style={{ color: "var(--fg-muted)" }}>{c.city}</span>
+                <span className="ml-1.5" style={{ color: "var(--ink-700)", fontWeight: 600 }}>
+                  {c.asset}
+                </span>
+              </span>
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  color: c.delta.startsWith("−")
+                    ? "var(--terracotta-500)"
+                    : "var(--forest-500)",
+                }}
+              >
+                {c.delta}
+              </span>
+            </li>
+          ))}
+        </ul>
 
         <p
           className="mx-auto mt-6 text-center text-[12px]"
@@ -456,11 +523,11 @@ function ProductPreviewGrid() {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-6">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
         {/* 1. Fiscalité — wide card with form mockup */}
         <Link
           href="/tax"
-          className="ic-card-pastel-lavender block lg:col-span-4"
+          className="ic-card-pastel-lavender block md:col-span-2 lg:col-span-4"
           style={{
             borderRadius: "var(--r-2xl)",
             padding: "32px",
@@ -597,7 +664,7 @@ function ProductPreviewGrid() {
         {/* 4. Podcast mockup */}
         <Link
           href="/podcast"
-          className="ic-card-pastel-mint block lg:col-span-4"
+          className="ic-card-pastel-mint block md:col-span-2 lg:col-span-4"
           style={{
             borderRadius: "var(--r-2xl)",
             padding: "32px",
