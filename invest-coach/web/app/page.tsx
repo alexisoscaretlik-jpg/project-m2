@@ -170,7 +170,9 @@ function Landing() {
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/" />
       <HeroSection />
-      <FeaturesSection />
+      <WorldPlaygroundSection />
+      <ProductPreviewGrid />
+      <SavingsEqualsEarningsSection />
       <PricingSection />
       <Footer />
     </main>
@@ -192,20 +194,20 @@ function HeroSection() {
       >
         <div className="mb-8 flex justify-center">
           <span className="ic-pill">
-            <span className="ic-pill-badge">Newsletter</span>
-            Le journal du dimanche
+            <span className="ic-pill-badge">Pour épargnants français</span>
+            PEA · AV · PER · IR
           </span>
         </div>
         <h1 className="ic-display mb-6">
-          Apprends à <em>faire travailler</em> ton argent.
+          Ton empreinte fiscale est unique. <em>La méthode, non.</em>
         </h1>
         <p
-          className="mx-auto mb-10 max-w-[560px] ic-lede"
+          className="mx-auto mb-10 max-w-[600px] ic-lede"
           style={{ color: "var(--fg-muted)" }}
         >
-          Une lettre par semaine. Des explications fiscales en français clair,
-          écrites pour les épargnants — pas pour les traders. Sans bruit, sans
-          publicité.
+          Tu paies un impôt français, mais tes ETF sont mondiaux. On t&apos;apprend
+          à voir les deux — et à les piloter ensemble. Économiser de l&apos;impôt,
+          c&apos;est gagner de l&apos;argent.
         </p>
 
         <div className="mx-auto flex flex-col items-center gap-5">
@@ -226,63 +228,218 @@ function HeroSection() {
   );
 }
 
-const FEATURES: {
-  eyebrow: string;
-  title: string;
-  body: string;
-  emoji: string;
-  pastel: string;
+// ─────────────────────── World Playground Section ───────────────────────
+
+const PLAYGROUND_CITIES: {
+  city: string;
+  asset: string;
+  delta: string;
+  x: number; // percent left
+  y: number; // percent top
+  labelBelow?: boolean; // place label below the dot to avoid overlap
 }[] = [
-  {
-    eyebrow: "01",
-    title: "Le journal du dimanche",
-    body: "Une édition longue le dimanche, trois brèves en semaine. Pour comprendre, pas pour réagir.",
-    emoji: "📰",
-    pastel: "ic-card-pastel-lavender",
-  },
-  {
-    eyebrow: "02",
-    title: "Optimisation fiscale",
-    body: "PEA, CTO, assurance-vie, PER : trois enveloppes, des règles claires, des chiffres en euros.",
-    emoji: "💰",
-    pastel: "ic-card-pastel-peach",
-  },
-  {
-    eyebrow: "03",
-    title: "Coach IA",
-    body: "Pose une question à toute heure. Le coach répond comme un ami patient qui aurait lu tous les rapports.",
-    emoji: "🎯",
-    pastel: "ic-card-pastel-mint",
-  },
-  {
-    eyebrow: "04",
-    title: "Watchlist & alertes",
-    body: "Suis les entreprises qui te concernent. On t'envoie un mot quand un événement public compte vraiment.",
-    emoji: "👀",
-    pastel: "ic-card-pastel-lavender",
-  },
-  {
-    eyebrow: "05",
-    title: "Simulateur d'enveloppes",
-    body: "Compare ton PEA, ton CTO, ton AV sur 10 ans. Les vraies hypothèses fiscales, pas un calculateur générique.",
-    emoji: "📊",
-    pastel: "ic-card-pastel-peach",
-  },
-  {
-    eyebrow: "06",
-    title: "Notes de recherche",
-    body: "Chaque rapport d'entreprise, résumé en deux pages. Tu lis les chiffres, pas le jargon.",
-    emoji: "📑",
-    pastel: "ic-card-pastel-mint",
-  },
+  { city: "New York", asset: "S&P 500", delta: "+0,6 %", x: 22, y: 44 },
+  { city: "London", asset: "FTSE 100", delta: "+0,2 %", x: 41, y: 22 },
+  { city: "Paris", asset: "CAC 40", delta: "+0,4 %", x: 48, y: 38, labelBelow: true },
+  { city: "Frankfurt", asset: "DAX", delta: "+0,3 %", x: 57, y: 24 },
+  { city: "Tokyo", asset: "Nikkei", delta: "−0,1 %", x: 82, y: 42 },
 ];
 
-function FeaturesSection() {
+function WorldPlaygroundSection() {
+  return (
+    <section
+      className="relative overflow-hidden py-24"
+      style={{ background: "var(--paper-100)" }}
+    >
+      <div className="mx-auto px-6 sm:px-8" style={{ maxWidth: "1080px" }}>
+        <div className="mb-10 text-center">
+          <div
+            className="mb-3 text-[12px] font-semibold uppercase"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--lavender-700)",
+              letterSpacing: "0.16em",
+            }}
+          >
+            Le monde · ton terrain de jeu
+          </div>
+          <h2 className="ic-h1 mx-auto" style={{ maxWidth: "640px" }}>
+            Pendant que tu dors, ton argent voyage.
+          </h2>
+          <p
+            className="mx-auto mt-5 text-[17px]"
+            style={{
+              maxWidth: "560px",
+              fontFamily: "var(--font-display)",
+              color: "var(--fg-muted)",
+              lineHeight: 1.55,
+            }}
+          >
+            Tes ETF sont à Wall Street. Ton PEA à Paris. Tes SCPI à Lyon. On
+            t&apos;aide à voir où ton argent travaille — et combien tu paies en
+            frais et impôts pour ça.
+          </p>
+        </div>
+
+        <div
+          className="relative mx-auto"
+          style={{
+            maxWidth: "920px",
+            aspectRatio: "16 / 9",
+            background: "var(--paper-0)",
+            borderRadius: "var(--r-2xl)",
+            border: "1px solid var(--border)",
+            overflow: "hidden",
+            boxShadow: "var(--sh-md)",
+          }}
+        >
+          {/* Dotted world map (stylized via SVG) */}
+          <svg
+            viewBox="0 0 920 520"
+            className="absolute inset-0 h-full w-full"
+            preserveAspectRatio="xMidYMid slice"
+            aria-hidden="true"
+          >
+            <defs>
+              <pattern id="dots" x="0" y="0" width="14" height="14" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="1.2" fill="var(--paper-200)" />
+              </pattern>
+              <radialGradient id="globeGlow" cx="50%" cy="50%" r="60%">
+                <stop offset="0%" stopColor="var(--lavender-100)" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="var(--paper-0)" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+            <rect width="920" height="520" fill="url(#globeGlow)" />
+            {/* Continent silhouettes (very stylized — large blobs) */}
+            <g fill="url(#dots)" opacity="0.95">
+              {/* North America */}
+              <path d="M 80 130 Q 100 100 160 105 T 280 130 Q 305 180 280 230 Q 240 270 200 280 Q 150 270 110 240 Q 80 200 80 130 Z" />
+              {/* South America */}
+              <path d="M 240 290 Q 260 285 280 310 Q 290 360 280 410 Q 260 440 240 430 Q 220 400 230 350 Z" />
+              {/* Europe */}
+              <path d="M 420 140 Q 460 115 510 130 Q 535 165 525 200 Q 490 220 450 215 Q 420 195 415 165 Z" />
+              {/* Africa */}
+              <path d="M 460 230 Q 510 230 540 270 Q 555 340 520 400 Q 480 425 450 410 Q 420 360 430 290 Z" />
+              {/* Asia */}
+              <path d="M 555 130 Q 640 105 740 135 Q 800 170 800 215 Q 760 240 700 240 Q 620 235 565 215 Q 540 175 555 130 Z" />
+              {/* India */}
+              <path d="M 640 240 Q 670 245 685 280 Q 685 320 660 330 Q 635 320 630 285 Z" />
+              {/* Australia */}
+              <path d="M 740 360 Q 790 350 820 380 Q 820 410 785 420 Q 745 415 730 390 Z" />
+            </g>
+            {/* Connection arcs between cities */}
+            <g
+              fill="none"
+              stroke="var(--lavender-300)"
+              strokeWidth="1"
+              opacity="0.7"
+              strokeDasharray="3 4"
+            >
+              <path d="M 248 198 Q 380 60 423 167" />
+              <path d="M 423 167 Q 470 90 469 154" />
+              <path d="M 469 154 Q 600 60 773 203" />
+              <path d="M 423 167 Q 460 80 469 158" />
+            </g>
+          </svg>
+
+          {/* Animated city dots with floating delta labels */}
+          {PLAYGROUND_CITIES.map((c, i) => (
+            <div
+              key={c.city}
+              className="absolute"
+              style={{
+                left: `${c.x}%`,
+                top: `${c.y}%`,
+                transform: "translate(-50%, -50%)",
+              }}
+            >
+              <span
+                className="ic-globe-pulse block"
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: "50%",
+                  background: "var(--lavender-600)",
+                  // @ts-expect-error animation delay CSS var
+                  "--pulse-delay": `${i * 0.6}s`,
+                }}
+                aria-hidden="true"
+              />
+              <div
+                className="ic-globe-card absolute"
+                style={{
+                  // @ts-expect-error animation delay CSS var
+                  "--float-delay": `${i * 0.4}s`,
+                  ...(c.labelBelow
+                    ? { top: "calc(100% + 8px)" }
+                    : { bottom: "calc(100% + 8px)" }),
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "var(--paper-0)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "10px",
+                  padding: "6px 10px",
+                  fontFamily: "var(--font-display)",
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  color: "var(--ink-700)",
+                  whiteSpace: "nowrap",
+                  boxShadow: "0 4px 12px -4px rgba(20,16,40,0.12)",
+                }}
+              >
+                <span style={{ color: "var(--fg-muted)" }}>{c.city}</span>
+                <span style={{ marginLeft: 6 }}>{c.asset}</span>
+                <span
+                  style={{
+                    marginLeft: 8,
+                    fontFamily: "var(--font-mono)",
+                    color: c.delta.startsWith("−")
+                      ? "var(--terracotta-500)"
+                      : "var(--forest-500)",
+                  }}
+                >
+                  {c.delta}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <p
+          className="mx-auto mt-6 text-center text-[12px]"
+          style={{
+            maxWidth: "560px",
+            fontFamily: "var(--font-display)",
+            color: "var(--fg-subtle)",
+          }}
+        >
+          Données illustratives. Pas de conseil en investissement personnalisé —
+          on explique, on n&apos;exécute pas pour toi.
+        </p>
+      </div>
+
+    </section>
+  );
+}
+
+// ─────────────────────── Product Preview Grid ───────────────────────
+
+function ProductPreviewGrid() {
   return (
     <section className="mx-auto px-6 py-24 sm:px-8" style={{ maxWidth: "1280px" }}>
       <div className="mb-14 text-center">
+        <div
+          className="mb-3 text-[12px] font-semibold uppercase"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--lavender-700)",
+            letterSpacing: "0.16em",
+          }}
+        >
+          La même boîte à outils, pour chaque empreinte
+        </div>
         <h2 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
-          Tout pour comprendre, rien pour spéculer.
+          Cinq surfaces. Une seule promesse&nbsp;: 1&nbsp;% mieux chaque jour.
         </h2>
         <p
           className="mx-auto mt-5 text-[17px]"
@@ -293,67 +450,712 @@ function FeaturesSection() {
             lineHeight: 1.55,
           }}
         >
-          Six outils. Une seule philosophie&nbsp;: 1&nbsp;% mieux chaque jour, sans
-          devenir trader.
+          Tu n&apos;as ni le même salaire, ni le même TMI, ni le même PEA que
+          ton voisin. Mais tu peux suivre la même méthode — et payer moins
+          d&apos;impôts en la suivant.
         </p>
       </div>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {FEATURES.map((f) => (
-          <article
-            key={f.eyebrow}
-            className={f.pastel}
+
+      <div className="grid gap-6 lg:grid-cols-6">
+        {/* 1. Fiscalité — wide card with form mockup */}
+        <Link
+          href="/tax"
+          className="ic-card-pastel-lavender block lg:col-span-4"
+          style={{
+            borderRadius: "var(--r-2xl)",
+            padding: "32px",
+            border: "1px solid rgba(124,91,250,0.10)",
+            transition: "all 200ms var(--ease-standard)",
+          }}
+        >
+          <div
+            className="text-[11px] font-semibold uppercase"
             style={{
-              borderRadius: "var(--r-2xl)",
-              padding: "32px 28px",
-              border: "1px solid rgba(20,16,40,0.04)",
-              transition: "all 200ms var(--ease-standard)",
+              fontFamily: "var(--font-display)",
+              color: "var(--lavender-700)",
+              letterSpacing: "0.12em",
             }}
           >
+            01 · Déclaration fiscale
+          </div>
+          <h3
+            className="mt-2 text-[26px] font-bold"
+            style={{
+              fontFamily: "var(--font-display)",
+              letterSpacing: "-0.025em",
+              color: "var(--ink-700)",
+              lineHeight: 1.15,
+            }}
+          >
+            Économiser de l&apos;impôt, c&apos;est gagner de l&apos;argent.
+          </h3>
+          <p
+            className="mt-3 max-w-[460px] text-[15px]"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--fg-muted)",
+              lineHeight: 1.55,
+            }}
+          >
+            Ton avis d&apos;imposition + ton profil = 3 à 5 leviers chiffrés en
+            euros. Cerfa 2042 pré-remplie, prête à signer.
+          </p>
+          <CerfaMockup />
+        </Link>
+
+        {/* 2. Watchlist mockup */}
+        <Link
+          href="/watchlist"
+          className="block lg:col-span-2"
+          style={{
+            background: "var(--bg-elevated)",
+            borderRadius: "var(--r-2xl)",
+            padding: "32px",
+            border: "1px solid var(--border)",
+            transition: "all 200ms var(--ease-standard)",
+          }}
+        >
+          <div
+            className="text-[11px] font-semibold uppercase"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--lavender-700)",
+              letterSpacing: "0.12em",
+            }}
+          >
+            02 · Watchlist
+          </div>
+          <h3
+            className="mt-2 text-[22px] font-bold"
+            style={{
+              fontFamily: "var(--font-display)",
+              letterSpacing: "-0.02em",
+              color: "var(--ink-700)",
+              lineHeight: 1.2,
+            }}
+          >
+            Coachings sur les entreprises que tu suis.
+          </h3>
+          <p
+            className="mt-2 text-[14px]"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--fg-muted)",
+              lineHeight: 1.5,
+            }}
+          >
+            Trade alerts éducatifs, jamais de prix temps réel.
+          </p>
+          <WatchlistMockup />
+        </Link>
+
+        {/* 3. Simulateur mockup */}
+        <Link
+          href="/simulation"
+          className="ic-card-pastel-peach block lg:col-span-2"
+          style={{
+            borderRadius: "var(--r-2xl)",
+            padding: "32px",
+            border: "1px solid rgba(204,116,72,0.10)",
+            transition: "all 200ms var(--ease-standard)",
+          }}
+        >
+          <div
+            className="text-[11px] font-semibold uppercase"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--terracotta-700)",
+              letterSpacing: "0.12em",
+            }}
+          >
+            03 · Simulateur
+          </div>
+          <h3
+            className="mt-2 text-[22px] font-bold"
+            style={{
+              fontFamily: "var(--font-display)",
+              letterSpacing: "-0.02em",
+              color: "var(--ink-700)",
+              lineHeight: 1.2,
+            }}
+          >
+            PEA vs AV vs CTO sur 10 ans.
+          </h3>
+          <p
+            className="mt-2 text-[14px]"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--fg-muted)",
+              lineHeight: 1.5,
+            }}
+          >
+            Vraies hypothèses fiscales, en euros nets.
+          </p>
+          <SimulatorMockup />
+        </Link>
+
+        {/* 4. Podcast mockup */}
+        <Link
+          href="/podcast"
+          className="ic-card-pastel-mint block lg:col-span-4"
+          style={{
+            borderRadius: "var(--r-2xl)",
+            padding: "32px",
+            border: "1px solid rgba(74,109,68,0.10)",
+            transition: "all 200ms var(--ease-standard)",
+          }}
+        >
+          <div
+            className="text-[11px] font-semibold uppercase"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--forest-700)",
+              letterSpacing: "0.12em",
+            }}
+          >
+            04 · Podcast & articles
+          </div>
+          <h3
+            className="mt-2 text-[26px] font-bold"
+            style={{
+              fontFamily: "var(--font-display)",
+              letterSpacing: "-0.025em",
+              color: "var(--ink-700)",
+              lineHeight: 1.15,
+            }}
+          >
+            Financial literacy, pour épargnants pressés.
+          </h3>
+          <p
+            className="mt-3 max-w-[460px] text-[15px]"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--fg-muted)",
+              lineHeight: 1.55,
+            }}
+          >
+            Une lettre par semaine, un podcast par épisode. Coach + Investisseur
+            creusent une seule loi de l&apos;argent à la fois.
+          </p>
+          <PodcastMockup />
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+function CerfaMockup() {
+  return (
+    <div
+      className="mt-7 rounded-2xl p-5"
+      style={{
+        background: "var(--paper-0)",
+        border: "1px solid var(--paper-200)",
+        boxShadow: "var(--sh-md)",
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <span
+          className="text-[10px] font-semibold uppercase"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--fg-subtle)",
+            letterSpacing: "0.12em",
+          }}
+        >
+          Cerfa 2042 · Aperçu
+        </span>
+        <span
+          className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+          style={{
+            fontFamily: "var(--font-mono)",
+            background: "var(--forest-50)",
+            color: "var(--forest-700)",
+          }}
+        >
+          −1 240 €
+        </span>
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-3">
+        {[
+          { label: "1AJ · Salaires", value: "42 800 €" },
+          { label: "2DH · Dividendes", value: "1 230 €" },
+          { label: "6PS · PER versé", value: "3 000 €" },
+        ].map((row) => (
+          <div
+            key={row.label}
+            className="rounded-lg p-3"
+            style={{ background: "var(--paper-100)" }}
+          >
             <div
-              className="grid h-[64px] w-[64px] place-items-center rounded-2xl"
-              style={{
-                background: "var(--paper-0)",
-                fontSize: "28px",
-                boxShadow: "var(--sh-md)",
-              }}
-            >
-              {f.emoji}
-            </div>
-            <div
-              className="mt-6 text-[11px]"
+              className="text-[10px]"
               style={{
                 fontFamily: "var(--font-mono)",
-                color: "var(--lavender-700)",
-                letterSpacing: "0.08em",
+                color: "var(--fg-subtle)",
+                letterSpacing: "0.04em",
               }}
             >
-              {f.eyebrow}
+              {row.label}
             </div>
-            <h3
-              className="mt-2 text-[22px] font-bold"
+            <div
+              className="mt-1 text-[13px] font-semibold"
               style={{
-                fontFamily: "var(--font-display)",
-                letterSpacing: "-0.02em",
+                fontFamily: "var(--font-mono)",
                 color: "var(--ink-700)",
-                lineHeight: 1.2,
+                fontVariantNumeric: "tabular-nums",
               }}
             >
-              {f.title}
-            </h3>
-            <p
-              className="mt-3 text-[15px]"
+              {row.value}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div
+        className="mt-4 flex items-center gap-2 rounded-lg p-3"
+        style={{ background: "var(--lavender-50)" }}
+      >
+        <span
+          className="grid h-6 w-6 place-items-center rounded-full text-[12px]"
+          style={{
+            background: "var(--lavender-600)",
+            color: "var(--paper-0)",
+          }}
+        >
+          ✓
+        </span>
+        <span
+          className="text-[13px]"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--ink-700)",
+          }}
+        >
+          PER plafond non utilisé&nbsp;: <strong>+9 200 €</strong> de versement déductible
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function WatchlistMockup() {
+  const rows = [
+    { ticker: "MC.PA", name: "LVMH", tone: "À surveiller", toneClr: "var(--warning)" },
+    { ticker: "TTE.PA", name: "TotalEnergies", tone: "Solide", toneClr: "var(--forest-600)" },
+    { ticker: "AIR.PA", name: "Airbus", tone: "Signal rouge", toneClr: "var(--terracotta-500)" },
+  ];
+  return (
+    <div className="mt-6 space-y-2">
+      {rows.map((r) => (
+        <div
+          key={r.ticker}
+          className="flex items-center justify-between rounded-xl p-3"
+          style={{
+            background: "var(--paper-0)",
+            border: "1px solid var(--paper-200)",
+          }}
+        >
+          <div className="flex items-baseline gap-2">
+            <span
+              className="text-[12px] font-semibold"
+              style={{
+                fontFamily: "var(--font-mono)",
+                color: "var(--ink-700)",
+              }}
+            >
+              {r.ticker}
+            </span>
+            <span
+              className="text-[12px]"
               style={{
                 fontFamily: "var(--font-display)",
                 color: "var(--fg-muted)",
-                lineHeight: 1.5,
               }}
             >
-              {f.body}
-            </p>
-          </article>
+              {r.name}
+            </span>
+          </div>
+          <span
+            className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: r.toneClr,
+              border: `1px solid ${r.toneClr}`,
+              letterSpacing: "0.04em",
+            }}
+          >
+            {r.tone}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SimulatorMockup() {
+  // Simple bar chart: PEA vs AV over 10 years
+  const data = [
+    { label: "PEA", value: 100, height: "100%", color: "var(--lavender-600)" },
+    { label: "AV", value: 84, height: "84%", color: "var(--lavender-300)" },
+    { label: "CTO", value: 71, height: "71%", color: "var(--terracotta-300)" },
+  ];
+  return (
+    <div
+      className="mt-6 rounded-2xl p-4"
+      style={{
+        background: "var(--paper-0)",
+        border: "1px solid var(--paper-200)",
+        boxShadow: "var(--sh-sm)",
+      }}
+    >
+      <div className="flex items-end justify-between gap-3" style={{ height: "100px" }}>
+        {data.map((d) => (
+          <div key={d.label} className="flex h-full flex-1 flex-col justify-end">
+            <div
+              className="rounded-t-md"
+              style={{
+                height: d.height,
+                background: d.color,
+                minHeight: "6px",
+              }}
+            />
+          </div>
         ))}
       </div>
+      <div className="mt-3 flex items-end justify-between gap-3">
+        {data.map((d) => (
+          <div
+            key={d.label}
+            className="flex-1 text-center"
+          >
+            <div
+              className="text-[10px] font-semibold"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--fg-muted)",
+                letterSpacing: "0.04em",
+              }}
+            >
+              {d.label}
+            </div>
+            <div
+              className="text-[12px] font-semibold"
+              style={{
+                fontFamily: "var(--font-mono)",
+                color: "var(--ink-700)",
+              }}
+            >
+              {Math.round(d.value * 1.34)} k€
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PodcastMockup() {
+  return (
+    <div
+      className="mt-6 rounded-full p-2 pl-2 pr-5"
+      style={{
+        background: "var(--paper-0)",
+        border: "1px solid var(--paper-200)",
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        boxShadow: "var(--sh-sm)",
+      }}
+    >
+      <span
+        className="grid h-10 w-10 shrink-0 place-items-center rounded-full"
+        style={{
+          background: "var(--lavender-600)",
+          color: "var(--paper-0)",
+        }}
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+          <path d="M3 2v10l8-5z" />
+        </svg>
+      </span>
+      <div className="flex-1 min-w-0">
+        <div
+          className="truncate text-[13px] font-semibold"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--ink-700)",
+            letterSpacing: "-0.005em",
+          }}
+        >
+          Ce que change la réforme PEA pour ton argent
+        </div>
+        <div className="mt-1 flex items-center gap-2">
+          <div
+            className="h-1 flex-1 rounded-full"
+            style={{ background: "var(--paper-200)" }}
+          >
+            <div
+              className="h-full rounded-full"
+              style={{
+                width: "38%",
+                background: "var(--lavender-600)",
+              }}
+            />
+          </div>
+          <span
+            className="text-[11px]"
+            style={{
+              fontFamily: "var(--font-mono)",
+              color: "var(--fg-muted)",
+            }}
+          >
+            12 min
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────── Savings = Earnings Section ───────────────────────
+
+function SavingsEqualsEarningsSection() {
+  return (
+    <section
+      className="relative overflow-hidden py-24"
+      style={{
+        background:
+          "linear-gradient(180deg, var(--paper-50) 0%, var(--lavender-50) 100%)",
+      }}
+    >
+      <div
+        className="mx-auto px-6 sm:px-8"
+        style={{ maxWidth: "1080px" }}
+      >
+        <div className="grid gap-12 md:grid-cols-2 md:items-center">
+          <div>
+            <div
+              className="mb-3 text-[12px] font-semibold uppercase"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--lavender-700)",
+                letterSpacing: "0.16em",
+              }}
+            >
+              Le calcul que personne ne te fait
+            </div>
+            <h2 className="ic-h1">
+              Économiser 5 000 € d&apos;impôts à 35 ans = <em>+38 000 €</em> à 65 ans.
+            </h2>
+            <p
+              className="mt-5 text-[17px]"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--fg-muted)",
+                lineHeight: 1.55,
+              }}
+            >
+              Chaque euro d&apos;impôt non-payé reste dans ton PEA et compose
+              pendant 30 ans. C&apos;est ça, notre métier&nbsp;: te montrer
+              chaque année combien tu peux récupérer — légalement, BOI à
+              l&apos;appui.
+            </p>
+            <ul className="mt-7 space-y-3">
+              {[
+                {
+                  k: "PER",
+                  v: "Jusqu'à 10 % de tes revenus déductibles",
+                },
+                {
+                  k: "PEA",
+                  v: "Exonération d'IR après 5 ans (17,2 % de PS seulement)",
+                },
+                {
+                  k: "Donations",
+                  v: "100 000 € exonérés tous les 15 ans par parent et enfant",
+                },
+                {
+                  k: "Plus-values",
+                  v: "Abattement pour durée de détention sur titres pré-2018",
+                },
+              ].map((item) => (
+                <li
+                  key={item.k}
+                  className="flex items-start gap-3 text-[15px]"
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    color: "var(--ink-700)",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  <span
+                    className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px]"
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      background: "var(--lavender-600)",
+                      color: "var(--paper-0)",
+                      fontWeight: 700,
+                    }}
+                  >
+                    €
+                  </span>
+                  <span>
+                    <strong style={{ color: "var(--lavender-700)" }}>{item.k}</strong>
+                    <span style={{ color: "var(--fg-muted)" }}> · {item.v}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <CompoundingChart />
+        </div>
+      </div>
     </section>
+  );
+}
+
+function CompoundingChart() {
+  // Simple SVG showing two lines: with vs without tax savings, growing over 30 years
+  const points = (start: number, growth: number) => {
+    const arr: { x: number; y: number }[] = [];
+    let v = start;
+    for (let i = 0; i <= 30; i++) {
+      arr.push({ x: i, y: v });
+      v *= 1 + growth;
+    }
+    return arr;
+  };
+  const without = points(40000, 0.07); // 7%/y — long-term equity average
+  const withSaved = points(45000, 0.07); // +5000 € d'impôt évité, même rendement
+  const maxY = Math.max(...withSaved.map((p) => p.y));
+  const w = 480;
+  const h = 320;
+  const padX = 40;
+  const padY = 30;
+  const sx = (i: number) => padX + (i / 30) * (w - padX * 2);
+  const sy = (v: number) => h - padY - (v / maxY) * (h - padY * 2);
+  const path = (pts: { x: number; y: number }[]) =>
+    pts
+      .map((p, i) => `${i === 0 ? "M" : "L"} ${sx(p.x)} ${sy(p.y)}`)
+      .join(" ");
+  const finalDelta = Math.round(withSaved[30].y - without[30].y);
+
+  return (
+    <div
+      className="rounded-2xl p-5"
+      style={{
+        background: "var(--paper-0)",
+        border: "1px solid var(--paper-200)",
+        boxShadow: "var(--sh-md)",
+      }}
+    >
+      <div className="flex items-baseline justify-between">
+        <span
+          className="text-[12px] font-semibold uppercase"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--fg-subtle)",
+            letterSpacing: "0.12em",
+          }}
+        >
+          Effet boule de neige · 30 ans
+        </span>
+        <span
+          className="rounded-full px-3 py-1 text-[12px] font-semibold"
+          style={{
+            fontFamily: "var(--font-mono)",
+            background: "var(--lavender-50)",
+            color: "var(--lavender-700)",
+          }}
+        >
+          +{finalDelta.toLocaleString("fr-FR")} €
+        </span>
+      </div>
+      <svg viewBox={`0 0 ${w} ${h}`} className="mt-4 w-full">
+        <defs>
+          <linearGradient id="lvAreaGrad" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="var(--lavender-300)" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="var(--lavender-300)" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {/* Without savings (lower line, muted) */}
+        <path
+          d={path(without)}
+          stroke="var(--paper-300)"
+          strokeWidth="2"
+          fill="none"
+          strokeDasharray="4 4"
+        />
+        {/* With savings (lavender, area + line) */}
+        <path
+          d={`${path(withSaved)} L ${sx(30)} ${h - padY} L ${sx(0)} ${h - padY} Z`}
+          fill="url(#lvAreaGrad)"
+        />
+        <path
+          d={path(withSaved)}
+          stroke="var(--lavender-600)"
+          strokeWidth="2.5"
+          fill="none"
+          strokeLinecap="round"
+        />
+        {/* Endpoints */}
+        <circle
+          cx={sx(30)}
+          cy={sy(withSaved[30].y)}
+          r="5"
+          fill="var(--lavender-600)"
+          stroke="var(--paper-0)"
+          strokeWidth="2"
+        />
+        <circle
+          cx={sx(30)}
+          cy={sy(without[30].y)}
+          r="4"
+          fill="var(--paper-300)"
+          stroke="var(--paper-0)"
+          strokeWidth="2"
+        />
+        {/* X-axis labels */}
+        <text
+          x={padX}
+          y={h - 5}
+          fontFamily="var(--font-mono)"
+          fontSize="10"
+          fill="var(--fg-subtle)"
+        >
+          35 ans
+        </text>
+        <text
+          x={w - padX}
+          y={h - 5}
+          textAnchor="end"
+          fontFamily="var(--font-mono)"
+          fontSize="10"
+          fill="var(--fg-subtle)"
+        >
+          65 ans
+        </text>
+      </svg>
+      <div
+        className="mt-3 flex items-center gap-4 text-[12px]"
+        style={{ fontFamily: "var(--font-display)" }}
+      >
+        <span className="flex items-center gap-2" style={{ color: "var(--lavender-700)" }}>
+          <span
+            className="inline-block h-2 w-6 rounded-full"
+            style={{ background: "var(--lavender-600)" }}
+          />
+          Avec 5 000 € d&apos;impôt évité
+        </span>
+        <span className="flex items-center gap-2" style={{ color: "var(--fg-muted)" }}>
+          <span
+            className="inline-block h-1 w-6 rounded-full"
+            style={{ background: "var(--paper-300)" }}
+          />
+          Sans
+        </span>
+      </div>
+    </div>
   );
 }
 
