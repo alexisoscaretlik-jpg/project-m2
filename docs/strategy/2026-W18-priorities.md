@@ -72,7 +72,7 @@ Two moves, executed in series:
    the original photographer, we fall back to a colored panel. Detect
    on first iPhone visual check; mirror to `/public/` if any breaks.
 4. **No real testimonials yet** — the trust bar uses real-but-thin
-   numbers ("5 articles · 1 podcast"). After 10 paying users, get
+   numbers ("6 articles · 1 podcast"). After 10 paying users, get
    one or two written testimonials and replace the trust bar with a
    real-name + city + quote pattern.
 
