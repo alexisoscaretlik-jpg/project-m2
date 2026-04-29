@@ -1,7 +1,12 @@
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
-import { SpotifyEpisodeList } from "@/components/spotify-episode-card";
 import { serviceClient } from "@/lib/supabase/service";
+import { SPOTIFY_EPISODES } from "@/lib/podcast/spotify-episodes";
+
+// slug → Spotify episode id; episodes present here render in a compact
+// Spotify embed instead of the native <audio> tag (so plays count on
+// Spotify and the UX matches Apple/Spotify expectations).
+const SPOTIFY_BY_SLUG = new Map(SPOTIFY_EPISODES.map((e) => [e.slug, e.id]));
 
 export const metadata = {
   title: "Argent · Podcast — Invest Coach",
@@ -106,8 +111,6 @@ export default async function PodcastIndexPage({
           </p>
         </div>
 
-        <SpotifyEpisodeList />
-
         {episodes.length === 0 && (
           <p
             className="text-[14px] italic"
@@ -144,12 +147,29 @@ export default async function PodcastIndexPage({
                 >
                   {ep.meta.summary}
                 </p>
-                <audio
-                  controls
-                  preload="metadata"
-                  src={ep.audioUrl}
-                  className="mt-4 w-full"
-                />
+                {SPOTIFY_BY_SLUG.has(ep.slug) ? (
+                  <iframe
+                    title={ep.meta.title}
+                    src={`https://open.spotify.com/embed/episode/${SPOTIFY_BY_SLUG.get(ep.slug)}?utm_source=generator&theme=0`}
+                    width="100%"
+                    height="152"
+                    frameBorder="0"
+                    loading="lazy"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    style={{
+                      borderRadius: "12px",
+                      border: "1px solid var(--border)",
+                      marginTop: "1rem",
+                    }}
+                  />
+                ) : (
+                  <audio
+                    controls
+                    preload="metadata"
+                    src={ep.audioUrl}
+                    className="mt-4 w-full"
+                  />
+                )}
                 <p
                   className="mt-3 text-[11px]"
                   style={{

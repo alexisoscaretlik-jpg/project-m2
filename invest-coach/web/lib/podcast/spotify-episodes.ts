@@ -17,6 +17,11 @@ export type SpotifyEpisode = {
 
 export const SPOTIFY_EPISODES: SpotifyEpisode[] = [
   {
+    id: "21YxQHG5xOK7AFNZG1GnW8",
+    slug: "le-vrai-levier-n-est-pas-d-epargner-c-est-de-monter-en-valeu",
+    title: "Le vrai levier n'est pas d'épargner, c'est de monter en valeur",
+  },
+  {
     id: "7ib7lIC37k2csGiJN3h85p",
     slug: "trois-regles-d-argent-qui-changent-tout",
     title: "Trois règles d'argent qui changent tout",
