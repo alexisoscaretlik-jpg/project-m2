@@ -1,4 +1,5 @@
 import { Nav } from "@/components/nav";
+import { Footer } from "@/components/footer";
 import { requireUser } from "@/lib/supabase/require-auth";
 
 import { openPortal, startCheckout } from "./actions";
@@ -15,6 +16,7 @@ const TIERS: Array<{
   key: Tier;
   name: string;
   price: string;
+  cadence: string;
   tagline: string;
   features: string[];
   highlighted: boolean;
@@ -22,11 +24,12 @@ const TIERS: Array<{
   {
     key: "free",
     name: "Free",
-    price: "€0",
-    tagline: "Daily coaching cards",
+    price: "0 €",
+    cadence: "pour toujours",
+    tagline: "Le coaching quotidien, gratuit.",
     features: [
-      "Chronological feed of SEC filings",
-      "10 tracked companies",
+      "Fil chronologique des publications SEC",
+      "10 entreprises suivies",
       "Watchlist",
     ],
     highlighted: false,
@@ -34,26 +37,28 @@ const TIERS: Array<{
   {
     key: "plus",
     name: "Plus",
-    price: "€9/mo",
-    tagline: "Alerts + tax optimization",
+    price: "9 €",
+    cadence: "/ mois",
+    tagline: "Alertes + optimisation fiscale.",
     features: [
-      "Everything in Free",
-      "Email alerts on 8-K materiality",
-      "Tax optimization (PEA, AV, PER)",
-      "Upload your avis d'imposition",
+      "Tout le contenu Free",
+      "Alertes email sur les 8-K matériels",
+      "Optimisation fiscale (PEA, AV, PER)",
+      "Téléversement de ton avis d'imposition",
     ],
     highlighted: true,
   },
   {
     key: "wealth",
     name: "Wealth",
-    price: "€19/mo",
-    tagline: "Full wealth coaching",
+    price: "19 €",
+    cadence: "/ mois",
+    tagline: "Le coaching patrimoine complet.",
     features: [
-      "Everything in Plus",
-      "Bank connection (PSD2)",
-      "Spending coach",
-      "Monthly investment plan",
+      "Tout le contenu Plus",
+      "Connexion bancaire (PSD2)",
+      "Coach des dépenses",
+      "Plan d'investissement mensuel",
     ],
     highlighted: false,
   },
@@ -76,105 +81,254 @@ export default async function SubscriptionPage({
   const currentTier: Tier = profile?.tier ?? "free";
 
   return (
-    <main className="min-h-screen bg-muted">
+    <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/subscription" />
 
-      <div className="mx-auto max-w-4xl px-4 py-6">
-        <h1 className="text-xl font-bold text-foreground">Subscription</h1>
-        <p className="text-xs text-muted-foreground">
-          Pick a plan. Cancel anytime. French VAT included.
-        </p>
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background:
+            "radial-gradient(120% 60% at 50% 0%, var(--lavender-100) 0%, var(--paper-50) 60%, var(--paper-50) 100%)",
+        }}
+      >
+        <div
+          className="mx-auto px-6 pt-16 pb-10 text-center sm:px-8 sm:pt-20"
+          style={{ maxWidth: "880px" }}
+        >
+          <div className="mb-6 flex justify-center">
+            <span className="ic-pill">
+              <span className="ic-pill-badge">Abonnement</span>
+              Annulable à tout moment · TVA française incluse
+            </span>
+          </div>
+          <h1 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
+            Choisis ton plan. <em>Annule quand tu veux.</em>
+          </h1>
+          <p
+            className="mx-auto mt-5 text-[17px]"
+            style={{
+              maxWidth: "560px",
+              fontFamily: "var(--font-display)",
+              color: "var(--fg-muted)",
+              lineHeight: 1.55,
+            }}
+          >
+            Trois plans, trois engagements. Tu peux passer de l&apos;un à
+            l&apos;autre à tout moment depuis le portail de gestion.
+          </p>
+        </div>
+      </section>
 
+      <div className="mx-auto max-w-5xl px-6 py-10 sm:px-8">
         {status === "success" ? (
-          <p className="mt-3 rounded-lg bg-[color:var(--forest-50)] p-3 text-sm text-[color:var(--forest-700)]">
-            Payment successful. Your plan will activate within a few
-            seconds — refresh if needed.
+          <p
+            className="mb-6 rounded-2xl px-5 py-4 text-[14px]"
+            style={{
+              background: "var(--forest-50)",
+              color: "var(--forest-700)",
+              fontFamily: "var(--font-display)",
+              border: "1px solid rgba(100,140,94,0.25)",
+            }}
+          >
+            Paiement validé. Ton plan s&apos;active dans quelques secondes.
+            Rafraîchis si besoin.
           </p>
         ) : null}
         {status === "cancelled" ? (
-          <p className="mt-3 rounded-lg bg-[color:var(--warning-soft)] p-3 text-sm text-[color:var(--warning)]">
-            Checkout cancelled.
+          <p
+            className="mb-6 rounded-2xl px-5 py-4 text-[14px]"
+            style={{
+              background: "var(--terracotta-50)",
+              color: "var(--terracotta-700)",
+              fontFamily: "var(--font-display)",
+              border: "1px solid rgba(204,116,72,0.25)",
+            }}
+          >
+            Paiement annulé. Aucun débit n&apos;a été effectué.
           </p>
         ) : null}
 
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-3">
           {TIERS.map((t) => {
             const isCurrent = t.key === currentTier;
             const isFree = t.key === "free";
             return (
-              <div
+              <article
                 key={t.key}
-                className={`rounded-xl border bg-card p-5 shadow-sm ${
-                  t.highlighted
-                    ? "border-primary ring-2 ring-blue-200"
-                    : "border-border"
-                }`}
+                className="flex flex-col"
+                style={{
+                  background: t.highlighted
+                    ? "var(--lavender-50)"
+                    : "var(--bg-elevated)",
+                  border: t.highlighted
+                    ? "1.5px solid var(--lavender-500)"
+                    : "1px solid var(--border)",
+                  borderRadius: "var(--r-2xl)",
+                  padding: "28px 26px",
+                  boxShadow: t.highlighted
+                    ? "0 12px 32px -16px rgba(124,91,250,0.35)"
+                    : "none",
+                }}
               >
-                <h2 className="text-lg font-semibold text-foreground">
-                  {t.name}
+                {t.highlighted ? (
+                  <div
+                    className="mb-3 inline-flex w-fit rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase"
+                    style={{
+                      background: "var(--lavender-600)",
+                      color: "var(--paper-0)",
+                      letterSpacing: "0.08em",
+                    }}
+                  >
+                    Recommandé
+                  </div>
+                ) : null}
+
+                <div className="flex items-baseline justify-between">
+                  <h2
+                    className="text-[20px] font-bold"
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      color: "var(--ink-700)",
+                    }}
+                  >
+                    {t.name}
+                  </h2>
                   {isCurrent ? (
-                    <span className="ml-2 rounded-full bg-[color:var(--forest-100)] px-2 py-0.5 text-xs text-[color:var(--forest-700)]">
-                      current
+                    <span
+                      className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase"
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        background: "var(--forest-50)",
+                        color: "var(--forest-700)",
+                        letterSpacing: "0.06em",
+                      }}
+                    >
+                      En cours
                     </span>
                   ) : null}
-                </h2>
-                <p className="mt-1 text-2xl font-bold text-foreground">
-                  {t.price}
+                </div>
+
+                <p
+                  className="mt-2 text-[13px]"
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    color: "var(--fg-muted)",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {t.tagline}
                 </p>
-                <p className="text-xs text-muted-foreground">{t.tagline}</p>
-                <ul className="mt-4 space-y-1 text-sm text-foreground">
+
+                <p
+                  className="mt-4 text-[36px] font-bold leading-none"
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    color: "var(--ink-700)",
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  {t.price}
+                  <span
+                    className="ml-1.5 text-[13px] font-normal"
+                    style={{ color: "var(--fg-muted)" }}
+                  >
+                    {t.cadence}
+                  </span>
+                </p>
+
+                <ul
+                  className="mt-5 space-y-2 text-[14px]"
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    color: "var(--ink-700)",
+                  }}
+                >
                   {t.features.map((f) => (
-                    <li key={f} className="flex gap-2">
-                      <span className="text-[color:var(--forest-600)]">&#10003;</span>
+                    <li key={f} className="flex items-start gap-2">
+                      <span
+                        className="shrink-0 leading-tight"
+                        style={{ color: "var(--forest-600)" }}
+                        aria-hidden="true"
+                      >
+                        ✓
+                      </span>
                       <span>{f}</span>
                     </li>
                   ))}
                 </ul>
 
-                {isFree ? (
-                  <button
-                    type="button"
-                    disabled
-                    className="mt-5 w-full rounded-lg bg-secondary px-4 py-2 text-sm font-medium text-foreground"
-                  >
-                    {isCurrent ? "Current plan" : "Included"}
-                  </button>
-                ) : isCurrent ? (
-                  <form action={openPortal} className="mt-5">
+                <div className="mt-auto pt-6">
+                  {isFree ? (
                     <button
-                      type="submit"
-                      className="w-full rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-white hover:bg-[color:var(--ink-600)]"
+                      type="button"
+                      disabled
+                      className="w-full rounded-full px-4 py-2.5 text-[14px] font-medium"
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        background: "var(--paper-200)",
+                        color: "var(--fg-subtle)",
+                      }}
                     >
-                      Manage subscription
+                      {isCurrent ? "Plan actuel" : "Inclus"}
                     </button>
-                  </form>
-                ) : (
-                  <form action={startCheckout} className="mt-5">
-                    <input type="hidden" name="tier" value={t.key} />
-                    <button
-                      type="submit"
-                      className={`w-full rounded-lg px-4 py-2 text-sm font-medium ${
-                        t.highlighted
-                          ? "bg-primary text-white hover:bg-primary"
-                          : "bg-secondary text-foreground hover:bg-secondary"
-                      }`}
-                    >
-                      {currentTier === "free" ? "Upgrade" : "Switch"}
-                    </button>
-                  </form>
-                )}
-              </div>
+                  ) : isCurrent ? (
+                    <form action={openPortal}>
+                      <button
+                        type="submit"
+                        className="w-full rounded-full px-4 py-2.5 text-[14px] font-semibold transition-colors"
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          background: "var(--ink-700)",
+                          color: "var(--paper-0)",
+                        }}
+                      >
+                        Gérer mon abonnement
+                      </button>
+                    </form>
+                  ) : (
+                    <form action={startCheckout}>
+                      <input type="hidden" name="tier" value={t.key} />
+                      <button
+                        type="submit"
+                        className="w-full rounded-full px-4 py-2.5 text-[14px] font-semibold transition-colors"
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          background: t.highlighted
+                            ? "var(--lavender-600)"
+                            : "var(--ink-700)",
+                          color: "var(--paper-0)",
+                        }}
+                      >
+                        {currentTier === "free" ? "Passer à " + t.name : "Changer pour " + t.name}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </article>
             );
           })}
         </div>
 
         {profile?.current_period_end ? (
-          <p className="mt-6 text-xs text-muted-foreground">
-            Current period ends{" "}
-            {new Date(profile.current_period_end).toLocaleDateString("fr-FR")}.
+          <p
+            className="mt-6 text-[12px]"
+            style={{
+              fontFamily: "var(--font-mono)",
+              color: "var(--fg-subtle)",
+            }}
+          >
+            Période en cours jusqu&apos;au{" "}
+            {new Date(profile.current_period_end).toLocaleDateString("fr-FR", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+            .
           </p>
         ) : null}
       </div>
+
+      <Footer />
     </main>
   );
 }
