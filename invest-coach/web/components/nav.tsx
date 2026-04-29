@@ -4,14 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
 
 const TABS = [
-  { href: "/", label: "Coaching" },
-  { href: "/charts", label: "Vue technique" },
-  { href: "/watchlist", label: "Watchlist" },
-  { href: "/simulation", label: "Simulateur" },
-  { href: "/articles", label: "Guides" },
+  { href: "/articles", label: "Articles" },
   { href: "/podcast", label: "Podcast" },
-  { href: "/tax", label: "Fiscalité" },
-  { href: "/bank", label: "Banque" },
+  { href: "/outils", label: "Outils" },
 ];
 
 export async function Nav({ active }: { active: string }) {
@@ -22,55 +17,40 @@ export async function Nav({ active }: { active: string }) {
 
   return (
     <header
-      className="sticky top-0 z-50 border-b backdrop-blur"
+      className="sticky top-0 z-50 backdrop-blur"
       style={{
-        background: "color-mix(in srgb, var(--paper-50) 88%, transparent)",
-        borderColor: "var(--border)",
+        background: "color-mix(in srgb, var(--paper-50) 85%, transparent)",
+        borderBottom: "1px solid var(--border)",
       }}
     >
-      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-y-2 px-6 py-3.5 lg:px-8">
+      <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-y-2 px-6 py-4 lg:px-8">
         <Link href="/" className="flex items-baseline gap-2">
           <span
-            className="text-[17px] font-semibold tracking-tight"
+            className="text-[18px] font-bold tracking-tight"
             style={{
               fontFamily: "var(--font-display)",
               color: "var(--ink-700)",
-              letterSpacing: "-0.01em",
+              letterSpacing: "-0.025em",
             }}
           >
             Invest Coach
           </span>
-          <span
-            className="hidden text-[11px] sm:inline"
-            style={{
-              fontFamily: "var(--font-mono)",
-              color: "var(--fg-subtle)",
-              letterSpacing: "0.08em",
-            }}
-          >
-            · FR
-          </span>
         </Link>
 
         <nav
-          className="order-3 flex w-full items-center gap-1 overflow-x-auto text-sm sm:order-none sm:w-auto"
+          className="hidden items-center gap-1 text-sm md:flex"
           style={{ fontFamily: "var(--font-display)" }}
         >
           {TABS.map((t) => {
-            const isActive = t.href === active;
+            const isActive = t.href === active || (active === "/" && t.href === "/");
             return (
               <Link
                 key={t.href}
                 href={t.href}
-                className="whitespace-nowrap rounded-md px-3 py-1.5 text-[14px] font-medium transition-colors duration-200"
-                style={
-                  isActive
-                    ? {
-                        color: "var(--ink-700)",
-                        background: "var(--paper-100)",
-                      }
-                    : { color: "var(--fg-muted)" }
-                }
+                className="whitespace-nowrap rounded-lg px-3 py-2 text-[14px] font-medium transition-colors duration-200 hover:bg-[var(--paper-100)]"
+                style={{
+                  color: isActive ? "var(--ink-700)" : "var(--fg-muted)",
+                }}
               >
                 {t.label}
               </Link>
@@ -78,7 +58,10 @@ export async function Nav({ active }: { active: string }) {
           })}
         </nav>
 
-        <div className="text-sm" style={{ fontFamily: "var(--font-display)" }}>
+        <div
+          className="flex items-center gap-2 text-sm"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
           {user ? (
             <form action={signOut} className="flex items-center gap-3">
               <span
@@ -89,7 +72,7 @@ export async function Nav({ active }: { active: string }) {
               </span>
               <button
                 type="submit"
-                className="rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors hover:bg-[var(--paper-100)]"
+                className="rounded-lg px-3 py-2 text-[13px] font-medium transition-colors hover:bg-[var(--paper-100)]"
                 style={{ color: "var(--fg-muted)" }}
               >
                 Déconnexion
@@ -98,11 +81,8 @@ export async function Nav({ active }: { active: string }) {
           ) : (
             <Link
               href="/login"
-              className="rounded-md px-3.5 py-2 text-[13px] font-semibold transition-colors duration-200"
-              style={{
-                background: "var(--forest-600)",
-                color: "var(--paper-50)",
-              }}
+              className="rounded-lg px-3 py-2 text-[14px] font-medium transition-colors hover:bg-[var(--paper-100)]"
+              style={{ color: "var(--fg-muted)" }}
             >
               Connexion
             </Link>

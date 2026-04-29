@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import { Inter_Tight, Source_Serif_4, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-// Capucine display family — geometric, modern sans, used everywhere except long-form reading.
+// Display family — Inter Tight, used everywhere.
 const interTight = Inter_Tight({
   variable: "--font-inter-tight",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
-// Capucine editorial serif — articles, ledes, pullquotes.
+// Editorial serif — kept available for legacy pages, no longer the body default.
 const sourceSerif = Source_Serif_4({
   variable: "--font-source-serif",
   subsets: ["latin"],
@@ -17,7 +17,7 @@ const sourceSerif = Source_Serif_4({
   style: ["normal", "italic"],
 });
 
-// Capucine numerical — tabular figures for prices, percentages, tickers.
+// Numerical — tabular figures for prices, percentages, tickers.
 const jetBrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],

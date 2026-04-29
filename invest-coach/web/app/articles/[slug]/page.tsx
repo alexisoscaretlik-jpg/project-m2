@@ -32,10 +32,13 @@ function formatDate(iso: string) {
   });
 }
 
-function renderMarkdown(md: string) {
+function renderMarkdown(md: string, midSlot?: React.ReactNode) {
   const lines = md.split("\n");
   const out: React.ReactNode[] = [];
   let listBuffer: string[] = [];
+  let paraBuffer: string[] = [];
+  let headingCount = 0;
+  let midInjected = false;
 
   const inline = (s: string) =>
     s
@@ -52,11 +55,18 @@ function renderMarkdown(md: string) {
   const flushList = () => {
     if (listBuffer.length === 0) return;
     out.push(
-      <ul key={`ul-${out.length}`} className="my-4 list-disc space-y-2 pl-6">
+      <ul
+        key={`ul-${out.length}`}
+        className="my-5 list-disc space-y-2 pl-6 text-[17px]"
+        style={{
+          fontFamily: "var(--font-display)",
+          lineHeight: 1.6,
+          color: "var(--fg)",
+        }}
+      >
         {listBuffer.map((item, i) => (
           <li
             key={i}
-            className="text-foreground"
             dangerouslySetInnerHTML={{ __html: inline(item) }}
           />
         ))}
@@ -65,60 +75,144 @@ function renderMarkdown(md: string) {
     listBuffer = [];
   };
 
+  const flushPara = () => {
+    if (paraBuffer.length === 0) return;
+    const text = paraBuffer.join(" ");
+    out.push(
+      <p
+        key={`p-${out.length}`}
+        className="mb-5 text-[18px]"
+        style={{
+          fontFamily: "var(--font-display)",
+          lineHeight: 1.65,
+          color: "var(--fg)",
+          textWrap: "pretty",
+        }}
+        dangerouslySetInnerHTML={{ __html: inline(text) }}
+      />,
+    );
+    paraBuffer = [];
+  };
+
+  const flushAll = () => {
+    flushList();
+    flushPara();
+  };
+
   for (const raw of lines) {
     const line = raw.trimEnd();
     if (line.startsWith("## ")) {
-      flushList();
+      flushAll();
+      headingCount += 1;
+      // Inject mid-article CTA after the 2nd top-level heading (~30% through)
+      if (midSlot && !midInjected && headingCount === 3) {
+        out.push(
+          <div key={`mid-${out.length}`} className="my-10">
+            {midSlot}
+          </div>,
+        );
+        midInjected = true;
+      }
       out.push(
         <h2
           key={`h2-${out.length}`}
-          className="mt-10 mb-3 text-[28px] font-semibold"
+          className="mt-12 mb-4 text-[30px] font-bold"
           style={{
             fontFamily: "var(--font-display)",
-            letterSpacing: "-0.01em",
-            color: "var(--fg)",
+            letterSpacing: "-0.025em",
+            color: "var(--ink-700)",
+            lineHeight: 1.2,
           }}
         >
           {line.slice(3)}
         </h2>,
       );
     } else if (line.startsWith("### ")) {
-      flushList();
+      flushAll();
       out.push(
         <h3
           key={`h3-${out.length}`}
-          className="mt-6 text-[20px] font-medium"
+          className="mt-8 mb-2 text-[20px] font-semibold"
           style={{
             fontFamily: "var(--font-display)",
-            color: "var(--fg)",
+            letterSpacing: "-0.015em",
+            color: "var(--ink-700)",
           }}
         >
           {line.slice(4)}
         </h3>,
       );
     } else if (line.startsWith("- ")) {
+      flushPara();
       listBuffer.push(line.slice(2));
     } else if (line === "") {
-      flushList();
+      // Blank line ends paragraph & list
+      flushAll();
+    } else if (listBuffer.length > 0 && paraBuffer.length === 0) {
+      // Soft-wrap continuation of the last list item (no blank line, not "- ")
+      listBuffer[listBuffer.length - 1] += " " + line;
     } else {
+      // Accumulate consecutive non-empty lines into a single paragraph
       flushList();
-      out.push(
-        <p
-          key={`p-${out.length}`}
-          className="mb-5 text-[19px]"
-          style={{
-            fontFamily: "var(--font-serif)",
-            lineHeight: 1.65,
-            color: "var(--fg)",
-            textWrap: "pretty",
-          }}
-          dangerouslySetInnerHTML={{ __html: inline(line) }}
-        />,
-      );
+      paraBuffer.push(line);
     }
   }
-  flushList();
+  flushAll();
+  // If article was too short to hit the trigger, append the CTA at the end
+  if (midSlot && !midInjected) {
+    out.push(
+      <div key={`mid-${out.length}`} className="my-10">
+        {midSlot}
+      </div>,
+    );
+  }
   return out;
+}
+
+function MidArticleCTA({ slug }: { slug: string }) {
+  return (
+    <div
+      className="ic-card-pastel-lavender"
+      style={{
+        borderRadius: "var(--r-2xl)",
+        padding: "28px",
+        border: "1px solid rgba(124,91,250,0.12)",
+      }}
+    >
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+        <div className="flex-1">
+          <div
+            className="text-[11px] font-semibold uppercase"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--lavender-700)",
+              letterSpacing: "0.12em",
+            }}
+          >
+            Newsletter
+          </div>
+          <p
+            className="mt-1 text-[16px] font-semibold"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--ink-700)",
+              lineHeight: 1.3,
+              letterSpacing: "-0.015em",
+            }}
+          >
+            Tu lis ça parce que ça compte. Ne rate pas le prochain.
+          </p>
+        </div>
+        <div className="shrink-0 sm:max-w-[300px]">
+          <SubscribeForm
+            variant="compact"
+            source={`article-mid:${slug}`}
+            placeholder="ton@email.fr"
+          />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default async function ArticlePage({
@@ -142,7 +236,7 @@ export default async function ArticlePage({
           className="inline-block text-[13px] font-medium"
           style={{
             fontFamily: "var(--font-display)",
-            color: "var(--forest-600)",
+            color: "var(--lavender-600)",
           }}
         >
           ← Tous les guides
@@ -152,18 +246,27 @@ export default async function ArticlePage({
           className="mt-6 pb-8"
           style={{ borderBottom: "1px solid var(--border)" }}
         >
-          <div className="cap-eyebrow">
+          <div className="ic-eyebrow">
             Guide · {article.readMinutes} min de lecture
           </div>
-          <h1 className="cap-h1 mt-3 text-[46px] leading-[1.05]">
+          <h1
+            className="mt-3 text-[44px] font-bold"
+            style={{
+              fontFamily: "var(--font-display)",
+              letterSpacing: "-0.03em",
+              lineHeight: 1.05,
+              color: "var(--ink-700)",
+            }}
+          >
             {article.title}
           </h1>
           <p
-            className="mt-4 text-[22px] italic"
+            className="mt-5 text-[20px]"
             style={{
-              fontFamily: "var(--font-serif)",
+              fontFamily: "var(--font-display)",
               color: "var(--fg-muted)",
-              lineHeight: 1.45,
+              lineHeight: 1.5,
+              fontWeight: 400,
             }}
           >
             {article.teaser}
@@ -180,33 +283,53 @@ export default async function ArticlePage({
           </p>
         </article>
 
-        <div className="mt-8 reader-body">
-          {renderMarkdown(article.body)}
+        <div className="mt-10 reader-body">
+          {renderMarkdown(
+            article.body,
+            <MidArticleCTA slug={slug} />,
+          )}
         </div>
 
         <section
-          className="cap-aside mt-12"
-          style={{ background: "var(--paper-100)" }}
+          className="mt-14 ic-card-pastel-lavender"
+          style={{
+            borderRadius: "var(--r-2xl)",
+            padding: "32px 28px",
+          }}
         >
-          <div className="cap-eyebrow">La lettre du dimanche</div>
-          <h3
-            className="mt-2 text-[20px] font-semibold"
-            style={{ fontFamily: "var(--font-display)", color: "var(--fg)" }}
+          <div
+            className="text-[12px] font-semibold uppercase"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--lavender-700)",
+              letterSpacing: "0.12em",
+            }}
           >
-            Un guide par semaine dans ta boîte mail
+            La lettre du dimanche
+          </div>
+          <h3
+            className="mt-2 text-[22px] font-bold"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--ink-700)",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.2,
+            }}
+          >
+            Reçois un guide comme celui-ci, chaque dimanche.
           </h3>
           <p
-            className="mt-1 text-[15px]"
+            className="mt-2 text-[15px]"
             style={{
-              fontFamily: "var(--font-serif)",
+              fontFamily: "var(--font-display)",
               color: "var(--fg-muted)",
               lineHeight: 1.55,
             }}
           >
-            Pas de spam, pas de pub déguisée. Tu peux te désabonner en un clic.
+            Pas de spam, pas de pub déguisée. Désabonnement en un clic.
           </p>
-          <div className="mt-4">
-            <SubscribeForm variant="compact" source={`article:${slug}`} />
+          <div className="mt-5">
+            <SubscribeForm variant="hero" source={`article-bottom:${slug}`} />
           </div>
         </section>
 

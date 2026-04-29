@@ -160,31 +160,18 @@ export default async function Home() {
 }
 
 // ========================================================================
-// Landing — Capucine editorial treatment.
-// Cream paper, forest + terracotta, Inter Tight + Source Serif 4.
-// Sections: Hero · Features · Pricing · Newsletter · Footer.
+// Landing — Invest Coach
+// Light, bold, lavender-accent. Inter Tight throughout. Pill CTAs.
+// Sections: Hero (with inline newsletter capture) · Features · Pricing · Footer.
 // ========================================================================
 
 function Landing() {
   return (
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/" />
-
-      {/* Hero */}
       <HeroSection />
-
-      {/* Themes — one card per public-facing shelf (money today, more later) */}
-      <ThemesSection />
-
-      {/* Features */}
       <FeaturesSection />
-
-      {/* Pricing */}
       <PricingSection />
-
-      {/* Newsletter teaser */}
-      <NewsletterSection />
-
       <Footer />
     </main>
   );
@@ -270,74 +257,46 @@ function ThemesSection() {
 function HeroSection() {
   return (
     <section
-      className="relative mx-auto overflow-hidden px-8 pt-24 pb-16"
-      style={{ maxWidth: "1280px" }}
+      className="relative overflow-hidden"
+      style={{
+        background:
+          "radial-gradient(120% 70% at 50% 0%, var(--lavender-100) 0%, var(--paper-50) 55%, var(--paper-50) 100%)",
+      }}
     >
-      <img
-        src="/capucine/pattern-branches.svg"
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute select-none"
-        style={{
-          right: "-80px",
-          top: "24px",
-          width: "600px",
-          opacity: 0.55,
-        }}
-      />
-      <div className="relative" style={{ maxWidth: "720px" }}>
-        <div className="cap-eyebrow">
-          Numéro 124 · dimanche 26 avril
-        </div>
-        <h1 className="cap-display mt-4 mb-6">
-          Ta liberté financière commence par{" "}
-          <em>une lecture du dimanche.</em>
-        </h1>
-        <p className="cap-lede mb-8" style={{ maxWidth: "600px" }}>
-          Une newsletter, des alertes, un coach. Pour que ton argent travaille
-          pendant que tu dors — sans que tu deviennes trader.
-        </p>
-        <div className="mb-8 flex flex-wrap items-center gap-4">
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 rounded-md px-6 py-3.5 text-[15px] font-medium transition-colors"
-            style={{
-              fontFamily: "var(--font-display)",
-              background: "var(--forest-600)",
-              color: "var(--paper-50)",
-              letterSpacing: "-0.005em",
-            }}
-          >
-            Commencer · gratuit
-          </Link>
-          <Link
-            href="/articles"
-            className="inline-flex items-center gap-1 px-1 py-3 text-[14px] font-medium transition-colors"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--forest-600)",
-            }}
-          >
-            Lire le dernier numéro →
-          </Link>
-        </div>
-        <div
-          className="flex flex-wrap items-center gap-3 text-[13px]"
-          style={{
-            fontFamily: "var(--font-display)",
-            color: "var(--fg-muted)",
-          }}
-        >
-          <span>
-            <strong style={{ color: "var(--fg)", fontWeight: 600 }}>
-              32 410
-            </strong>{" "}
-            lecteurs
+      <div
+        className="relative mx-auto px-6 pt-20 pb-24 text-center sm:px-8 sm:pt-28 sm:pb-32"
+        style={{ maxWidth: "880px" }}
+      >
+        <div className="mb-8 flex justify-center">
+          <span className="ic-pill">
+            <span className="ic-pill-badge">Newsletter</span>
+            Le journal du dimanche
           </span>
-          <span style={{ color: "var(--fg-subtle)" }}>·</span>
-          <span>Édité chaque dimanche depuis 2024</span>
-          <span style={{ color: "var(--fg-subtle)" }}>·</span>
-          <span>Sans publicité</span>
+        </div>
+        <h1 className="ic-display mb-6">
+          Apprends à <em>faire travailler</em> ton argent.
+        </h1>
+        <p
+          className="mx-auto mb-10 max-w-[560px] ic-lede"
+          style={{ color: "var(--fg-muted)" }}
+        >
+          Une lettre par semaine. Des explications fiscales en français clair,
+          écrites pour les épargnants — pas pour les traders. Sans bruit, sans
+          publicité.
+        </p>
+
+        <div className="mx-auto flex flex-col items-center gap-5">
+          <SubscribeForm source="landing-hero" />
+          <p
+            className="text-[12px]"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--fg-subtle)",
+              letterSpacing: "0.02em",
+            }}
+          >
+            Édité chaque dimanche depuis 2024 · Sans publicité · Désabonnement en un clic
+          </p>
         </div>
       </div>
     </section>
@@ -348,83 +307,122 @@ const FEATURES: {
   eyebrow: string;
   title: string;
   body: string;
-  illo: string;
+  emoji: string;
+  pastel: string;
 }[] = [
   {
     eyebrow: "01",
-    title: "Le journal",
+    title: "Le journal du dimanche",
     body: "Une édition longue le dimanche, trois brèves en semaine. Pour comprendre, pas pour réagir.",
-    illo: "newspaper",
+    emoji: "📰",
+    pastel: "ic-card-pastel-lavender",
   },
   {
     eyebrow: "02",
-    title: "Alertes éprouvées",
-    body: "Nos signaux ne sont publiés qu'après quinze ans de back-test. Quand le marché bouge, on prévient — pas avant.",
-    illo: "curve",
+    title: "Optimisation fiscale",
+    body: "PEA, CTO, assurance-vie, PER : trois enveloppes, des règles claires, des chiffres en euros.",
+    emoji: "💰",
+    pastel: "ic-card-pastel-peach",
   },
   {
     eyebrow: "03",
     title: "Coach IA",
     body: "Pose une question à toute heure. Le coach répond comme un ami patient qui aurait lu tous les rapports.",
-    illo: "cafe",
+    emoji: "🎯",
+    pastel: "ic-card-pastel-mint",
   },
   {
     eyebrow: "04",
-    title: "Optimisation fiscale",
-    body: "PEA, CTO, assurance-vie : trois enveloppes, des règles claires, un simulateur qui parle français.",
-    illo: "envelope",
+    title: "Watchlist & alertes",
+    body: "Suis les entreprises qui te concernent. On t'envoie un mot quand un événement public compte vraiment.",
+    emoji: "👀",
+    pastel: "ic-card-pastel-lavender",
   },
   {
     eyebrow: "05",
-    title: "Recherche institutionnelle",
-    body: "Les notes que les banques d'affaires gardent pour leurs clients. Ici, en accès direct, traduites.",
-    illo: "window",
+    title: "Simulateur d'enveloppes",
+    body: "Compare ton PEA, ton CTO, ton AV sur 10 ans. Les vraies hypothèses fiscales, pas un calculateur générique.",
+    emoji: "📊",
+    pastel: "ic-card-pastel-peach",
   },
   {
     eyebrow: "06",
-    title: "Documents trimestriels",
+    title: "Notes de recherche",
     body: "Chaque rapport d'entreprise, résumé en deux pages. Tu lis les chiffres, pas le jargon.",
-    illo: "newspaper",
+    emoji: "📑",
+    pastel: "ic-card-pastel-mint",
   },
 ];
 
 function FeaturesSection() {
   return (
-    <section
-      className="mx-auto pb-20 pt-16"
-      style={{ maxWidth: "1280px" }}
-    >
-      <div className="px-8 pb-8">
-        <div className="cap-eyebrow">Ce qu&apos;on fait</div>
-        <h2 className="cap-h1 mt-3" style={{ maxWidth: "720px" }}>
-          Six outils, une seule philosophie&nbsp;: 1&nbsp;% mieux chaque jour.
+    <section className="mx-auto px-6 py-24 sm:px-8" style={{ maxWidth: "1280px" }}>
+      <div className="mb-14 text-center">
+        <h2 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
+          Tout pour comprendre, rien pour spéculer.
         </h2>
+        <p
+          className="mx-auto mt-5 text-[17px]"
+          style={{
+            maxWidth: "560px",
+            fontFamily: "var(--font-display)",
+            color: "var(--fg-muted)",
+            lineHeight: 1.55,
+          }}
+        >
+          Six outils. Une seule philosophie&nbsp;: 1&nbsp;% mieux chaque jour, sans
+          devenir trader.
+        </p>
       </div>
-      <div className="grid gap-6 px-8 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {FEATURES.map((f) => (
-          <article key={f.eyebrow} className="cap-card">
-            <img
-              src={`/capucine/illustrations/${f.illo}.svg`}
-              alt=""
-              className="h-[72px] w-[96px]"
-              style={{ opacity: 0.85 }}
-            />
+          <article
+            key={f.eyebrow}
+            className={f.pastel}
+            style={{
+              borderRadius: "var(--r-2xl)",
+              padding: "32px 28px",
+              border: "1px solid rgba(20,16,40,0.04)",
+              transition: "all 200ms var(--ease-standard)",
+            }}
+          >
             <div
-              className="mt-3 text-[11px]"
+              className="grid h-[64px] w-[64px] place-items-center rounded-2xl"
+              style={{
+                background: "var(--paper-0)",
+                fontSize: "28px",
+                boxShadow: "var(--sh-md)",
+              }}
+            >
+              {f.emoji}
+            </div>
+            <div
+              className="mt-6 text-[11px]"
               style={{
                 fontFamily: "var(--font-mono)",
-                color: "var(--terracotta-500)",
+                color: "var(--lavender-700)",
+                letterSpacing: "0.08em",
               }}
             >
               {f.eyebrow}
             </div>
-            <h3 className="cap-h3 mt-1.5 text-[22px]">{f.title}</h3>
-            <p
-              className="mt-2 text-[15px] leading-snug"
+            <h3
+              className="mt-2 text-[22px] font-bold"
               style={{
-                fontFamily: "var(--font-serif)",
+                fontFamily: "var(--font-display)",
+                letterSpacing: "-0.02em",
+                color: "var(--ink-700)",
+                lineHeight: 1.2,
+              }}
+            >
+              {f.title}
+            </h3>
+            <p
+              className="mt-3 text-[15px]"
+              style={{
+                fontFamily: "var(--font-display)",
                 color: "var(--fg-muted)",
-                lineHeight: 1.55,
+                lineHeight: 1.5,
               }}
             >
               {f.body}
@@ -501,60 +499,70 @@ const TIERS: {
 
 function PricingSection() {
   return (
-    <section
-      id="tarifs"
-      className="py-20"
-      style={{ background: "var(--paper-100)" }}
-    >
-      <div className="mx-auto px-8 text-center" style={{ maxWidth: "720px" }}>
-        <div className="cap-eyebrow">Abonnement mensuel</div>
-        <h2 className="cap-h1 mt-3 mx-auto">
-          Trois formules. Pas de frais cachés. Annulable en un clic.
+    <section id="tarifs" className="py-24" style={{ background: "var(--paper-100)" }}>
+      <div className="mx-auto px-6 text-center sm:px-8" style={{ maxWidth: "720px" }}>
+        <h2 className="ic-h1 mx-auto">
+          Trois formules. Annulable en un clic.
         </h2>
+        <p
+          className="mx-auto mt-5 text-[17px]"
+          style={{
+            maxWidth: "520px",
+            fontFamily: "var(--font-display)",
+            color: "var(--fg-muted)",
+            lineHeight: 1.55,
+          }}
+        >
+          Découverte est gratuite, pour toujours. Tu passes payant seulement quand tu en veux plus.
+        </p>
       </div>
       <div
-        className="mx-auto mt-12 grid gap-5 px-8 md:grid-cols-3"
+        className="mx-auto mt-14 grid gap-6 px-6 sm:px-8 md:grid-cols-3"
         style={{ maxWidth: "1080px" }}
       >
         {TIERS.map((t) => (
           <article
             key={t.id}
-            className={`cap-tier ${t.featured ? "cap-tier-featured" : ""}`}
+            className={`ic-tier ${t.featured ? "ic-tier-featured" : ""}`}
             style={t.featured ? { transform: "translateY(-8px)" } : undefined}
           >
             {t.featured ? (
-              <div className="cap-tier-ribbon">La plus choisie</div>
+              <div className="ic-tier-ribbon">La plus choisie</div>
             ) : null}
             <h3
-              className="m-0 text-[22px] font-semibold"
-              style={{ fontFamily: "var(--font-display)" }}
+              className="m-0 text-[22px] font-bold"
+              style={{
+                fontFamily: "var(--font-display)",
+                letterSpacing: "-0.02em",
+                color: "var(--ink-700)",
+              }}
             >
               {t.name}
             </h3>
             <p
-              className="m-0 text-[15px] italic"
+              className="m-0 text-[14px]"
               style={{
-                fontFamily: "var(--font-serif)",
+                fontFamily: "var(--font-display)",
                 color: "var(--fg-muted)",
               }}
             >
               {t.tag}
             </p>
             <div
-              className="flex items-baseline gap-1.5 py-2"
+              className="flex items-baseline gap-1.5 py-3"
               style={{
                 borderTop: "1px solid var(--border)",
                 borderBottom: "1px solid var(--border)",
               }}
             >
               <span
-                className="cap-num"
                 style={{
                   fontFamily: "var(--font-display)",
                   fontSize: "56px",
-                  fontWeight: 600,
-                  letterSpacing: "-0.03em",
+                  fontWeight: 700,
+                  letterSpacing: "-0.035em",
                   lineHeight: 1,
+                  color: "var(--ink-700)",
                 }}
               >
                 {t.price}
@@ -574,7 +582,7 @@ function PricingSection() {
                 <li
                   key={f}
                   className="flex items-start gap-2.5 text-[14px]"
-                  style={{ color: "var(--fg)", lineHeight: 1.45 }}
+                  style={{ color: "var(--fg)", lineHeight: 1.45, fontFamily: "var(--font-display)" }}
                 >
                   <CheckIcon />
                   <span>{f}</span>
@@ -583,16 +591,16 @@ function PricingSection() {
             </ul>
             <Link
               href={t.href}
-              className="mt-2 inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-[14px] font-medium transition-colors"
+              className="mt-2 inline-flex items-center justify-center rounded-full px-5 py-3 text-[14px] font-semibold transition-all hover:translate-y-[-1px] hover:shadow-md"
               style={{
                 fontFamily: "var(--font-display)",
                 background: t.featured
-                  ? "var(--forest-600)"
+                  ? "var(--ink-700)"
                   : "var(--bg-elevated)",
-                color: t.featured ? "var(--paper-50)" : "var(--fg)",
+                color: t.featured ? "var(--paper-0)" : "var(--ink-700)",
                 border: t.featured
-                  ? "1px solid var(--forest-600)"
-                  : "1px solid var(--border-strong)",
+                  ? "1px solid var(--ink-700)"
+                  : "1px solid var(--paper-300)",
               }}
             >
               {t.cta}
@@ -612,11 +620,11 @@ function CheckIcon() {
       height="16"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       style={{
-        color: "var(--forest-600)",
+        color: "var(--lavender-600)",
         marginTop: "3px",
         flexShrink: 0,
       }}

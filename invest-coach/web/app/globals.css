@@ -5,8 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ==========================================================================
-   Capucine — design tokens (Cozy palette default)
-   French-first finance literacy. Parisian editorial × fintech precision.
+   Invest Coach — design tokens
+   French money coaching. Modern, light, bold. Lavender as primary accent,
+   terracotta for warmth, deep ink for type.
    These tokens are the source of truth. They are also mapped onto the shadcn
    variable names below so existing Card / Button / Badge / etc. inherit them.
    ========================================================================== */
@@ -15,7 +16,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-display);
-  --font-serif: var(--font-serif);
+  --font-serif: var(--font-display);
   --font-mono: var(--font-mono);
   --font-heading: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -57,59 +58,74 @@
 }
 
 :root {
-  /* ── Capucine raw palette (Cozy) ───────────────────────────────────── */
+  /* ── Lavender (primary accent) ────────────────────────────────────── */
+  --lavender-50:  #f5f3ff;
+  --lavender-100: #ece9ff;
+  --lavender-200: #ddd6fe;
+  --lavender-300: #c4b5fd;
+  --lavender-400: #a78bfa;
+  --lavender-500: #8b6cf7;
+  --lavender-600: #7c5bfa;
+  --lavender-700: #6747e0;
+  --lavender-800: #5a3fd8;
+  --lavender-900: #3b1f8f;
+
+  /* ── Terracotta (warm secondary, kept from prior identity) ────────── */
+  --terracotta-50:  #fff4ec;
+  --terracotta-100: #ffe4d2;
+  --terracotta-200: #fbbf85;
+  --terracotta-300: #f59560;
+  --terracotta-400: #e08654;
+  --terracotta-500: #cc7448;
+  --terracotta-600: #ad5b30;
+  --terracotta-700: #884221;
+  --terracotta-800: #54251a;
+  --terracotta-900: #361810;
+
+  /* ── Forest (positive, kept for finance signaling) ────────────────── */
   --forest-50:  #ecf2e9;
   --forest-100: #d6e3d1;
   --forest-200: #b9ccb3;
   --forest-300: #8eac86;
   --forest-400: #648c5e;
   --forest-500: #5a7c4f;
-  --forest-600: #5a7c4f;   /* Cozy primary brand */
-  --forest-700: #466540;
+  --forest-600: #4f6d44;
+  --forest-700: #3d553a;
   --forest-800: #1b3220;
   --forest-900: #122318;
 
-  --terracotta-50:  #fbeadc;
-  --terracotta-100: #f4dccd;
-  --terracotta-200: #e9b89c;
-  --terracotta-300: #e8a07a;
-  --terracotta-400: #cf6f43;
-  --terracotta-500: #cc7448;   /* Cozy primary accent */
-  --terracotta-600: #964326;
-  --terracotta-700: #743321;
-  --terracotta-800: #54251a;
-  --terracotta-900: #361810;
-
+  /* ── Paper / surfaces (light-leaning, very subtle warmth) ─────────── */
   --paper-0:   #ffffff;
-  --paper-50:  #fbf5ea;        /* Cozy default page bg */
-  --paper-100: #f4ead4;
-  --paper-200: #e8d8b6;
-  --paper-300: #d8c194;
+  --paper-50:  #fbfaff;     /* lavender-tinted off-white — page bg */
+  --paper-100: #f4f2fa;     /* sunken / muted card bg */
+  --paper-200: #e8e5f2;     /* borders */
+  --paper-300: #c8c3da;     /* strong borders */
 
-  --ink-50:  #ecebe7;
-  --ink-100: #d6d4cc;
-  --ink-200: #aaa79b;
-  --ink-300: #7e7a6c;
-  --ink-400: #5a564a;
-  --ink-500: #3d3a31;
-  --ink-600: #2a2823;
-  --ink-700: #2a2820;          /* Cozy primary text */
-  --ink-800: #121110;
-  --ink-900: #08080a;
+  /* ── Ink (text) ───────────────────────────────────────────────────── */
+  --ink-50:  #ecebef;
+  --ink-100: #cfcdd4;
+  --ink-200: #9d9aa6;
+  --ink-300: #6d6a78;
+  --ink-400: #5d5b66;       /* muted text */
+  --ink-500: #3a3845;
+  --ink-600: #1f1d27;
+  --ink-700: #0a0a0a;       /* primary text */
+  --ink-800: #050505;
+  --ink-900: #000000;
 
   /* Semantic */
-  --positive:        var(--forest-600);
+  --positive:        var(--forest-500);
   --positive-soft:   var(--forest-50);
   --negative:        var(--terracotta-500);
   --negative-soft:   var(--terracotta-50);
   --warning:         #c98a2b;
   --warning-soft:    #f5e6c8;
-  --info:            #466b8a;
-  --info-soft:       #dde6ee;
+  --info:            var(--lavender-600);
+  --info-soft:       var(--lavender-50);
 
-  /* Capucine semantic tokens (used by .cap-* utilities) */
+  /* Surface tokens (used by .ic-* / .cap-* utilities) */
   --bg:              var(--paper-50);
-  --bg-elevated:     #fffaf0;
+  --bg-elevated:     var(--paper-0);
   --bg-sunken:       var(--paper-100);
   --bg-inverse:      var(--ink-700);
   --fg:              var(--ink-700);
@@ -118,13 +134,13 @@
   --fg-inverse:      var(--paper-50);
   --border-strong:   var(--paper-300);
   --border-inverse:  var(--ink-500);
-  --highlight:       var(--terracotta-500);
-  --highlight-soft:  var(--terracotta-50);
-  --accent-soft:     var(--forest-50);
+  --highlight:       var(--lavender-600);
+  --highlight-soft:  var(--lavender-50);
+  --accent-soft:     var(--lavender-50);
 
   /* Type families */
   --font-display: var(--font-inter-tight, "Inter Tight"), "Helvetica Neue", Arial, sans-serif;
-  --font-serif:   var(--font-source-serif, "Source Serif 4"), "Iowan Old Style", Georgia, serif;
+  --font-serif:   var(--font-inter-tight, "Inter Tight"), "Helvetica Neue", Arial, sans-serif;
   --font-mono:    var(--font-jetbrains-mono, "JetBrains Mono"), "SF Mono", Menlo, monospace;
   --font-sans:    var(--font-inter-tight, "Inter Tight"), system-ui, sans-serif;
 
@@ -132,21 +148,21 @@
   --fs-xs:   12px;
   --fs-sm:   14px;
   --fs-base: 16px;
-  --fs-md:   18px;
-  --fs-lg:   22px;
-  --fs-xl:   28px;
+  --fs-md:   17px;
+  --fs-lg:   20px;
+  --fs-xl:   26px;
   --fs-2xl:  36px;
   --fs-3xl:  46px;
   --fs-4xl:  60px;
   --fs-5xl:  76px;
 
   --lh-tight:   1.05;
-  --lh-snug:    1.2;
+  --lh-snug:    1.15;
   --lh-normal:  1.45;
-  --lh-relaxed: 1.65;
+  --lh-relaxed: 1.55;
 
-  --tr-tight:  -0.02em;
-  --tr-snug:   -0.01em;
+  --tr-tight:  -0.025em;
+  --tr-snug:   -0.015em;
   --tr-normal: 0;
   --tr-wide:   0.04em;
   --tr-eyebrow: 0.12em;
@@ -156,21 +172,21 @@
   --sp-6: 24px; --sp-8: 32px;  --sp-10: 40px; --sp-12: 48px; --sp-16: 64px;
   --sp-20: 80px; --sp-24: 96px; --sp-32: 128px;
 
-  /* Radii */
-  --r-xs:   2px;
-  --r-sm:   4px;
-  --r-md:   8px;
-  --r-lg:   12px;
-  --r-xl:   16px;
-  --r-2xl:  24px;
+  /* Radii — softer, more contemporary */
+  --r-xs:   4px;
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-xl:   20px;
+  --r-2xl:  28px;
   --r-pill: 999px;
 
-  /* Shadows — soft, paper-like, warm-tinted */
-  --sh-xs: 0 1px 0 0 rgba(28, 27, 23, 0.04);
-  --sh-sm: 0 1px 2px 0 rgba(28, 27, 23, 0.05), 0 1px 1px 0 rgba(28, 27, 23, 0.03);
-  --sh-md: 0 4px 8px -2px rgba(28, 27, 23, 0.06), 0 2px 4px -1px rgba(28, 27, 23, 0.04);
-  --sh-lg: 0 12px 24px -6px rgba(28, 27, 23, 0.08), 0 4px 8px -2px rgba(28, 27, 23, 0.04);
-  --sh-xl: 0 24px 48px -12px rgba(28, 27, 23, 0.12);
+  /* Shadows — soft, lavender-tinted */
+  --sh-xs: 0 1px 0 0 rgba(20, 16, 40, 0.04);
+  --sh-sm: 0 1px 2px 0 rgba(20, 16, 40, 0.05), 0 1px 1px 0 rgba(20, 16, 40, 0.03);
+  --sh-md: 0 4px 12px -2px rgba(20, 16, 40, 0.06), 0 2px 4px -1px rgba(20, 16, 40, 0.04);
+  --sh-lg: 0 16px 40px -16px rgba(124, 91, 250, 0.18), 0 4px 12px -4px rgba(20, 16, 40, 0.06);
+  --sh-xl: 0 24px 60px -16px rgba(124, 91, 250, 0.22);
 
   /* Motion */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -186,8 +202,7 @@
   --container-wide:   1280px;
 
   /* ── shadcn token mappings ─────────────────────────────────────────── */
-  /* These are what every Card/Button/Badge/Input/etc. references.       */
-  /* By pointing them at Capucine tokens, every shadcn surface rebrands. */
+  /* These are what every Card/Button/Badge/Input/etc. references. */
 
   --background: var(--paper-50);
   --foreground: var(--ink-700);
@@ -198,9 +213,9 @@
   --popover: var(--bg-elevated);
   --popover-foreground: var(--ink-700);
 
-  /* Forest is primary */
-  --primary: var(--forest-600);
-  --primary-foreground: var(--paper-50);
+  /* Lavender is primary */
+  --primary: var(--lavender-600);
+  --primary-foreground: var(--paper-0);
 
   --secondary: var(--paper-100);
   --secondary-foreground: var(--ink-700);
@@ -208,49 +223,46 @@
   --muted: var(--paper-100);
   --muted-foreground: var(--ink-400);
 
-  /* shadcn's --accent is a soft surface (used for hover states), not the brand. */
-  --accent: var(--forest-50);
-  --accent-foreground: var(--forest-700);
+  --accent: var(--lavender-50);
+  --accent-foreground: var(--lavender-700);
 
-  /* Terracotta as destructive — warm, not aggressive. */
   --destructive: var(--terracotta-500);
 
   --border: var(--paper-200);
   --input: var(--paper-200);
-  --ring: var(--forest-600);
+  --ring: var(--lavender-600);
 
-  /* Charts: forest, terracotta, ink shades — warm, editorial. */
-  --chart-1: var(--forest-600);
+  --chart-1: var(--lavender-600);
   --chart-2: var(--terracotta-500);
-  --chart-3: var(--forest-300);
-  --chart-4: var(--terracotta-300);
+  --chart-3: var(--forest-500);
+  --chart-4: var(--lavender-300);
   --chart-5: var(--ink-400);
 
-  --radius: 0.625rem;
+  --radius: 0.875rem;
 
   --sidebar: var(--paper-100);
   --sidebar-foreground: var(--ink-700);
-  --sidebar-primary: var(--forest-600);
-  --sidebar-primary-foreground: var(--paper-50);
+  --sidebar-primary: var(--lavender-600);
+  --sidebar-primary-foreground: var(--paper-0);
   --sidebar-accent: var(--paper-50);
   --sidebar-accent-foreground: var(--ink-700);
   --sidebar-border: var(--paper-200);
-  --sidebar-ring: var(--forest-600);
+  --sidebar-ring: var(--lavender-600);
 }
 
-/* Dark theme — Premium-ish. */
+/* Dark theme */
 .dark {
-  --paper-50:  #0f1614;
-  --paper-100: #16201d;
-  --paper-200: #1f2c28;
-  --paper-300: #2a3a35;
-  --ink-700: #f4ede0;
-  --ink-400: #a39a87;
-  --ink-300: #7a7263;
+  --paper-50:  #0e0d14;
+  --paper-100: #15141c;
+  --paper-200: #1f1d27;
+  --paper-300: #2e2b3c;
+  --ink-700: #f4efe3;
+  --ink-400: #a39e91;
+  --ink-300: #6d6a78;
 
   --bg: var(--paper-50);
   --bg-elevated: var(--paper-100);
-  --bg-sunken: #0a100e;
+  --bg-sunken: #050410;
   --fg: var(--ink-700);
   --fg-muted: var(--ink-400);
   --fg-subtle: var(--ink-300);
@@ -261,26 +273,26 @@
   --card-foreground: var(--ink-700);
   --popover: var(--paper-100);
   --popover-foreground: var(--ink-700);
-  --primary: #4fa372;
-  --primary-foreground: #0f1614;
+  --primary: var(--lavender-500);
+  --primary-foreground: var(--paper-50);
   --secondary: var(--paper-200);
   --secondary-foreground: var(--ink-700);
   --muted: var(--paper-200);
   --muted-foreground: var(--ink-400);
-  --accent: #1a2a22;
-  --accent-foreground: #4fa372;
-  --destructive: #c89a4a;
+  --accent: #2a1f4a;
+  --accent-foreground: var(--lavender-300);
+  --destructive: var(--terracotta-400);
   --border: var(--paper-200);
   --input: var(--paper-200);
-  --ring: #4fa372;
+  --ring: var(--lavender-500);
   --sidebar: var(--paper-100);
   --sidebar-foreground: var(--ink-700);
-  --sidebar-primary: #4fa372;
-  --sidebar-primary-foreground: #0f1614;
+  --sidebar-primary: var(--lavender-500);
+  --sidebar-primary-foreground: var(--paper-50);
   --sidebar-accent: var(--paper-50);
   --sidebar-accent-foreground: var(--ink-700);
   --sidebar-border: var(--paper-200);
-  --sidebar-ring: #4fa372;
+  --sidebar-ring: var(--lavender-500);
 }
 
 /* Aceternity UI — spotlight keyframe (kept for compatibility) */
@@ -301,9 +313,9 @@
   html {
     @apply font-sans;
   }
-  /* Reading-surface defaults: serif for long-form. */
+  /* Reading-surface defaults */
   .prose, .reader-body {
-    font-family: var(--font-serif);
+    font-family: var(--font-display);
     font-size: var(--fs-md);
     line-height: var(--lh-relaxed);
     color: var(--fg);
@@ -312,77 +324,89 @@
 }
 
 /* ==========================================================================
-   Capucine — utility classes
-   Use these for editorial flourishes (hero, eyebrows, pullquotes, numbers).
-   They co-exist with Tailwind utilities — apply via className.
+   Invest Coach — utility classes
+   Low-friction helpers for hero, eyebrows, pills, cards. Class names use the
+   .ic- prefix; legacy .cap- prefix is aliased for backwards compatibility
+   while non-rebranded pages migrate.
    ========================================================================== */
 
 /* Eyebrow — small uppercase label above a heading */
+.ic-eyebrow,
 .cap-eyebrow {
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: var(--tr-eyebrow);
   text-transform: uppercase;
-  color: var(--terracotta-500);
+  color: var(--lavender-600);
 }
 
 /* Display / hero heading */
+.ic-display,
 .cap-display {
   font-family: var(--font-display);
   font-size: clamp(40px, 5.5vw, 76px);
-  font-weight: 600;
-  line-height: 1.02;
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
   color: var(--fg);
   text-wrap: balance;
 }
+.ic-display em,
 .cap-display em {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 400;
-  color: var(--terracotta-500);
+  font-style: normal;
+  background: linear-gradient(135deg, var(--lavender-600) 0%, var(--terracotta-500) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
 }
 
+.ic-h1,
 .cap-h1 {
   font-family: var(--font-display);
   font-size: var(--fs-3xl);
-  font-weight: 600;
+  font-weight: 700;
   line-height: var(--lh-snug);
   letter-spacing: var(--tr-tight);
   color: var(--fg);
   text-wrap: balance;
 }
+.ic-h2,
 .cap-h2 {
   font-family: var(--font-display);
   font-size: var(--fs-2xl);
-  font-weight: 600;
+  font-weight: 700;
   line-height: var(--lh-snug);
   letter-spacing: var(--tr-snug);
   color: var(--fg);
   text-wrap: balance;
 }
+.ic-h3,
 .cap-h3 {
   font-family: var(--font-display);
   font-size: var(--fs-xl);
-  font-weight: 500;
+  font-weight: 600;
   line-height: var(--lh-snug);
   letter-spacing: var(--tr-snug);
   color: var(--fg);
 }
 
 /* Lede / subtitle */
+.ic-lede,
 .cap-lede {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: var(--fs-lg);
-  line-height: 1.5;
+  line-height: 1.45;
   color: var(--fg-muted);
   text-wrap: pretty;
+  font-weight: 400;
 }
 
 /* Body */
+.ic-body,
 .cap-body-serif {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: var(--fs-md);
   line-height: var(--lh-relaxed);
   color: var(--fg);
@@ -390,39 +414,45 @@
 }
 
 /* Numbers — tabular */
+.ic-num,
 .cap-num {
   font-family: var(--font-mono);
   font-feature-settings: "tnum" 1, "zero" 1;
   letter-spacing: var(--tr-snug);
 }
-.cap-num-positive { color: var(--positive); }
-.cap-num-negative { color: var(--negative); }
+.ic-num-positive, .cap-num-positive { color: var(--positive); }
+.ic-num-negative, .cap-num-negative { color: var(--negative); }
 
 /* Pullquote */
+.ic-pullquote,
 .cap-pullquote {
-  font-family: var(--font-serif);
-  font-style: italic;
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 600;
   font-size: var(--fs-2xl);
-  line-height: 1.3;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   color: var(--fg);
-  border-left: 2px solid var(--terracotta-500);
-  padding: 6px 0 6px 24px;
+  border-left: 3px solid var(--lavender-600);
+  padding: 8px 0 8px 24px;
   margin: 32px 0;
   text-wrap: balance;
 }
 
 /* Drop cap */
+.ic-dropcap::first-letter,
 .cap-dropcap::first-letter {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 4.4em;
   line-height: 0.85;
   float: left;
   padding: 6px 12px 0 0;
-  color: var(--terracotta-500);
+  color: var(--lavender-600);
 }
 
-/* Editorial card on cream background */
+/* Editorial card */
+.ic-card,
 .cap-card {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
@@ -430,21 +460,23 @@
   padding: 24px;
   transition: all 200ms var(--ease-standard);
 }
-.cap-card:hover {
+.ic-card:hover, .cap-card:hover {
   border-color: var(--border-strong);
   box-shadow: var(--sh-md);
 }
 
-/* Inverse "spotlight" card — used for featured editorial blocks */
+/* Inverse card — dark featured block */
+.ic-card-inverse,
 .cap-card-inverse {
   background: var(--ink-700);
   color: var(--paper-50);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-2xl);
   padding: 36px;
 }
-.cap-card-inverse a { color: var(--paper-50); }
+.ic-card-inverse a, .cap-card-inverse a { color: var(--paper-50); }
 
-/* Aside — soft cream callout in articles */
+/* Aside — soft callout in articles */
+.ic-aside,
 .cap-aside {
   background: var(--paper-100);
   border-radius: var(--r-lg);
@@ -453,68 +485,114 @@
 }
 
 /* Pricing tier */
+.ic-tier,
 .cap-tier {
   position: relative;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-2xl);
   padding: 28px;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  transition: all 200ms var(--ease-standard);
 }
+.ic-tier:hover, .cap-tier:hover {
+  box-shadow: var(--sh-md);
+}
+.ic-tier-featured,
 .cap-tier-featured {
-  border-color: var(--forest-600);
+  border-color: var(--lavender-600);
   border-width: 2px;
   box-shadow: var(--sh-lg);
 }
+.ic-tier-ribbon,
 .cap-tier-ribbon {
   position: absolute;
   top: -12px;
   left: 28px;
-  background: var(--forest-600);
-  color: var(--paper-50);
+  background: var(--ink-700);
+  color: var(--paper-0);
   font-family: var(--font-display);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: var(--r-pill);
 }
 
 /* Pill / tag */
+.ic-pill,
 .cap-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 6px 14px 6px 6px;
+  border-radius: var(--r-pill);
+  background: var(--ink-700);
+  color: var(--paper-0);
+}
+.ic-pill-badge {
+  background: var(--lavender-600);
+  color: var(--paper-0);
+  font-weight: 600;
+  font-size: 10px;
   letter-spacing: 0.04em;
   padding: 4px 10px;
   border-radius: var(--r-pill);
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
-  color: var(--fg-muted);
+  text-transform: uppercase;
 }
 
-/* Branching pattern decoration helper */
-.cap-pattern-bg {
-  position: relative;
-  isolation: isolate;
+/* Pill button — Draftr-style hero CTA */
+.ic-btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--ink-700);
+  color: var(--paper-0);
+  padding: 8px 8px 8px 24px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  height: 56px;
+  transition: all 200ms var(--ease-standard);
+  cursor: pointer;
 }
-.cap-pattern-bg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("/capucine/pattern-branches.svg");
-  background-repeat: no-repeat;
-  background-position: right -80px top 24px;
-  background-size: 600px auto;
-  opacity: 0.15;
-  pointer-events: none;
-  z-index: -1;
+.ic-btn-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--sh-lg);
+}
+.ic-btn-pill .ic-btn-arrow {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--lavender-600);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: transform 200ms var(--ease-standard);
+}
+.ic-btn-pill:hover .ic-btn-arrow {
+  transform: translateX(2px);
+}
+
+/* Soft pastel card backgrounds */
+.ic-card-pastel-lavender {
+  background: linear-gradient(160deg, var(--lavender-100) 0%, #f5e8ff 100%);
+}
+.ic-card-pastel-peach {
+  background: linear-gradient(160deg, var(--terracotta-50) 0%, #ffe1d3 100%);
+}
+.ic-card-pastel-mint {
+  background: linear-gradient(160deg, var(--forest-50) 0%, #e0f0d8 100%);
 }
 
 /* Reduced motion */
