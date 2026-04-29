@@ -41,7 +41,7 @@ export default function ArticlesIndexPage() {
             </span>
           </div>
           <h1 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
-            Articles
+            Le journal de <em>l&apos;épargnant français.</em>
           </h1>
           <p
             className="mx-auto mt-5 text-[17px]"
@@ -55,6 +55,29 @@ export default function ArticlesIndexPage() {
             Les bases, sans jargon. Chaque article est pensé pour te faire
             gagner du temps — pas pour te vendre un produit.
           </p>
+
+          {/* Atmospheric photo strip — Unsplash CDN.
+              Container has a brand-color backdrop so the layout stays intact
+              if the external hotlink ever fails. */}
+          <div
+            className="mx-auto mt-10 overflow-hidden rounded-2xl"
+            style={{
+              maxWidth: "640px",
+              aspectRatio: "16 / 5",
+              background:
+                "linear-gradient(135deg, var(--lavender-200) 0%, var(--lavender-100) 100%)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <img
+              src="https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1280&h=400&q=80"
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover"
+              style={{ display: "block" }}
+            />
+          </div>
         </div>
       </section>
 

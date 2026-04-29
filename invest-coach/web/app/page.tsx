@@ -6,6 +6,8 @@ import { SubscribeForm } from "@/app/newsletter/subscribe-form";
 import { CoachingPodcast } from "@/components/coaching-podcast";
 import { PodcastEpisodeList } from "@/components/podcast-episode-list";
 import { SpotifyEpisodeList } from "@/components/spotify-episode-card";
+import { PricingTable } from "@/components/pricing-table";
+import { ProductTabsNav } from "@/components/product-tabs-nav";
 import { createClient } from "@/lib/supabase/server";
 import { serviceClient } from "@/lib/supabase/service";
 
@@ -171,39 +173,566 @@ function Landing() {
       <Nav active="/" />
       <HeroSection />
       <WorldPlaygroundSection />
+      <IntegrationsSection />
+      <HowItWorksSection />
       <ProductPreviewGrid />
       <SavingsEqualsEarningsSection />
-      <PricingSection />
+      <PhilosophySection />
+      <PricingTable />
+      <TrustStatsBar />
       <Footer />
     </main>
   );
 }
 
+// ─────────────────────── How It Works · 3-step isometric ───────────────────────
+
+const HOW_STEPS: {
+  index: string;
+  title: string;
+  body: string;
+  illustration: "scan" | "gears" | "sign";
+}[] = [
+  {
+    index: "01",
+    title: "Connecte ton avis d'imposition",
+    body: "PDF, photo, ou copie-colle. On lit ton TMI, tes revenus, tes parts. Aucune donnée ne quitte la France.",
+    illustration: "scan",
+  },
+  {
+    index: "02",
+    title: "On chiffre tes leviers",
+    body: "PEA, AV, PER, dons, frais réels. Trois à cinq actions classées par euros gagnés, pas par buzz.",
+    illustration: "gears",
+  },
+  {
+    index: "03",
+    title: "Tu signes ta déclaration",
+    body: "On pré-remplit ton 2042. Tu vérifies, tu signes, tu envoies à impots.gouv. Cinq minutes en mai.",
+    illustration: "sign",
+  },
+];
+
+function HowItWorksSection() {
+  return (
+    <section className="mx-auto px-6 py-24 sm:px-8" style={{ maxWidth: "1080px" }}>
+      <div className="mb-14 text-center">
+        <div
+          className="mb-3 text-[12px] font-semibold uppercase"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--lavender-700)",
+            letterSpacing: "0.16em",
+          }}
+        >
+          Comment ça marche
+        </div>
+        <h2 className="ic-h1 mx-auto" style={{ maxWidth: "640px" }}>
+          Trois étapes. <em>Quinze minutes au total.</em>
+        </h2>
+        <p
+          className="mx-auto mt-5 text-[17px]"
+          style={{
+            maxWidth: "560px",
+            fontFamily: "var(--font-display)",
+            color: "var(--fg-muted)",
+            lineHeight: 1.55,
+          }}
+        >
+          Pas de rendez-vous, pas de jargon de conseiller, pas de revente
+          de ta data. Tu pilotes, on chiffre.
+        </p>
+      </div>
+
+      <ol className="grid gap-6 md:grid-cols-3">
+        {HOW_STEPS.map((s) => (
+          <li
+            key={s.index}
+            className="flex flex-col rounded-2xl p-6"
+            style={{
+              background: "var(--bg-elevated)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <div
+              className="mb-5 flex h-32 items-center justify-center rounded-xl"
+              style={{
+                background:
+                  "linear-gradient(160deg, var(--lavender-50) 0%, var(--paper-100) 100%)",
+                border: "1px solid var(--border)",
+              }}
+            >
+              <IsoIllustration kind={s.illustration} />
+            </div>
+            <div
+              className="mb-2 text-[11px] font-bold uppercase"
+              style={{
+                fontFamily: "var(--font-mono)",
+                color: "var(--lavender-700)",
+                letterSpacing: "0.12em",
+              }}
+            >
+              Étape {s.index}
+            </div>
+            <h3
+              className="text-[20px] font-bold"
+              style={{
+                fontFamily: "var(--font-display)",
+                letterSpacing: "-0.02em",
+                color: "var(--ink-700)",
+                lineHeight: 1.25,
+              }}
+            >
+              {s.title}
+            </h3>
+            <p
+              className="mt-3 text-[14px]"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--fg-muted)",
+                lineHeight: 1.55,
+              }}
+            >
+              {s.body}
+            </p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+function IsoIllustration({ kind }: { kind: "scan" | "gears" | "sign" }) {
+  if (kind === "scan") {
+    // Isometric document with a scanning beam.
+    return (
+      <svg width="120" height="100" viewBox="0 0 120 100" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="isoPaperA" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--paper-0)" />
+            <stop offset="100%" stopColor="var(--lavender-50)" />
+          </linearGradient>
+        </defs>
+        {/* Document — isometric face */}
+        <path d="M 30 26 L 75 14 L 100 30 L 55 42 Z" fill="url(#isoPaperA)" stroke="var(--lavender-400)" strokeWidth="1.2" />
+        <path d="M 55 42 L 100 30 L 100 78 L 55 90 Z" fill="var(--lavender-100)" stroke="var(--lavender-400)" strokeWidth="1.2" />
+        <path d="M 30 26 L 55 42 L 55 90 L 30 74 Z" fill="var(--lavender-200)" stroke="var(--lavender-400)" strokeWidth="1.2" />
+        {/* Lines on the front face */}
+        <line x1="62" y1="55" x2="92" y2="47" stroke="var(--lavender-500)" strokeWidth="1" />
+        <line x1="62" y1="63" x2="86" y2="56" stroke="var(--lavender-400)" strokeWidth="1" opacity="0.8" />
+        <line x1="62" y1="71" x2="80" y2="66" stroke="var(--lavender-400)" strokeWidth="1" opacity="0.8" />
+        {/* Scan beam */}
+        <line x1="20" y1="50" x2="110" y2="50" stroke="var(--terracotta-500)" strokeWidth="1.5" strokeDasharray="2 3" opacity="0.9" />
+      </svg>
+    );
+  }
+  if (kind === "gears") {
+    // Two interlocked isometric gears + a stack of coins.
+    return (
+      <svg width="120" height="100" viewBox="0 0 120 100" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="isoCoin" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--lavender-200)" />
+            <stop offset="100%" stopColor="var(--lavender-400)" />
+          </linearGradient>
+        </defs>
+        {/* Coin stack (isometric) */}
+        <g>
+          <ellipse cx="38" cy="78" rx="22" ry="8" fill="var(--lavender-300)" />
+          <rect x="16" y="62" width="44" height="16" fill="url(#isoCoin)" />
+          <ellipse cx="38" cy="62" rx="22" ry="8" fill="var(--lavender-200)" stroke="var(--lavender-500)" strokeWidth="0.8" />
+          <ellipse cx="38" cy="58" rx="22" ry="8" fill="var(--lavender-100)" stroke="var(--lavender-500)" strokeWidth="0.8" />
+          <ellipse cx="38" cy="54" rx="22" ry="8" fill="var(--paper-0)" stroke="var(--lavender-500)" strokeWidth="0.8" />
+          <text x="38" y="58" textAnchor="middle" fontFamily="var(--font-mono)" fontSize="10" fontWeight="700" fill="var(--lavender-700)">€</text>
+        </g>
+        {/* Big gear */}
+        <g transform="translate(86 38)">
+          <circle r="20" fill="var(--lavender-100)" stroke="var(--lavender-500)" strokeWidth="1.2" />
+          <circle r="6"  fill="var(--paper-0)"     stroke="var(--lavender-500)" strokeWidth="1" />
+          {[0, 60, 120, 180, 240, 300].map((angle) => (
+            <rect
+              key={angle}
+              x="-3"
+              y="-24"
+              width="6"
+              height="6"
+              fill="var(--lavender-400)"
+              transform={`rotate(${angle})`}
+            />
+          ))}
+        </g>
+        {/* Small gear */}
+        <g transform="translate(98 76)">
+          <circle r="11" fill="var(--lavender-200)" stroke="var(--lavender-500)" strokeWidth="1" />
+          <circle r="3"  fill="var(--paper-0)"     stroke="var(--lavender-500)" strokeWidth="0.8" />
+          {[0, 72, 144, 216, 288].map((angle) => (
+            <rect
+              key={angle}
+              x="-2"
+              y="-14"
+              width="4"
+              height="4"
+              fill="var(--lavender-500)"
+              transform={`rotate(${angle})`}
+            />
+          ))}
+        </g>
+      </svg>
+    );
+  }
+  // sign
+  return (
+    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="isoSheet" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--paper-0)" />
+          <stop offset="100%" stopColor="var(--paper-100)" />
+        </linearGradient>
+      </defs>
+      {/* Folder back */}
+      <path d="M 24 30 L 70 18 L 100 32 L 54 44 Z" fill="var(--lavender-200)" stroke="var(--lavender-500)" strokeWidth="1" />
+      {/* Sheet on top, isometric */}
+      <path d="M 30 38 L 76 26 L 96 38 L 50 50 Z"  fill="url(#isoSheet)" stroke="var(--lavender-500)" strokeWidth="1.2" />
+      <path d="M 50 50 L 96 38 L 96 80 L 50 92 Z"  fill="var(--paper-0)"  stroke="var(--lavender-500)" strokeWidth="1.2" />
+      <path d="M 30 38 L 50 50 L 50 92 L 30 80 Z"  fill="var(--paper-100)" stroke="var(--lavender-500)" strokeWidth="1.2" />
+      {/* Form rows */}
+      <line x1="56" y1="60" x2="88" y2="51" stroke="var(--lavender-400)" strokeWidth="1" />
+      <line x1="56" y1="68" x2="84" y2="60" stroke="var(--lavender-300)" strokeWidth="1" opacity="0.7" />
+      {/* Signature swoosh */}
+      <path d="M 58 80 Q 68 70 78 78 T 92 76" stroke="var(--terracotta-500)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      {/* Check mark */}
+      <g transform="translate(94 22)">
+        <circle r="10" fill="var(--forest-500)" />
+        <path d="M -4 0 L -1 4 L 5 -3" stroke="var(--paper-0)" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </g>
+    </svg>
+  );
+}
+
+// ─────────────────────── Philosophy section (dark editorial pull-quote) ───────────────────────
+
+function PhilosophySection() {
+  return (
+    <section
+      className="relative overflow-hidden"
+      style={{ background: "var(--ink-700)" }}
+    >
+      <img
+        src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2000&q=85"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{ display: "block" }}
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(20,16,40,0.85) 0%, rgba(20,16,40,0.78) 100%)",
+        }}
+      />
+
+      <div
+        className="relative mx-auto px-6 py-28 text-center sm:px-8 sm:py-36"
+        style={{ maxWidth: "880px" }}
+      >
+        <div
+          className="mb-6 text-[12px] font-bold uppercase"
+          style={{
+            fontFamily: "var(--font-mono)",
+            color: "var(--lavender-300)",
+            letterSpacing: "0.20em",
+          }}
+        >
+          La méthode
+        </div>
+        <p
+          className="mx-auto"
+          style={{
+            fontFamily: "var(--font-source-serif), Georgia, serif",
+            fontStyle: "italic",
+            fontWeight: 500,
+            fontSize: "clamp(28px, 4.2vw, 48px)",
+            lineHeight: 1.2,
+            letterSpacing: "-0.015em",
+            color: "var(--paper-0)",
+            maxWidth: "720px",
+            textWrap: "balance",
+          }}
+        >
+          Le temps est l&apos;allié de l&apos;épargnant patient.{" "}
+          <span style={{ color: "var(--lavender-200)" }}>
+            Pas le marché. Pas le timing. Pas la chance.
+          </span>
+        </p>
+        <p
+          className="mx-auto mt-8 text-[13px]"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "rgba(245,243,255,0.65)",
+            letterSpacing: "0.04em",
+          }}
+        >
+          Une règle qu&apos;on rabâche · parce qu&apos;elle marche depuis 1900.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────── Trust Stats Bar (above footer) ───────────────────────
+
+function TrustStatsBar() {
+  return (
+    <section
+      className="border-y"
+      style={{ background: "var(--paper-100)", borderColor: "var(--border)" }}
+    >
+      <div
+        className="mx-auto grid gap-6 px-6 py-12 sm:px-8 md:grid-cols-3"
+        style={{ maxWidth: "1080px" }}
+      >
+        {[
+          { num: "Depuis 2024", label: "Newsletter du dimanche, sans interruption." },
+          { num: "5 articles", label: "Tous fact-checkés, mis à jour à chaque réforme." },
+          { num: "1 podcast", label: "Premier épisode sur Spotify · trois par mois à venir." },
+        ].map((s) => (
+          <div key={s.label} className="text-center md:text-left">
+            <div
+              className="text-[28px] font-bold"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--ink-700)",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.1,
+              }}
+            >
+              {s.num}
+            </div>
+            <p
+              className="mt-2 text-[13px]"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--fg-muted)",
+                lineHeight: 1.55,
+              }}
+            >
+              {s.label}
+            </p>
+          </div>
+        ))}
+      </div>
+      <div
+        className="mx-auto px-6 pb-10 text-center sm:px-8"
+        style={{ maxWidth: "720px" }}
+      >
+        <p
+          className="text-[11px] uppercase"
+          style={{
+            fontFamily: "var(--font-mono)",
+            color: "var(--fg-subtle)",
+            letterSpacing: "0.12em",
+          }}
+        >
+          Données hébergées en France · Pas de revente · Désabonnement en un clic
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────── Integrations Section ───────────────────────
+
+const INTEGRATIONS: { name: string; bg: string; fg: string }[] = [
+  { name: "Boursorama",     bg: "#fef2f2", fg: "#e11d48" },
+  { name: "Fortuneo",       bg: "#fff7ed", fg: "#ea580c" },
+  { name: "Trade Republic", bg: "#f5f5f4", fg: "#1c1917" },
+  { name: "Bourse Direct",  bg: "#eff6ff", fg: "#1d4ed8" },
+  { name: "Linxea",         bg: "#ecfeff", fg: "#0e7490" },
+  { name: "Saxo Bank",      bg: "#eff6ff", fg: "#1e3a8a" },
+  { name: "DEGIRO",         bg: "#fefce8", fg: "#a16207" },
+  { name: "BoursoBank",     bg: "#fdf2f8", fg: "#be185d" },
+];
+
+function IntegrationsSection() {
+  return (
+    <section className="mx-auto px-6 py-20 sm:px-8" style={{ maxWidth: "1080px" }}>
+      <div className="mb-10 text-center">
+        <div
+          className="mb-3 text-[12px] font-semibold uppercase"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--lavender-700)",
+            letterSpacing: "0.16em",
+          }}
+        >
+          Compatible avec ton écosystème
+        </div>
+        <h2
+          className="mx-auto text-[28px] font-bold sm:text-[32px]"
+          style={{
+            fontFamily: "var(--font-display)",
+            color: "var(--ink-700)",
+            letterSpacing: "-0.02em",
+            lineHeight: 1.2,
+            maxWidth: "560px",
+          }}
+        >
+          Tu changes de courtier ? On t&apos;y suit.
+        </h2>
+        <p
+          className="mx-auto mt-4 text-[15px]"
+          style={{
+            maxWidth: "520px",
+            fontFamily: "var(--font-display)",
+            color: "var(--fg-muted)",
+            lineHeight: 1.55,
+          }}
+        >
+          Que ton PEA soit chez Bourso, ton AV chez Linxea ou ton CTO chez
+          Trade Republic, on parle leur langue. Et on connaît leurs frais.
+        </p>
+      </div>
+
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {INTEGRATIONS.map((it) => (
+          <li
+            key={it.name}
+            className="flex h-16 items-center justify-center rounded-2xl px-4 transition-transform"
+            style={{
+              background: it.bg,
+              border: "1px solid var(--border)",
+            }}
+          >
+            <span
+              className="text-[15px] font-bold"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: it.fg,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {it.name}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <p
+        className="mx-auto mt-6 text-center text-[12px]"
+        style={{
+          fontFamily: "var(--font-mono)",
+          color: "var(--fg-subtle)",
+          maxWidth: "560px",
+        }}
+      >
+        Marques citées à titre informatif. Aucun partenariat commercial avec
+        ces établissements.
+      </p>
+    </section>
+  );
+}
+
 function HeroSection() {
+  // White & Case-style full-bleed atmospheric hero.
+  // Real photography (Unsplash CDN, free commercial use) layered behind a
+  // dark gradient that ensures headline contrast and fades to lavender at
+  // the bottom for a smooth transition into the next (light) section.
+  // Solid `--ink-700` is the ultimate fallback if the hotlink ever dies.
   return (
     <section
       className="relative overflow-hidden"
       style={{
-        background:
-          "radial-gradient(120% 70% at 50% 0%, var(--lavender-100) 0%, var(--paper-50) 55%, var(--paper-50) 100%)",
+        background: "var(--ink-700)",
       }}
     >
+      {/* Photo layer — calm misty mountains. */}
+      <img
+        src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2000&q=85"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{ display: "block" }}
+      />
+      {/* Dark + lavender-fade overlay for text contrast and bottom transition. */}
       <div
-        className="relative mx-auto px-6 pt-20 pb-24 text-center sm:px-8 sm:pt-28 sm:pb-32"
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(20,16,40,0.78) 0%, rgba(20,16,40,0.62) 55%, rgba(245,243,255,0.92) 92%, var(--paper-50) 100%)",
+        }}
+      />
+
+      <div
+        className="relative mx-auto px-6 pt-20 pb-32 text-center sm:px-8 sm:pt-32 sm:pb-44"
         style={{ maxWidth: "880px" }}
       >
+        <div className="mb-6 flex justify-center">
+          <Link
+            href="/podcast"
+            className="group inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12px] backdrop-blur transition-colors"
+            style={{
+              fontFamily: "var(--font-display)",
+              background: "rgba(245,243,255,0.10)",
+              border: "1px solid rgba(245,243,255,0.25)",
+              color: "var(--paper-0)",
+            }}
+          >
+            <span
+              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase"
+              style={{
+                background: "var(--lavender-500)",
+                color: "var(--paper-0)",
+                letterSpacing: "0.06em",
+              }}
+            >
+              Nouveau
+            </span>
+            <span>Premier épisode du podcast est sorti</span>
+            <span
+              className="transition-transform group-hover:translate-x-0.5"
+              style={{ color: "var(--lavender-200)" }}
+              aria-hidden="true"
+            >
+              →
+            </span>
+          </Link>
+        </div>
         <div className="mb-8 flex justify-center">
-          <span className="ic-pill">
-            <span className="ic-pill-badge">Pour épargnants français</span>
-            PEA · AV · PER · IR
+          <span
+            className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12px] backdrop-blur"
+            style={{
+              fontFamily: "var(--font-display)",
+              background: "rgba(245,243,255,0.08)",
+              border: "1px solid rgba(245,243,255,0.20)",
+              color: "var(--paper-0)",
+            }}
+          >
+            <span
+              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase"
+              style={{
+                background: "var(--lavender-500)",
+                color: "var(--paper-0)",
+                letterSpacing: "0.06em",
+              }}
+            >
+              Pour épargnants français
+            </span>
+            <span>PEA · AV · PER · IR</span>
           </span>
         </div>
-        <h1 className="ic-display mb-6">
-          Ton empreinte fiscale est unique. <em>La méthode, non.</em>
+        <h1
+          className="ic-display mb-6"
+          style={{ color: "var(--paper-0)" }}
+        >
+          Ton empreinte fiscale est unique.{" "}
+          <em style={{ color: "var(--lavender-200)" }}>La méthode, non.</em>
         </h1>
         <p
           className="mx-auto mb-10 max-w-[600px] ic-lede"
-          style={{ color: "var(--fg-muted)" }}
+          style={{ color: "rgba(245,243,255,0.82)" }}
         >
           Tu paies un impôt français, mais tes ETF sont mondiaux. On t&apos;apprend
           à voir les deux — et à les piloter ensemble. Économiser de l&apos;impôt,
@@ -216,7 +745,7 @@ function HeroSection() {
             className="text-[12px]"
             style={{
               fontFamily: "var(--font-display)",
-              color: "var(--fg-subtle)",
+              color: "rgba(245,243,255,0.65)",
               letterSpacing: "0.02em",
             }}
           >
@@ -293,7 +822,7 @@ function WorldPlaygroundSection() {
             boxShadow: "var(--sh-md)",
           }}
         >
-          {/* Dotted world map (stylized via SVG) */}
+          {/* Particle world map — Stripe-style dense dot field, lavender tinted. */}
           <svg
             viewBox="0 0 920 520"
             className="absolute inset-0 h-full w-full"
@@ -301,44 +830,92 @@ function WorldPlaygroundSection() {
             aria-hidden="true"
           >
             <defs>
-              <pattern id="dots" x="0" y="0" width="14" height="14" patternUnits="userSpaceOnUse">
-                <circle cx="2" cy="2" r="1.2" fill="var(--paper-200)" />
+              {/* Two staggered dot patterns for a denser, more organic particle field. */}
+              <pattern id="dots-a" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+                <circle cx="1.5" cy="1.5" r="0.85" fill="var(--lavender-400)" opacity="0.55" />
+              </pattern>
+              <pattern id="dots-b" x="4" y="4" width="8" height="8" patternUnits="userSpaceOnUse">
+                <circle cx="1.5" cy="1.5" r="0.55" fill="var(--lavender-300)" opacity="0.45" />
               </pattern>
               <radialGradient id="globeGlow" cx="50%" cy="50%" r="60%">
                 <stop offset="0%" stopColor="var(--lavender-100)" stopOpacity="0.7" />
                 <stop offset="100%" stopColor="var(--paper-0)" stopOpacity="0" />
               </radialGradient>
+              <linearGradient id="arcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"  stopColor="var(--lavender-600)" stopOpacity="0" />
+                <stop offset="50%" stopColor="var(--lavender-600)" stopOpacity="0.85" />
+                <stop offset="100%" stopColor="var(--lavender-600)" stopOpacity="0" />
+              </linearGradient>
             </defs>
             <rect width="920" height="520" fill="url(#globeGlow)" />
-            {/* Continent silhouettes (very stylized — large blobs) */}
-            <g fill="url(#dots)" opacity="0.95">
+            {/* Continent silhouettes filled with the dense particle field. */}
+            <g opacity="0.95">
               {/* North America */}
-              <path d="M 80 130 Q 100 100 160 105 T 280 130 Q 305 180 280 230 Q 240 270 200 280 Q 150 270 110 240 Q 80 200 80 130 Z" />
+              <path d="M 80 130 Q 100 100 160 105 T 280 130 Q 305 180 280 230 Q 240 270 200 280 Q 150 270 110 240 Q 80 200 80 130 Z" fill="url(#dots-a)" />
+              <path d="M 80 130 Q 100 100 160 105 T 280 130 Q 305 180 280 230 Q 240 270 200 280 Q 150 270 110 240 Q 80 200 80 130 Z" fill="url(#dots-b)" />
               {/* South America */}
-              <path d="M 240 290 Q 260 285 280 310 Q 290 360 280 410 Q 260 440 240 430 Q 220 400 230 350 Z" />
+              <path d="M 240 290 Q 260 285 280 310 Q 290 360 280 410 Q 260 440 240 430 Q 220 400 230 350 Z" fill="url(#dots-a)" />
+              <path d="M 240 290 Q 260 285 280 310 Q 290 360 280 410 Q 260 440 240 430 Q 220 400 230 350 Z" fill="url(#dots-b)" />
               {/* Europe */}
-              <path d="M 420 140 Q 460 115 510 130 Q 535 165 525 200 Q 490 220 450 215 Q 420 195 415 165 Z" />
+              <path d="M 420 140 Q 460 115 510 130 Q 535 165 525 200 Q 490 220 450 215 Q 420 195 415 165 Z" fill="url(#dots-a)" />
+              <path d="M 420 140 Q 460 115 510 130 Q 535 165 525 200 Q 490 220 450 215 Q 420 195 415 165 Z" fill="url(#dots-b)" />
               {/* Africa */}
-              <path d="M 460 230 Q 510 230 540 270 Q 555 340 520 400 Q 480 425 450 410 Q 420 360 430 290 Z" />
+              <path d="M 460 230 Q 510 230 540 270 Q 555 340 520 400 Q 480 425 450 410 Q 420 360 430 290 Z" fill="url(#dots-a)" />
+              <path d="M 460 230 Q 510 230 540 270 Q 555 340 520 400 Q 480 425 450 410 Q 420 360 430 290 Z" fill="url(#dots-b)" />
               {/* Asia */}
-              <path d="M 555 130 Q 640 105 740 135 Q 800 170 800 215 Q 760 240 700 240 Q 620 235 565 215 Q 540 175 555 130 Z" />
+              <path d="M 555 130 Q 640 105 740 135 Q 800 170 800 215 Q 760 240 700 240 Q 620 235 565 215 Q 540 175 555 130 Z" fill="url(#dots-a)" />
+              <path d="M 555 130 Q 640 105 740 135 Q 800 170 800 215 Q 760 240 700 240 Q 620 235 565 215 Q 540 175 555 130 Z" fill="url(#dots-b)" />
               {/* India */}
-              <path d="M 640 240 Q 670 245 685 280 Q 685 320 660 330 Q 635 320 630 285 Z" />
+              <path d="M 640 240 Q 670 245 685 280 Q 685 320 660 330 Q 635 320 630 285 Z" fill="url(#dots-a)" />
+              <path d="M 640 240 Q 670 245 685 280 Q 685 320 660 330 Q 635 320 630 285 Z" fill="url(#dots-b)" />
               {/* Australia */}
-              <path d="M 740 360 Q 790 350 820 380 Q 820 410 785 420 Q 745 415 730 390 Z" />
+              <path d="M 740 360 Q 790 350 820 380 Q 820 410 785 420 Q 745 415 730 390 Z" fill="url(#dots-a)" />
+              <path d="M 740 360 Q 790 350 820 380 Q 820 410 785 420 Q 745 415 730 390 Z" fill="url(#dots-b)" />
             </g>
-            {/* Connection arcs between cities */}
-            <g
-              fill="none"
-              stroke="var(--lavender-300)"
-              strokeWidth="1"
-              opacity="0.7"
-              strokeDasharray="3 4"
-            >
-              <path d="M 248 198 Q 380 60 423 167" />
-              <path d="M 423 167 Q 470 90 469 154" />
-              <path d="M 469 154 Q 600 60 773 203" />
-              <path d="M 423 167 Q 460 80 469 158" />
+            {/* Animated transaction arcs — lavender pulse traveling along each curve. */}
+            <g fill="none" strokeWidth="1.5" strokeLinecap="round">
+              {/* NY → London */}
+              <path
+                className="ic-arc-trail"
+                d="M 200 200 Q 350 70 470 165"
+                stroke="var(--lavender-200)"
+                strokeWidth="1"
+                opacity="0.6"
+                strokeDasharray="3 5"
+              />
+              <path
+                className="ic-arc-pulse ic-arc-pulse-a"
+                d="M 200 200 Q 350 70 470 165"
+                stroke="url(#arcGradient)"
+              />
+              {/* London → Tokyo */}
+              <path
+                className="ic-arc-trail"
+                d="M 470 165 Q 620 60 770 195"
+                stroke="var(--lavender-200)"
+                strokeWidth="1"
+                opacity="0.6"
+                strokeDasharray="3 5"
+              />
+              <path
+                className="ic-arc-pulse ic-arc-pulse-b"
+                d="M 470 165 Q 620 60 770 195"
+                stroke="url(#arcGradient)"
+              />
+              {/* Paris → Frankfurt */}
+              <path
+                className="ic-arc-trail"
+                d="M 442 197 Q 480 130 525 175"
+                stroke="var(--lavender-200)"
+                strokeWidth="1"
+                opacity="0.5"
+                strokeDasharray="3 5"
+              />
+              <path
+                className="ic-arc-pulse ic-arc-pulse-c"
+                d="M 442 197 Q 480 130 525 175"
+                stroke="url(#arcGradient)"
+              />
             </g>
           </svg>
 
@@ -366,7 +943,7 @@ function WorldPlaygroundSection() {
                 aria-hidden="true"
               />
               <div
-                className="ic-globe-card absolute"
+                className="ic-globe-card absolute hidden sm:block"
                 style={{
                   // @ts-expect-error animation delay CSS var
                   "--float-delay": `${i * 0.4}s`,
@@ -404,6 +981,42 @@ function WorldPlaygroundSection() {
             </div>
           ))}
         </div>
+
+        {/* Mobile-only legend — the floating cards are hidden < sm to avoid overlap. */}
+        <ul
+          className="mx-auto mt-5 grid grid-cols-2 gap-2 sm:hidden"
+          style={{ maxWidth: "560px" }}
+        >
+          {PLAYGROUND_CITIES.map((c) => (
+            <li
+              key={c.city}
+              className="flex items-center justify-between rounded-lg px-3 py-2"
+              style={{
+                background: "var(--paper-0)",
+                border: "1px solid var(--border)",
+                fontFamily: "var(--font-display)",
+                fontSize: "12px",
+              }}
+            >
+              <span>
+                <span style={{ color: "var(--fg-muted)" }}>{c.city}</span>
+                <span className="ml-1.5" style={{ color: "var(--ink-700)", fontWeight: 600 }}>
+                  {c.asset}
+                </span>
+              </span>
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  color: c.delta.startsWith("−")
+                    ? "var(--terracotta-500)"
+                    : "var(--forest-500)",
+                }}
+              >
+                {c.delta}
+              </span>
+            </li>
+          ))}
+        </ul>
 
         <p
           className="mx-auto mt-6 text-center text-[12px]"
@@ -456,11 +1069,14 @@ function ProductPreviewGrid() {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-6">
+      <ProductTabsNav />
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
         {/* 1. Fiscalité — wide card with form mockup */}
         <Link
+          id="product-fiscalite"
           href="/tax"
-          className="ic-card-pastel-lavender block lg:col-span-4"
+          className="ic-card-pastel-lavender block scroll-mt-24 md:col-span-2 lg:col-span-4"
           style={{
             borderRadius: "var(--r-2xl)",
             padding: "32px",
@@ -505,8 +1121,9 @@ function ProductPreviewGrid() {
 
         {/* 2. Watchlist mockup */}
         <Link
+          id="product-watchlist"
           href="/watchlist"
-          className="block lg:col-span-2"
+          className="block scroll-mt-24 lg:col-span-2"
           style={{
             background: "var(--bg-elevated)",
             borderRadius: "var(--r-2xl)",
@@ -551,8 +1168,9 @@ function ProductPreviewGrid() {
 
         {/* 3. Simulateur mockup */}
         <Link
+          id="product-simulateur"
           href="/simulation"
-          className="ic-card-pastel-peach block lg:col-span-2"
+          className="ic-card-pastel-peach block scroll-mt-24 lg:col-span-2"
           style={{
             borderRadius: "var(--r-2xl)",
             padding: "32px",
@@ -596,8 +1214,9 @@ function ProductPreviewGrid() {
 
         {/* 4. Podcast mockup */}
         <Link
+          id="product-podcast"
           href="/podcast"
-          className="ic-card-pastel-mint block lg:col-span-4"
+          className="ic-card-pastel-mint block scroll-mt-24 md:col-span-2 lg:col-span-4"
           style={{
             borderRadius: "var(--r-2xl)",
             padding: "32px",
@@ -1156,206 +1775,6 @@ function CompoundingChart() {
         </span>
       </div>
     </div>
-  );
-}
-
-const TIERS: {
-  id: string;
-  name: string;
-  price: string;
-  period: string;
-  tag: string;
-  features: string[];
-  cta: string;
-  href: string;
-  featured: boolean;
-}[] = [
-  {
-    id: "decouverte",
-    name: "Découverte",
-    price: "0",
-    period: "€ / mois",
-    tag: "Gratuit, pour toujours.",
-    features: [
-      "Le journal du dimanche",
-      "3 brèves par semaine",
-      "Glossaire complet",
-      "Communauté de lecteurs",
-    ],
-    cta: "Commencer · gratuit",
-    href: "/login",
-    featured: false,
-  },
-  {
-    id: "investisseur",
-    name: "Investisseur",
-    price: "14",
-    period: "€ / mois",
-    tag: "Pour passer à l'acte.",
-    features: [
-      "Tout Découverte",
-      "Alertes éprouvées",
-      "Coach IA illimité",
-      "Notes de recherche",
-      "Simulateur PEA / CTO",
-    ],
-    cta: "Essayer 14 jours",
-    href: "/subscription",
-    featured: true,
-  },
-  {
-    id: "patrimoine",
-    name: "Patrimoine",
-    price: "39",
-    period: "€ / mois",
-    tag: "Pour piloter l'ensemble.",
-    features: [
-      "Tout Investisseur",
-      "Optimisation fiscale avancée",
-      "Suivi multi-enveloppes",
-      "Rapports trimestriels en deux pages",
-      "Coach IA prioritaire",
-    ],
-    cta: "Essayer 14 jours",
-    href: "/subscription",
-    featured: false,
-  },
-];
-
-function PricingSection() {
-  return (
-    <section id="tarifs" className="py-24" style={{ background: "var(--paper-100)" }}>
-      <div className="mx-auto px-6 text-center sm:px-8" style={{ maxWidth: "720px" }}>
-        <h2 className="ic-h1 mx-auto">
-          Trois formules. Annulable en un clic.
-        </h2>
-        <p
-          className="mx-auto mt-5 text-[17px]"
-          style={{
-            maxWidth: "520px",
-            fontFamily: "var(--font-display)",
-            color: "var(--fg-muted)",
-            lineHeight: 1.55,
-          }}
-        >
-          Découverte est gratuite, pour toujours. Tu passes payant seulement quand tu en veux plus.
-        </p>
-      </div>
-      <div
-        className="mx-auto mt-14 grid gap-6 px-6 sm:px-8 md:grid-cols-3"
-        style={{ maxWidth: "1080px" }}
-      >
-        {TIERS.map((t) => (
-          <article
-            key={t.id}
-            className={`ic-tier ${t.featured ? "ic-tier-featured" : ""}`}
-            style={t.featured ? { transform: "translateY(-8px)" } : undefined}
-          >
-            {t.featured ? (
-              <div className="ic-tier-ribbon">La plus choisie</div>
-            ) : null}
-            <h3
-              className="m-0 text-[22px] font-bold"
-              style={{
-                fontFamily: "var(--font-display)",
-                letterSpacing: "-0.02em",
-                color: "var(--ink-700)",
-              }}
-            >
-              {t.name}
-            </h3>
-            <p
-              className="m-0 text-[14px]"
-              style={{
-                fontFamily: "var(--font-display)",
-                color: "var(--fg-muted)",
-              }}
-            >
-              {t.tag}
-            </p>
-            <div
-              className="flex items-baseline gap-1.5 py-3"
-              style={{
-                borderTop: "1px solid var(--border)",
-                borderBottom: "1px solid var(--border)",
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "56px",
-                  fontWeight: 700,
-                  letterSpacing: "-0.035em",
-                  lineHeight: 1,
-                  color: "var(--ink-700)",
-                }}
-              >
-                {t.price}
-              </span>
-              <span
-                className="text-[13px]"
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  color: "var(--fg-muted)",
-                }}
-              >
-                {t.period}
-              </span>
-            </div>
-            <ul className="m-0 flex flex-1 list-none flex-col gap-2.5 p-0">
-              {t.features.map((f) => (
-                <li
-                  key={f}
-                  className="flex items-start gap-2.5 text-[14px]"
-                  style={{ color: "var(--fg)", lineHeight: 1.45, fontFamily: "var(--font-display)" }}
-                >
-                  <CheckIcon />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href={t.href}
-              className="mt-2 inline-flex items-center justify-center rounded-full px-5 py-3 text-[14px] font-semibold transition-all hover:translate-y-[-1px] hover:shadow-md"
-              style={{
-                fontFamily: "var(--font-display)",
-                background: t.featured
-                  ? "var(--ink-700)"
-                  : "var(--bg-elevated)",
-                color: t.featured ? "var(--paper-0)" : "var(--ink-700)",
-                border: t.featured
-                  ? "1px solid var(--ink-700)"
-                  : "1px solid var(--paper-300)",
-              }}
-            >
-              {t.cta}
-            </Link>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width="16"
-      height="16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      style={{
-        color: "var(--lavender-600)",
-        marginTop: "3px",
-        flexShrink: 0,
-      }}
-    >
-      <path d="M4 12 L10 18 L20 6" />
-    </svg>
   );
 }
 
