@@ -39,11 +39,13 @@ type Tweet = {
   media_urls: string[] | null;
 };
 
-const TYPE_COLOR: Record<KeyLevel["type"], string> = {
-  support: "var(--forest-600)",
-  resistance: "var(--terracotta-500)",
-  target: "var(--forest-700)",
-  trend: "var(--ink-500)",
+// Pastel background per level type — palette C only (rose / lilac /
+// peach / paper). No green / red. Border + text stay ink.
+const TYPE_BG: Record<KeyLevel["type"], string> = {
+  support: "var(--lavender-200)",      // lilac — "le sol"
+  resistance: "var(--rose-100)",       // rose — "le plafond"
+  target: "var(--terracotta-100)",     // peach — "la cible"
+  trend: "var(--paper-100)",           // off-white — "la direction"
 };
 
 const TYPE_LABEL: Record<KeyLevel["type"], string> = {
@@ -52,6 +54,82 @@ const TYPE_LABEL: Record<KeyLevel["type"], string> = {
   target: "Objectif",
   trend: "Tendance",
 };
+
+// One-sentence plain-French explainer per level type. Shown directly
+// under the level value so a reader who's never seen a chart still
+// understands what the number means.
+const TYPE_EXPLAINER: Record<KeyLevel["type"], string> = {
+  support:
+    "Prix « plancher » — niveau où le marché a tendance à rebondir vers le haut.",
+  resistance:
+    "Prix « plafond » — niveau où le marché a tendance à buter et redescendre.",
+  target:
+    "Prix « cible » — objectif que vise le mouvement en cours s'il continue.",
+  trend:
+    "Direction de fond — la pente générale du graphique sur la période.",
+};
+
+// Static glossary of universal technical-analysis concepts, in plain
+// French — always shown at the bottom of every chart detail page so a
+// first-time reader can decode the AI synthesis above. Independent of
+// what the model wrote in `body_md ## Glossaire`.
+const STATIC_GLOSSARY: { term: string; definition: string }[] = [
+  {
+    term: "Support",
+    definition:
+      "Prix « plancher » — quand le cours descend dessus, il a tendance à rebondir. Un support cassé devient souvent une nouvelle résistance.",
+  },
+  {
+    term: "Résistance",
+    definition:
+      "Prix « plafond » — quand le cours monte dessus, il a tendance à buter. Une résistance franchie devient souvent un nouveau support.",
+  },
+  {
+    term: "Tendance",
+    definition:
+      "Direction générale du marché. Haussière (sommets et creux qui montent), baissière (qui descendent) ou neutre (latérale).",
+  },
+  {
+    term: "Cassure (breakout)",
+    definition:
+      "Le cours franchit un support ou une résistance. Souvent suivi d'un mouvement plus marqué dans la direction de la cassure.",
+  },
+  {
+    term: "Retracement",
+    definition:
+      "Repli temporaire dans une tendance plus longue. Ne change pas le cap, juste un souffle.",
+  },
+  {
+    term: "Volume",
+    definition:
+      "Quantité d'actifs échangés. Un mouvement avec gros volume est plus crédible qu'un mouvement à volume faible.",
+  },
+  {
+    term: "Volatilité",
+    definition:
+      "Amplitude des variations. Forte volatilité = grands écarts, faible volatilité = mouvement calme.",
+  },
+  {
+    term: "Moyenne mobile (MA)",
+    definition:
+      "Moyenne des prix sur N jours, recalculée chaque jour. Lisse le bruit pour faire ressortir la tendance.",
+  },
+  {
+    term: "RSI (Relative Strength Index)",
+    definition:
+      "Indicateur entre 0 et 100. Au-dessus de 70 → marché « suracheté », en-dessous de 30 → « survendu ». À lire avec la tendance, pas en isolation.",
+  },
+  {
+    term: "Bougies (candlesticks)",
+    definition:
+      "Chaque bougie résume une période (jour, heure…) : ouverture, clôture, plus haut, plus bas. Verte = clôture au-dessus de l'ouverture, rouge = au-dessous.",
+  },
+  {
+    term: "Haussier / baissier",
+    definition:
+      "Vocabulaire de direction : haussier (bull) = on s'attend à monter, baissier (bear) = on s'attend à descendre, neutre = pas d'opinion forte.",
+  },
+];
 
 const DIRECTION_COLOR: Record<string, string> = {
   bullish: "var(--forest-600)",
@@ -343,82 +421,261 @@ export default async function ChartDetailPage({
         ) : null}
 
         {Array.isArray(a.key_levels) && a.key_levels.length > 0 ? (
-          <section className="mt-10">
-            <div className="cap-eyebrow">Niveaux clés</div>
-            <ul
-              className="mt-4 grid gap-3 sm:grid-cols-2"
-              style={{ listStyle: "none", padding: 0 }}
+          <section className="mt-12">
+            <span className="ic-eyebrow-mono">Niveaux clés</span>
+            <p
+              className="mt-3 text-[14px]"
+              style={{
+                fontFamily: "var(--font-source-serif), Georgia, serif",
+                fontStyle: "italic",
+                color: "var(--ink-700)",
+                opacity: 0.85,
+                lineHeight: 1.55,
+              }}
             >
-              {a.key_levels.map((lvl, i) => (
-                <li
-                  key={`${lvl.label}-${i}`}
-                  className="rounded-lg p-4"
-                  style={{
-                    background: "var(--bg-elevated)",
-                    border: "1px solid var(--border)",
-                  }}
-                >
-                  <div
-                    className="text-[11px] uppercase"
+              « Les chiffres ci-dessous sont des prix repères. Ils ne disent
+              pas où aller — ils disent où regarder. »
+            </p>
+            <ul
+              className="mt-6 grid sm:grid-cols-2"
+              style={{
+                listStyle: "none",
+                padding: 0,
+                border: "1px solid var(--ink-700)",
+              }}
+            >
+              {a.key_levels.map((lvl, i) => {
+                const col = i % 2;
+                const totalRows = Math.ceil(a.key_levels.length / 2);
+                const row = Math.floor(i / 2);
+                const isLastRow = row === totalRows - 1;
+                return (
+                  <li
+                    key={`${lvl.label}-${i}`}
                     style={{
-                      fontFamily: "var(--font-display)",
-                      fontWeight: 600,
-                      letterSpacing: "0.08em",
-                      color: TYPE_COLOR[lvl.type] ?? "var(--fg-muted)",
+                      borderRight:
+                        col === 0 ? "1px solid var(--ink-700)" : "none",
+                      borderBottom: !isLastRow ? "1px solid var(--ink-700)" : "none",
                     }}
                   >
-                    {TYPE_LABEL[lvl.type] ?? "Niveau"} · {lvl.label}
-                  </div>
-                  <div
-                    className="cap-num mt-1 text-[22px] font-semibold"
-                    style={{ color: "var(--ink-700)" }}
-                  >
-                    {lvl.value}
-                  </div>
-                </li>
-              ))}
+                    <div className="flex h-full flex-col">
+                      <div
+                        className="px-5 py-4"
+                        style={{
+                          background: TYPE_BG[lvl.type] ?? "var(--paper-100)",
+                          borderBottom: "1px solid var(--ink-700)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontFamily: "var(--font-mono)",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            letterSpacing: "0.14em",
+                            textTransform: "uppercase",
+                            color: "var(--ink-700)",
+                          }}
+                        >
+                          ↳ {TYPE_LABEL[lvl.type] ?? "Niveau"}
+                        </div>
+                        <div
+                          className="mt-1.5"
+                          style={{
+                            fontFamily: "var(--font-display)",
+                            fontSize: "13px",
+                            color: "var(--ink-700)",
+                            opacity: 0.75,
+                          }}
+                        >
+                          {lvl.label}
+                        </div>
+                      </div>
+                      <div className="flex-1 px-5 py-5">
+                        <div
+                          style={{
+                            fontFamily: "var(--font-mono)",
+                            fontFeatureSettings: '"tnum" 1',
+                            fontSize: "32px",
+                            fontWeight: 700,
+                            letterSpacing: "-0.02em",
+                            lineHeight: 1,
+                            color: "var(--ink-700)",
+                          }}
+                        >
+                          {lvl.value}
+                        </div>
+                        <p
+                          className="mt-3 text-[13px]"
+                          style={{
+                            fontFamily: "var(--font-source-serif), Georgia, serif",
+                            fontStyle: "italic",
+                            color: "var(--ink-700)",
+                            lineHeight: 1.5,
+                            opacity: 0.8,
+                          }}
+                        >
+                          « {TYPE_EXPLAINER[lvl.type]} »
+                        </p>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         ) : null}
 
+        {/* AI-synthesised glossary specific to this analysis. */}
         {parsed.glossary.length > 0 ? (
           <section
-            className="mt-10 rounded-lg p-6"
-            style={{
-              background: "var(--paper-100)",
-              border: "1px solid var(--border)",
-            }}
+            className="ic-block-lilac mt-12 px-6 py-8 sm:px-8"
+            style={{ border: "1px solid var(--ink-700)" }}
           >
-            <div className="cap-eyebrow">Glossaire</div>
-            <dl className="mt-4 space-y-3">
+            <span className="ic-eyebrow-mono">Vocabulaire de l&apos;analyse</span>
+            <p
+              className="mt-3 text-[13px]"
+              style={{
+                fontFamily: "var(--font-mono)",
+                color: "var(--ink-700)",
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                opacity: 0.7,
+              }}
+            >
+              Termes utilisés dans la lecture de cette journée
+            </p>
+            <dl className="mt-6 space-y-5">
               {parsed.glossary.map((g, i) => (
-                <div key={i}>
+                <div
+                  key={i}
+                  className="grid grid-cols-1 gap-1 md:grid-cols-[180px_1fr] md:gap-6"
+                  style={{
+                    borderTop: i === 0 ? "1px solid var(--ink-700)" : "none",
+                    borderBottom: "1px solid var(--ink-700)",
+                    padding: "16px 0",
+                  }}
+                >
                   <dt
-                    className="text-[15px]"
                     style={{
-                      fontFamily: "var(--font-display)",
-                      fontWeight: 600,
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
                       color: "var(--ink-700)",
                     }}
                   >
-                    {g.term}
+                    ↳ {g.term}
                   </dt>
                   <dd
-                    className="mt-0.5 text-[15px]"
                     style={{
-                      fontFamily: "var(--font-serif)",
-                      color: "var(--fg-muted)",
-                      lineHeight: 1.5,
+                      fontFamily: "var(--font-source-serif), Georgia, serif",
+                      fontStyle: "italic",
+                      fontSize: "15px",
+                      color: "var(--ink-700)",
+                      lineHeight: 1.55,
                       marginLeft: 0,
                     }}
                   >
-                    {g.definition}
+                    « {g.definition} »
                   </dd>
                 </div>
               ))}
             </dl>
           </section>
         ) : null}
+
+        {/* Static "key concepts" glossary — universal terms anyone reading
+            a chart should recognise. Always shown, regardless of what the
+            AI synthesis covered. Plain French, no jargon dump. */}
+        <section
+          className="ic-block-rose mt-10 px-6 py-10 sm:px-8 sm:py-14"
+          style={{ border: "1px solid var(--ink-700)" }}
+        >
+          <span className="ic-eyebrow-mono">Termes clés à connaître</span>
+          <h3
+            className="mt-3 mb-2"
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(22px, 3vw, 32px)",
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.15,
+              color: "var(--ink-700)",
+              textTransform: "uppercase",
+            }}
+          >
+            Lire un graphique sans jargon
+          </h3>
+          <p
+            className="mb-8 max-w-[640px] text-[15px]"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--ink-700)",
+              lineHeight: 1.55,
+              opacity: 0.85,
+            }}
+          >
+            Onze concepts à connaître pour comprendre n&apos;importe quelle
+            lecture de marché. Pas une formation, juste le minimum vital pour
+            décoder ce qui est écrit au-dessus.
+          </p>
+          <dl
+            style={{
+              borderTop: "1px solid var(--ink-700)",
+              borderBottom: "1px solid var(--ink-700)",
+            }}
+          >
+            {STATIC_GLOSSARY.map((g, i) => (
+              <div
+                key={g.term}
+                className="grid grid-cols-1 gap-2 py-4 md:grid-cols-[200px_1fr] md:gap-6"
+                style={{
+                  borderBottom:
+                    i < STATIC_GLOSSARY.length - 1
+                      ? "1px solid var(--ink-700)"
+                      : "none",
+                }}
+              >
+                <dt
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-700)",
+                  }}
+                >
+                  ↳ {g.term}
+                </dt>
+                <dd
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "15px",
+                    color: "var(--ink-700)",
+                    lineHeight: 1.55,
+                    marginLeft: 0,
+                  }}
+                >
+                  {g.definition}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p
+            className="mt-8 text-[13px]"
+            style={{
+              fontFamily: "var(--font-mono)",
+              color: "var(--ink-700)",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              opacity: 0.7,
+            }}
+          >
+            Lecture éducative · Pas de signal d&apos;achat · Confirme avec un expert
+          </p>
+        </section>
 
         <section className="mt-12">
           <a
