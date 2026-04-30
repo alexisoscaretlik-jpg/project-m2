@@ -172,11 +172,10 @@ function Landing() {
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/" />
       <HeroSection />
-      <WorldPlaygroundSection />
-      <IntegrationsSection />
       <HowItWorksSection />
       <ProductPreviewGrid />
       <SavingsEqualsEarningsSection />
+      <IntegrationsSection />
       <PhilosophySection />
       <PricingTable />
       <TrustStatsBar />
@@ -1035,220 +1034,193 @@ function WorldPlaygroundSection() {
 
 // ─────────────────────── Product Preview Grid ───────────────────────
 
+const PRODUCTS: {
+  id: string;
+  href: string;
+  number: string;
+  eyebrow: string;
+  title: string;
+  body: string;
+  pastel: string;
+  mockup: "cerfa" | "watchlist" | "simulator" | "podcast";
+}[] = [
+  {
+    id: "product-fiscalite",
+    href: "/tax",
+    number: "01",
+    eyebrow: "Fiscalité",
+    title: "Économiser l'impôt, c'est gagner de l'argent",
+    body: "Ton avis d'imposition + ton profil = 3 à 5 leviers chiffrés en euros. Cerfa 2042 pré-remplie, prête à signer.",
+    pastel: "var(--rose-100)",
+    mockup: "cerfa",
+  },
+  {
+    id: "product-watchlist",
+    href: "/watchlist",
+    number: "02",
+    eyebrow: "Watchlist",
+    title: "Coachings sur les entreprises que tu suis",
+    body: "Trade alerts éducatifs sur les publications trimestrielles, alertes AMF. Jamais de prix temps réel.",
+    pastel: "var(--lavender-200)",
+    mockup: "watchlist",
+  },
+  {
+    id: "product-simulateur",
+    href: "/simulation",
+    number: "03",
+    eyebrow: "Simulateur",
+    title: "PEA vs AV vs CTO sur 10 ans",
+    body: "Vraies hypothèses fiscales, en euros nets. Compare tes enveloppes avec ton vrai TMI.",
+    pastel: "var(--terracotta-100)",
+    mockup: "simulator",
+  },
+  {
+    id: "product-podcast",
+    href: "/podcast",
+    number: "04",
+    eyebrow: "Podcast & articles",
+    title: "Financial literacy, pour épargnants pressés",
+    body: "Une lettre par semaine, un podcast par épisode. Coach + Investisseur creusent une seule loi de l'argent à la fois.",
+    pastel: "var(--rose-100)",
+    mockup: "podcast",
+  },
+];
+
+function ProductMockup({ kind }: { kind: "cerfa" | "watchlist" | "simulator" | "podcast" }) {
+  if (kind === "cerfa") return <CerfaMockup />;
+  if (kind === "watchlist") return <WatchlistMockup />;
+  if (kind === "simulator") return <SimulatorMockup />;
+  return <PodcastMockup />;
+}
+
 function ProductPreviewGrid() {
   return (
-    <section className="mx-auto px-6 py-24 sm:px-8" style={{ maxWidth: "1280px" }}>
-      <div className="mb-14 text-center">
-        <div className="mb-3 flex justify-center">
-          <span className="ic-eyebrow-mono">La même boîte à outils, pour chaque empreinte</span>
+    <section
+      className="px-6 py-20 sm:px-8 sm:py-24"
+      style={{
+        background: "var(--paper-0)",
+        borderBottom: "1px solid var(--ink-700)",
+      }}
+    >
+      <div className="mx-auto" style={{ maxWidth: "1280px" }}>
+        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <span className="ic-eyebrow-mono">Tes outils</span>
+            <h2
+              className="ic-bigsection mt-5"
+              style={{ fontSize: "clamp(34px, 5vw, 72px)" }}
+            >
+              Quatre surfaces.<br />Une promesse :<br />1 % mieux chaque jour.
+            </h2>
+          </div>
+          <p
+            className="max-w-[420px] text-[15px]"
+            style={{
+              fontFamily: "var(--font-source-serif), Georgia, serif",
+              fontStyle: "italic",
+              color: "var(--ink-700)",
+              lineHeight: 1.55,
+            }}
+          >
+            « Tu n&apos;as ni le même salaire, ni le même TMI, ni le même PEA
+            que ton voisin. Mais tu peux suivre la même méthode — et payer
+            moins d&apos;impôts en la suivant. »
+          </p>
         </div>
-        <h2 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
-          Cinq surfaces. Une seule promesse&nbsp;: 1&nbsp;% mieux chaque jour.
-        </h2>
-        <p
-          className="mx-auto mt-5 text-[17px]"
-          style={{
-            maxWidth: "560px",
-            fontFamily: "var(--font-display)",
-            color: "var(--fg-muted)",
-            lineHeight: 1.55,
-          }}
-        >
-          Tu n&apos;as ni le même salaire, ni le même TMI, ni le même PEA que
-          ton voisin. Mais tu peux suivre la même méthode — et payer moins
-          d&apos;impôts en la suivant.
-        </p>
-      </div>
 
-      <ProductTabsNav />
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
-        {/* 1. Fiscalité — wide card with form mockup */}
-        <Link
-          id="product-fiscalite"
-          href="/tax"
-          className="ic-card-pastel-lavender block scroll-mt-24 md:col-span-2 lg:col-span-4"
-          style={{
-            borderRadius: "var(--r-2xl)",
-            padding: "32px",
-            border: "1px solid rgba(124,91,250,0.10)",
-            transition: "all 200ms var(--ease-standard)",
-          }}
+        <ul
+          className="grid md:grid-cols-2"
+          style={{ border: "1px solid var(--ink-700)" }}
         >
-          <div
-            className="text-[11px] font-semibold uppercase"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--lavender-700)",
-              letterSpacing: "0.12em",
-            }}
-          >
-            01 · Déclaration fiscale
-          </div>
-          <h3
-            className="mt-2 text-[26px] font-bold"
-            style={{
-              fontFamily: "var(--font-display)",
-              letterSpacing: "-0.025em",
-              color: "var(--ink-700)",
-              lineHeight: 1.15,
-            }}
-          >
-            Économiser de l&apos;impôt, c&apos;est gagner de l&apos;argent.
-          </h3>
-          <p
-            className="mt-3 max-w-[460px] text-[15px]"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--fg-muted)",
-              lineHeight: 1.55,
-            }}
-          >
-            Ton avis d&apos;imposition + ton profil = 3 à 5 leviers chiffrés en
-            euros. Cerfa 2042 pré-remplie, prête à signer.
-          </p>
-          <CerfaMockup />
-        </Link>
-
-        {/* 2. Watchlist mockup */}
-        <Link
-          id="product-watchlist"
-          href="/watchlist"
-          className="block scroll-mt-24 lg:col-span-2"
-          style={{
-            background: "var(--bg-elevated)",
-            borderRadius: "var(--r-2xl)",
-            padding: "32px",
-            border: "1px solid var(--border)",
-            transition: "all 200ms var(--ease-standard)",
-          }}
-        >
-          <div
-            className="text-[11px] font-semibold uppercase"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--lavender-700)",
-              letterSpacing: "0.12em",
-            }}
-          >
-            02 · Watchlist
-          </div>
-          <h3
-            className="mt-2 text-[22px] font-bold"
-            style={{
-              fontFamily: "var(--font-display)",
-              letterSpacing: "-0.02em",
-              color: "var(--ink-700)",
-              lineHeight: 1.2,
-            }}
-          >
-            Coachings sur les entreprises que tu suis.
-          </h3>
-          <p
-            className="mt-2 text-[14px]"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--fg-muted)",
-              lineHeight: 1.5,
-            }}
-          >
-            Trade alerts éducatifs, jamais de prix temps réel.
-          </p>
-          <WatchlistMockup />
-        </Link>
-
-        {/* 3. Simulateur mockup */}
-        <Link
-          id="product-simulateur"
-          href="/simulation"
-          className="ic-card-pastel-peach block scroll-mt-24 lg:col-span-2"
-          style={{
-            borderRadius: "var(--r-2xl)",
-            padding: "32px",
-            border: "1px solid rgba(204,116,72,0.10)",
-            transition: "all 200ms var(--ease-standard)",
-          }}
-        >
-          <div
-            className="text-[11px] font-semibold uppercase"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--terracotta-700)",
-              letterSpacing: "0.12em",
-            }}
-          >
-            03 · Simulateur
-          </div>
-          <h3
-            className="mt-2 text-[22px] font-bold"
-            style={{
-              fontFamily: "var(--font-display)",
-              letterSpacing: "-0.02em",
-              color: "var(--ink-700)",
-              lineHeight: 1.2,
-            }}
-          >
-            PEA vs AV vs CTO sur 10 ans.
-          </h3>
-          <p
-            className="mt-2 text-[14px]"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--fg-muted)",
-              lineHeight: 1.5,
-            }}
-          >
-            Vraies hypothèses fiscales, en euros nets.
-          </p>
-          <SimulatorMockup />
-        </Link>
-
-        {/* 4. Podcast mockup */}
-        <Link
-          id="product-podcast"
-          href="/podcast"
-          className="ic-card-pastel-mint block scroll-mt-24 md:col-span-2 lg:col-span-4"
-          style={{
-            borderRadius: "var(--r-2xl)",
-            padding: "32px",
-            border: "1px solid rgba(74,109,68,0.10)",
-            transition: "all 200ms var(--ease-standard)",
-          }}
-        >
-          <div
-            className="text-[11px] font-semibold uppercase"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--forest-700)",
-              letterSpacing: "0.12em",
-            }}
-          >
-            04 · Podcast & articles
-          </div>
-          <h3
-            className="mt-2 text-[26px] font-bold"
-            style={{
-              fontFamily: "var(--font-display)",
-              letterSpacing: "-0.025em",
-              color: "var(--ink-700)",
-              lineHeight: 1.15,
-            }}
-          >
-            Financial literacy, pour épargnants pressés.
-          </h3>
-          <p
-            className="mt-3 max-w-[460px] text-[15px]"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--fg-muted)",
-              lineHeight: 1.55,
-            }}
-          >
-            Une lettre par semaine, un podcast par épisode. Coach + Investisseur
-            creusent une seule loi de l&apos;argent à la fois.
-          </p>
-          <PodcastMockup />
-        </Link>
+          {PRODUCTS.map((p, idx) => {
+            const col = idx % 2;
+            const totalRows = Math.ceil(PRODUCTS.length / 2);
+            const row = Math.floor(idx / 2);
+            const isLastRow = row === totalRows - 1;
+            return (
+              <li
+                key={p.id}
+                style={{
+                  borderRight:
+                    col === 0 ? "1px solid var(--ink-700)" : "none",
+                  borderBottom: !isLastRow ? "1px solid var(--ink-700)" : "none",
+                }}
+              >
+                <Link
+                  id={p.id}
+                  href={p.href}
+                  className="block h-full transition-colors scroll-mt-24 hover:bg-[var(--paper-100)]"
+                >
+                  <article className="flex h-full flex-col">
+                    <div
+                      className="flex items-center justify-center"
+                      style={{
+                        background: p.pastel,
+                        borderBottom: "1px solid var(--ink-700)",
+                        padding: "32px 24px",
+                        minHeight: "240px",
+                      }}
+                    >
+                      <ProductMockup kind={p.mockup} />
+                    </div>
+                    <div className="flex flex-1 flex-col gap-3 px-6 py-6 sm:px-8 sm:py-8">
+                      <div className="flex items-baseline justify-between gap-4">
+                        <span
+                          style={{
+                            fontFamily: "var(--font-mono)",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            letterSpacing: "0.14em",
+                            textTransform: "uppercase",
+                            color: "var(--ink-700)",
+                          }}
+                        >
+                          ↳ {p.number} · {p.eyebrow}
+                        </span>
+                        <span
+                          aria-hidden="true"
+                          style={{
+                            fontFamily: "var(--font-mono)",
+                            fontSize: "16px",
+                            fontWeight: 700,
+                            color: "var(--ink-700)",
+                          }}
+                        >
+                          →
+                        </span>
+                      </div>
+                      <h3
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          fontSize: "clamp(22px, 2.4vw, 28px)",
+                          fontWeight: 700,
+                          letterSpacing: "-0.025em",
+                          lineHeight: 1.15,
+                          color: "var(--ink-700)",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {p.title}
+                      </h3>
+                      <p
+                        className="text-[14px]"
+                        style={{
+                          fontFamily: "var(--font-source-serif), Georgia, serif",
+                          fontStyle: "italic",
+                          color: "var(--ink-700)",
+                          lineHeight: 1.55,
+                          opacity: 0.85,
+                        }}
+                      >
+                        « {p.body} »
+                      </p>
+                    </div>
+                  </article>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </section>
   );
@@ -1529,89 +1501,109 @@ function PodcastMockup() {
 // ─────────────────────── Savings = Earnings Section ───────────────────────
 
 function SavingsEqualsEarningsSection() {
+  // Photo: orange/black abstract fluid texture (Unsplash gSRCehQLUu0).
+  // Sits behind the "compounding" message — visual stand-in for the chart
+  // we removed: motion, density, time. No data, just mood.
+  const PHOTO_FLUID =
+    "https://images.unsplash.com/photo-1777033481363-96640776ae62?auto=format&fit=crop&w=1600&q=85";
+
+  const LEVERS: { k: string; v: string }[] = [
+    { k: "PER", v: "Jusqu'à 10 % de tes revenus déductibles" },
+    { k: "PEA", v: "Exonération d'IR après 5 ans (17,2 % de PS seulement)" },
+    { k: "Donations", v: "100 000 € exonérés tous les 15 ans, par parent et par enfant" },
+    { k: "Plus-values", v: "Abattement pour durée de détention sur titres pré-2018" },
+  ];
+
   return (
     <section
-      className="relative overflow-hidden py-24"
-      style={{
-        background:
-          "linear-gradient(180deg, var(--paper-50) 0%, var(--lavender-50) 100%)",
-      }}
+      className="grid md:grid-cols-2"
+      style={{ borderBottom: "1px solid var(--ink-700)" }}
     >
       <div
-        className="mx-auto px-6 sm:px-8"
-        style={{ maxWidth: "1080px" }}
+        className="ic-block-lilac flex flex-col justify-between px-6 py-14 sm:px-10 sm:py-20"
+        style={{ borderRight: "1px solid var(--ink-700)" }}
       >
-        <div className="grid gap-12 md:grid-cols-2 md:items-center">
-          <div>
-            <div className="mb-3">
-              <span className="ic-eyebrow-mono">Le calcul que personne ne te fait</span>
-            </div>
-            <h2 className="ic-h1">
-              Économiser 5 000 € d&apos;impôts à 35 ans = <em>+38 000 €</em> à 65 ans.
-            </h2>
-            <p
-              className="mt-5 text-[17px]"
+        <div>
+          <span className="ic-eyebrow-mono mb-6 inline-flex">
+            Le calcul que personne ne te fait
+          </span>
+          <h2
+            className="ic-bigsection mb-6"
+            style={{ fontSize: "clamp(30px, 4.4vw, 60px)" }}
+          >
+            5 000 € d&apos;impôt<br />économisés à 35 ans<br />= 38 000 € à 65.
+          </h2>
+          <p
+            className="max-w-[440px] text-[16px]"
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--ink-700)",
+              lineHeight: 1.55,
+            }}
+          >
+            Chaque euro d&apos;impôt non payé reste dans ton PEA et compose
+            pendant trente ans. C&apos;est ça, notre métier — te montrer
+            chaque année combien tu peux récupérer, légalement, BOI à
+            l&apos;appui.
+          </p>
+        </div>
+
+        <ul
+          className="mt-10"
+          style={{ borderTop: "1px solid var(--ink-700)" }}
+        >
+          {LEVERS.map((item, i) => (
+            <li
+              key={item.k}
+              className="flex items-baseline gap-4 py-4"
               style={{
-                fontFamily: "var(--font-display)",
-                color: "var(--fg-muted)",
-                lineHeight: 1.55,
+                borderBottom:
+                  i < LEVERS.length - 1
+                    ? "1px solid var(--ink-700)"
+                    : "none",
               }}
             >
-              Chaque euro d&apos;impôt non-payé reste dans ton PEA et compose
-              pendant 30 ans. C&apos;est ça, notre métier&nbsp;: te montrer
-              chaque année combien tu peux récupérer — légalement, BOI à
-              l&apos;appui.
-            </p>
-            <ul className="mt-7 space-y-3">
-              {[
-                {
-                  k: "PER",
-                  v: "Jusqu'à 10 % de tes revenus déductibles",
-                },
-                {
-                  k: "PEA",
-                  v: "Exonération d'IR après 5 ans (17,2 % de PS seulement)",
-                },
-                {
-                  k: "Donations",
-                  v: "100 000 € exonérés tous les 15 ans par parent et enfant",
-                },
-                {
-                  k: "Plus-values",
-                  v: "Abattement pour durée de détention sur titres pré-2018",
-                },
-              ].map((item) => (
-                <li
-                  key={item.k}
-                  className="flex items-start gap-3 text-[15px]"
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    color: "var(--ink-700)",
-                    lineHeight: 1.5,
-                  }}
-                >
-                  <span
-                    className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px]"
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      background: "var(--lavender-600)",
-                      color: "var(--paper-0)",
-                      fontWeight: 700,
-                    }}
-                  >
-                    €
-                  </span>
-                  <span>
-                    <strong style={{ color: "var(--lavender-700)" }}>{item.k}</strong>
-                    <span style={{ color: "var(--fg-muted)" }}> · {item.v}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+              <span
+                className="shrink-0"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: "var(--ink-700)",
+                  width: "112px",
+                }}
+              >
+                ↳ {item.k}
+              </span>
+              <span
+                className="flex-1 text-[14px] sm:text-[15px]"
+                style={{
+                  fontFamily: "var(--font-source-serif), Georgia, serif",
+                  fontStyle: "italic",
+                  color: "var(--ink-700)",
+                  lineHeight: 1.5,
+                }}
+              >
+                « {item.v} »
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-          <CompoundingChart />
-        </div>
+      <div
+        className="relative min-h-[360px] md:min-h-full"
+        style={{ background: "var(--ink-700)" }}
+      >
+        <img
+          src={PHOTO_FLUID}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ display: "block" }}
+        />
       </div>
     </section>
   );
