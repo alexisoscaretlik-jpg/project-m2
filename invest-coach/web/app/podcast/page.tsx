@@ -11,22 +11,22 @@ export const metadata = {
 
 const BUCKET = "podcasts";
 
+// Hero painting (lilac × photo split right pane).
+const HERO_PAINTING =
+  "https://images.unsplash.com/photo-1618331833071-ce81bd50d300?auto=format&fit=crop&w=1600&q=85";
+
 // Cover photos curated by Oscar (Unsplash, free commercial license).
-// One per episode card — no repeats. Eight photos for up to eight cards.
+// Hero painting (above) is intentionally excluded so episode covers
+// never repeat the hero on the same page.
 const COVERS: string[] = [
-  "https://images.unsplash.com/photo-1618331833071-ce81bd50d300?auto=format&fit=crop&w=1200&q=85", // abstract painting blue/yellow
-  "https://images.unsplash.com/photo-1773332611514-238856b76198?auto=format&fit=crop&w=1200&q=85", // smartphone
-  "https://images.unsplash.com/photo-1762760081003-28ae8d6adbbb?auto=format&fit=crop&w=1200&q=85", // balcony
   "https://images.unsplash.com/photo-1776693836271-3c25955c90de?auto=format&fit=crop&w=1200&q=85", // sailboat
+  "https://images.unsplash.com/photo-1762760081003-28ae8d6adbbb?auto=format&fit=crop&w=1200&q=85", // balcony
+  "https://images.unsplash.com/photo-1773332611514-238856b76198?auto=format&fit=crop&w=1200&q=85", // smartphone
   "https://images.unsplash.com/photo-1774618683913-b8262a72fa53?auto=format&fit=crop&w=1200&q=85", // staircase
   "https://images.unsplash.com/photo-1764831685497-3095f33bada2?auto=format&fit=crop&w=1200&q=85", // orange tunnel
   "https://images.unsplash.com/photo-1776066361430-dd62847db7c6?auto=format&fit=crop&w=1200&q=85", // autumn truck
   "https://images.unsplash.com/photo-1777033481363-96640776ae62?auto=format&fit=crop&w=1200&q=85", // orange/black fluid
 ];
-
-// Hero painting (lilac × photo split right pane).
-const HERO_PAINTING =
-  "https://images.unsplash.com/photo-1618331833071-ce81bd50d300?auto=format&fit=crop&w=1600&q=85";
 
 // Spotify show URL — the creator's show on Spotify. We use the first
 // episode URL as a stand-in until a true show URL is available.
