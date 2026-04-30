@@ -495,7 +495,7 @@ function TrustStatsBar() {
       >
         {[
           { num: "Depuis 2024", label: "Newsletter du dimanche, sans interruption." },
-          { num: "8 articles", label: "Tous fact-checkés, mis à jour à chaque réforme." },
+          { num: "9 articles", label: "Tous fact-checkés, mis à jour à chaque réforme." },
           { num: "1 podcast", label: "Premier épisode sur Spotify · trois par mois à venir." },
         ].map((s) => (
           <div key={s.label} className="text-center md:text-left">
