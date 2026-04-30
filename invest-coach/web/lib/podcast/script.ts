@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import {
-  buildBabylonPrompt,
+  buildBabylonPromptParts,
   countScriptWords,
   qaCheckScript,
   type BabylonBrief,
@@ -11,6 +11,16 @@ import {
 // Generate the full 20-min French script from a brief.
 // Uses Claude Sonnet 4.6 — long-form French narrative + dialogue is its
 // strength, and 3,000-word output is well within max_tokens.
+//
+// Prompt is sent as TWO content blocks:
+//   1. Stable framework (cache_control: ephemeral) — ~1500 tokens, identical
+//      across episodes. Anthropic charges 10 % of input rate to read this
+//      from cache after the first call within the cache TTL window.
+//   2. Per-episode brief (no cache control) — ~500 tokens, varies every call.
+//
+// The cache TTL is 5 min (ephemeral default). The structural separation is
+// the real win: it pays off during iteration and when volume grows. At 1
+// episode/week the savings are pennies.
 
 const DEFAULT_MODEL = "claude-sonnet-4-6";
 const MAX_TOKENS = 16_000;
@@ -25,13 +35,28 @@ function client(): Anthropic {
 }
 
 export async function writeBabylonScript(brief: BabylonBrief): Promise<BabylonScript> {
-  const prompt = buildBabylonPrompt(brief);
+  const { stableFramework, episodeBrief } = buildBabylonPromptParts(brief);
 
   const model = process.env.ANTHROPIC_PODCAST_MODEL || DEFAULT_MODEL;
   const msg = await client().messages.create({
     model,
     max_tokens: MAX_TOKENS,
-    messages: [{ role: "user", content: prompt }],
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: stableFramework,
+            cache_control: { type: "ephemeral" },
+          },
+          {
+            type: "text",
+            text: episodeBrief,
+          },
+        ],
+      },
+    ],
   });
 
   const block = msg.content.find((b) => b.type === "text");

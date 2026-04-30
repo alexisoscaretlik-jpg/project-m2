@@ -82,10 +82,38 @@ export type BabylonScript = {
 };
 
 export function buildBabylonPrompt(brief: BabylonBrief): string {
-  const lawFr = LAW_FR[brief.law];
-  const c = brief.character;
+  const parts = buildBabylonPromptParts(brief);
+  return parts.stableFramework + "\n\n" + parts.episodeBrief;
+}
 
-  return `Tu écris un épisode de podcast français de 18 minutes pour Invest Coach.
+// Same prompt, split into a stable framework and a per-episode brief so the
+// caller can attach Anthropic prompt-cache control to the framework block.
+//
+// Caching math (sanity check, not a sales pitch):
+// - Stable framework  ≈ 1500 tokens
+// - Episode brief     ≈   500 tokens
+// - Output            ≈ 5000 tokens
+// At Sonnet 4.6 prices, prompt caching saves ~$0.004 / episode. At Opus 4.7
+// prices, ~$0.02 / episode. The real win is during iteration (multiple calls
+// within the 5-min ephemeral cache TTL while tuning a single episode), not
+// the weekly production cadence. Ship the structural separation anyway —
+// it costs ~nothing and pays off when (a) we iterate, (b) volume grows,
+// (c) we add other call sites that share the framework.
+export function buildBabylonPromptParts(brief: BabylonBrief): {
+  stableFramework: string;
+  episodeBrief: string;
+} {
+  return {
+    stableFramework: STABLE_FRAMEWORK,
+    episodeBrief: buildEpisodeBrief(brief),
+  };
+}
+
+// ───────────────────────── Stable framework ─────────────────────────
+// No template interpolation here on purpose. Anything that varies per
+// episode lives in `buildEpisodeBrief` below. If you find yourself adding
+// a `${...}` to this string, stop — you're breaking caching.
+const STABLE_FRAMEWORK = `Tu écris un épisode de podcast français de 18 minutes pour Invest Coach.
 
 # Format
 Conversation naturelle entre DEUX voix uniquement : Coach et Investisseur.
@@ -103,7 +131,7 @@ Il porte l'épisode. Il raconte les histoires (parables, exemples concrets, anec
 
 Style : phrases courtes, posées, beaucoup de pauses respirées. Tutoiement total. Calme, patient, jamais condescendant. Il enseigne par questions plutôt que par affirmations sèches.
 
-Il utilise un personnage fictif pour illustrer la leçon : ${c.name}, ${c.age} ans, ${c.city}. Situation : ${c.situation}. Il raconte SA réalité, SES choix, SES erreurs, comme on parlerait d'un voisin ou d'un collègue.
+Il utilise un personnage fictif pour illustrer la leçon — voir le BRIEF DE L'ÉPISODE ci-dessous pour son prénom, son âge, sa ville et sa situation. Il raconte SA réalité, SES choix, SES erreurs, comme on parlerait d'un voisin ou d'un collègue.
 
 # Investisseur — qui il est et comment il parle
 38 ans, salarié français ordinaire (CDI à Lille, loyer 850 €, fille en CP, RIB qui clignote rouge le 22 du mois). Il représente l'auditeur cible : un Français moyen avec un PEA à moitié rempli, une assurance-vie qu'il regarde rarement, et qui hésite sur le PER.
@@ -121,7 +149,7 @@ Ses questions sont celles que se pose un vrai Français devant ses placements :
 Tonalité : il dit "ouais", "attends, attends", il rit parfois, il doute. Il ne se laisse pas avoir par le jargon.
 
 # Cadre conceptuel (interne, jamais nommé à voix haute)
-La leçon de cet épisode : **${lawFr}**
+La leçon précise de cet épisode est définie dans le BRIEF DE L'ÉPISODE ci-dessous.
 
 Cette leçon vient d'un cadre de sept lois de l'argent, mais le cadre reste invisible. Le Coach enseigne le principe sans jamais le sourcer.
 
@@ -136,19 +164,6 @@ Aucune des chaînes suivantes ne doit apparaître dans le script :
 - "garanti", "sans risque", "doublez votre capital", "révolutionnaire"
 
 Si l'une de ces phrases apparaît, le script est rejeté.
-
-# Vidéo source (matière première — jamais citée à l'audio)
-URL : ${brief.sourceUrl}
-Créateur : ${brief.sourceCreator}
-Insights extraits :
-${brief.keyInsightBullets.map((b) => `- ${b}`).join("\n")}
-
-Utilise ces idées pour nourrir les exemples du Coach. Ne mentionne jamais la vidéo source ni son créateur dans le script.
-
-# Action concrète (vers la fin de l'épisode)
-${brief.targetAction}
-
-Le Coach énonce cette action en 2-3 phrases : précise, datée, mesurable. L'Investisseur la reformule dans ses propres mots pour confirmer qu'il a compris.
 
 # Crochet final pour le mois suivant (PAS un CTA)
 L'épisode finit par un crochet d'attente — pas par une demande d'abonnement.
@@ -170,9 +185,9 @@ Réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans préambule. S
 {
   "title": "Titre de l'épisode (max 70 caractères)",
   "summary": "Deux phrases : ce que l'épisode enseigne et pour qui.",
-  "law": "${brief.law}",
-  "character": ${JSON.stringify(brief.character)},
-  "source": { "url": "${brief.sourceUrl}", "creator": "${brief.sourceCreator}" },
+  "law": "<recopie la valeur 'law' du brief ci-dessous>",
+  "character": <recopie l'objet 'character' du brief ci-dessous>,
+  "source": <recopie l'objet 'source' du brief ci-dessous>,
   "lines": [
     { "speaker": "Coach", "text": "..." },
     { "speaker": "Investisseur", "text": "..." }
@@ -183,6 +198,41 @@ Réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans préambule. S
 "wordCount" doit être le total réel des mots du champ "text" sur toutes les lignes. Compte avant de répondre.
 
 Le ratio Coach/Investisseur doit être proche de 80/20 en mots. Vérifie avant de répondre.
+`;
+
+// ───────────────────────── Episode brief ─────────────────────────
+function buildEpisodeBrief(brief: BabylonBrief): string {
+  const lawFr = LAW_FR[brief.law];
+  const c = brief.character;
+
+  return `# BRIEF DE L'ÉPISODE
+
+## Personnage de l'histoire (cité par le Coach, jamais par l'Investisseur)
+- Prénom : ${c.name}
+- Âge : ${c.age}
+- Ville : ${c.city}
+- Situation : ${c.situation}
+
+## Loi de l'argent enseignée
+${lawFr}
+
+## Vidéo source (matière première — jamais citée à l'audio)
+- URL : ${brief.sourceUrl}
+- Créateur : ${brief.sourceCreator}
+- Insights extraits :
+${brief.keyInsightBullets.map((b) => `- ${b}`).join("\n")}
+
+Utilise ces idées pour nourrir les exemples du Coach. Ne mentionne jamais la vidéo source ni son créateur dans le script.
+
+## Action concrète (vers la fin de l'épisode)
+${brief.targetAction}
+
+Le Coach énonce cette action en 2-3 phrases : précise, datée, mesurable. L'Investisseur la reformule dans ses propres mots pour confirmer qu'il a compris.
+
+## Valeurs JSON exactes à utiliser dans la sortie
+- "law" → "${brief.law}"
+- "character" → ${JSON.stringify(brief.character)}
+- "source" → { "url": "${brief.sourceUrl}", "creator": "${brief.sourceCreator}" }
 `;
 }
 
