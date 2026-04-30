@@ -42,10 +42,10 @@ export default async function DiagnosticPage() {
       >
         <span className="ic-eyebrow-mono">Diagnostic</span>
         <h1 id="diagnostic-mark" className="mt-5">
-          <span className="ic-mega" style={{ fontSize: "clamp(56px, 13vw, 200px)" }}>
+          <span className="ic-mega" style={{ fontSize: "clamp(42px, 10vw, 152px)" }}>
             CINQ QUESTIONS
           </span>
-          <span className="ic-mega" style={{ fontSize: "clamp(56px, 13vw, 200px)" }}>
+          <span className="ic-mega" style={{ fontSize: "clamp(42px, 10vw, 152px)" }}>
             DEUX MINUTES
           </span>
         </h1>
