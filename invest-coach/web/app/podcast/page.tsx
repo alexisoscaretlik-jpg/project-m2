@@ -222,7 +222,7 @@ export default async function PodcastIndexPage({
 
           {episodes.length === 0 ? (
             <div
-              className="ic-block-cream"
+              className="ic-block-rose"
               style={{
                 border: "1px solid var(--ink-700)",
                 padding: "32px 28px",
@@ -311,8 +311,8 @@ export default async function PodcastIndexPage({
         </div>
       </section>
 
-      {/* Row 5 — cream prose block with editorial drop-cap. */}
-      <section className="ic-block-cream px-6 py-20 sm:px-8">
+      {/* Row 5 — rose prose block with editorial drop-cap (echoes homepage hero). */}
+      <section className="ic-block-rose px-6 py-20 sm:px-8">
         <div className="mx-auto" style={{ maxWidth: "720px" }}>
           <span className="ic-eyebrow-mono">Comment on choisit la vidéo</span>
           <h3
