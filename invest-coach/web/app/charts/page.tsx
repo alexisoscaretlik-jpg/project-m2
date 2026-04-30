@@ -43,10 +43,12 @@ const CATEGORIES: {
   { slug: "autre", label: "Autres", blurb: "Tout ce qui ne rentre pas ailleurs" },
 ];
 
-const DIRECTION_COLOR: Record<string, string> = {
-  bullish: "var(--forest-600)",
-  bearish: "var(--terracotta-500)",
-  neutral: "var(--ink-400)",
+// Palette C only — pink + lilac + peach + ink. Direction is signalled
+// through pastel background, not green/red. Border + text stay ink.
+const DIRECTION_BG: Record<string, string> = {
+  bullish: "var(--terracotta-100)", // peach
+  bearish: "var(--rose-100)",       // pink
+  neutral: "transparent",
 };
 
 const DIRECTION_LABEL: Record<string, string> = {
@@ -103,9 +105,9 @@ export default async function ChartsIndexPage() {
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/charts" />
 
-      {/* Row 1 — cream pastel hero with mega wordmark stack. */}
+      {/* Row 1 — peach pastel hero with mega wordmark stack. */}
       <section
-        className="ic-block-cream px-6 pt-12 pb-8 sm:px-8 sm:pt-16 sm:pb-12"
+        className="ic-block-peach px-6 pt-12 pb-8 sm:px-8 sm:pt-16 sm:pb-12"
         style={{ borderBottom: "1px solid var(--ink-700)" }}
         aria-labelledby="charts-mark"
       >
@@ -209,7 +211,7 @@ export default async function ChartsIndexPage() {
         <div className="mx-auto" style={{ maxWidth: "1280px" }}>
           {latest.length === 0 ? (
             <div
-              className="ic-block-cream"
+              className="ic-block-peach"
               style={{
                 border: "1px solid var(--ink-700)",
                 padding: "32px 28px",
@@ -290,8 +292,9 @@ export default async function ChartsIndexPage() {
                                       letterSpacing: "0.12em",
                                       textTransform: "uppercase",
                                       padding: "4px 10px",
-                                      border: `1px solid ${DIRECTION_COLOR[a.direction]}`,
-                                      color: DIRECTION_COLOR[a.direction],
+                                      border: "1px solid var(--ink-700)",
+                                      color: "var(--ink-700)",
+                                      background: DIRECTION_BG[a.direction],
                                     }}
                                   >
                                     {DIRECTION_LABEL[a.direction]}
@@ -348,7 +351,7 @@ export default async function ChartsIndexPage() {
       </section>
 
       {/* Row 5 — disclaimer strip. */}
-      <p className="ic-strip" style={{ background: "var(--paper-100)" }}>
+      <p className="ic-strip">
         Pas un conseil en investissement personnalisé · Lecture éducative · L&apos;analyse originale appartient à @great_martis
       </p>
 
