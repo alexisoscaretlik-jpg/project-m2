@@ -83,7 +83,7 @@ const svg = `<?xml version="1.0" encoding="UTF-8"?>
     <text x="0" y="0"
           font-family="'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif"
           font-weight="400" font-size="18"
-          fill="rgba(255,255,255,0.55)">Newsletter du dimanche · podcast hebdo · 8 articles fact-checkés</text>
+          fill="rgba(255,255,255,0.55)">Newsletter du dimanche · podcast hebdo · 9 articles fact-checkés</text>
   </g>
 </svg>`;
 

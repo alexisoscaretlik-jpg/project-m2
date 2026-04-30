@@ -9,6 +9,221 @@ export type Article = {
 
 export const ARTICLES: Article[] = [
   {
+    slug: "pfu-30-vs-bareme-progressif",
+    title: "PFU 30 % ou barème progressif : faut-il vraiment cocher la case ?",
+    teaser:
+      "Une seule case sur ta 2042 (la 2OP) peut te faire gagner ou perdre quelques centaines d'euros chaque année. La règle est simple : ça dépend de ta TMI et de tes revenus du capital. Voici comment trancher en 5 minutes.",
+    readMinutes: 6,
+    updated: "2026-04-30",
+    body: `## Le résumé en 30 secondes
+
+Par défaut, tes **revenus du capital** (dividendes, intérêts,
+plus-values mobilières) sont taxés au **PFU à 30 %** : 12,8 % d'IR +
+17,2 % de prélèvements sociaux.
+
+Tu peux **opter pour le barème progressif** en cochant la **case 2OP**
+sur ta déclaration 2042. Cette option s'applique alors à **tous** tes
+revenus du capital de l'année — c'est tout ou rien.
+
+La règle de pouce :
+
+- **TMI 0 % ou 11 %** → barème progressif gagne (presque toujours).
+- **TMI 30 % et plus** → PFU gagne (toujours).
+- **TMI 11 % avec gros dividendes** → cas par cas, à calculer.
+
+Trois minutes de simulation peuvent te faire économiser 100 à 800 €.
+
+## Ce que recouvre vraiment "revenus du capital"
+
+L'option 2OP couvre **tous** ces revenus, simultanément :
+
+- **Intérêts** : Livret A non concerné (déjà exonéré), mais comptes à
+  terme, livrets bancaires fiscalisés, obligations, fonds euros d'AV
+  retirés avant 8 ans.
+- **Dividendes** : actions françaises et étrangères en CTO. PEA non
+  concerné (exonération propre après 5 ans).
+- **Plus-values mobilières** : ventes d'actions, ETF, OPCVM en CTO.
+- **Crypto** : depuis 2023, les plus-values crypto suivent le PFU
+  par défaut, mais sont aussi concernées par l'option 2OP.
+
+## La case 2OP — où exactement
+
+Sur la déclaration 2042 papier ou en ligne, formulaire principal :
+
+- Ligne **2OP** : "Vous optez pour l'imposition au barème progressif
+  des revenus de capitaux mobiliers et plus-values."
+- Coche la case si tu choisis le barème · laisse vide pour rester au
+  PFU (le défaut).
+
+L'option est **annuelle** — tu peux cocher une année, ne pas cocher
+l'année suivante. Pas d'engagement.
+
+## Quand le barème gagne (TMI 0 % et 11 %)
+
+### TMI 0 % (revenu imposable < 11 497 € en 2026)
+
+Tu ne paies **pas d'impôt sur le revenu** quoi qu'il arrive. Donc :
+
+- **PFU** : 12,8 % IR + 17,2 % PS = **30 %**.
+- **Barème** : 0 % IR + 17,2 % PS = **17,2 %**.
+
+L'écart est mécanique : tu économises **12,8 %** sur tous tes revenus
+du capital. Pour 2 000 € d'intérêts annuels, c'est 256 €. Toujours
+cocher la 2OP.
+
+### TMI 11 % (revenu imposable 11 497 € à 29 315 €)
+
+Le calcul devient subtil à cause de **l'abattement 40 % sur les
+dividendes** au barème :
+
+- **PFU sur 5 000 € de dividendes** : 30 % × 5 000 = **1 500 €**.
+- **Barème sur 5 000 € de dividendes** :
+  - 40 % d'abattement → base imposable 3 000 €
+  - 11 % d'IR sur 3 000 € = 330 €
+  - 17,2 % PS sur 5 000 € = 860 €
+  - CSG déductible 6,8 % sur 5 000 € = 340 € (réduit ton IR de
+    l'année suivante)
+  - Total net réel : ~**1 153 €**
+
+Économie : **347 €**. Le barème gagne sur les dividendes même à
+TMI 11 %.
+
+Mais attention : si tu as aussi **3 000 € d'intérêts** (sans abattement
+40 %) :
+
+- **PFU sur 3 000 €** : 900 €.
+- **Barème sur 3 000 €** : 11 % IR + 17,2 % PS = 28,2 % = 846 €.
+
+Économie marginale : 54 €. À TMI 11 %, le barème reste légèrement
+gagnant sur les intérêts purs, mais la marge est mince.
+
+### TMI 11 %, plus-values uniquement
+
+Pas d'abattement 40 % sur les plus-values · barème 11 % vs PFU 12,8 %
+sur l'IR · économie ~1,8 %. Pour 5 000 € de plus-values, ça fait 90 €.
+Rentable mais peu.
+
+## Quand le PFU gagne (TMI 30 % et plus)
+
+Au barème, à TMI 30 % : 30 % IR + 17,2 % PS = **47,2 %** sur les
+intérêts et plus-values, ou **40,3 %** sur les dividendes (avec
+abattement 40 %).
+
+Le PFU à **30 %** plafonne ta charge fiscale. Au-delà de TMI 30 %, le
+PFU bat **systématiquement** le barème, peu importe la composition
+des revenus du capital.
+
+Vérifié : **TMI 30, 41 ou 45 % → ne coche jamais la 2OP**.
+
+## Le piège du tout-ou-rien
+
+L'option 2OP s'applique à **tous** tes revenus du capital de l'année.
+Tu ne peux pas dire "barème pour mes dividendes, PFU pour mes
+plus-values". C'est tout, ou rien.
+
+Conséquence pratique : si tu as à la fois des dividendes (où le barème
+gagne grâce à l'abattement 40 %) et de gros intérêts (où le PFU
+plafonne mieux), il faut **simuler les deux scénarios** sur impots.gouv
+avant de cocher.
+
+L'outil de simulation officiel est dispo dans ton espace particulier
+sur impots.gouv → "Simulateur" → tu peux comparer les deux options en
+2 clics.
+
+## Le cas des plus-values long terme (avant 2018)
+
+Si tu vends en 2026 des titres que tu détenais **avant le
+1ᵉʳ janvier 2018**, tu peux bénéficier d'un **abattement pour durée
+de détention** au barème — uniquement :
+
+- 50 % d'abattement après 2 ans
+- 65 % d'abattement après 8 ans
+
+Cet abattement n'existe **pas au PFU**. Pour ces plus-values
+spécifiques, le barème peut largement gagner même à TMI 30 %. Cas rare
+mais à vérifier si tu liquides un vieux portefeuille CTO.
+
+## Trois exemples concrets
+
+### Émilie, 28 ans, infirmière, TMI 11 %
+
+- 1 200 € d'intérêts (compte à terme)
+- 600 € de dividendes (CTO Boursorama)
+- Pas de plus-value cette année
+
+**PFU** : (1 200 + 600) × 30 % = **540 €**.
+**Barème (case 2OP cochée)** :
+- Intérêts : 1 200 × 28,2 % = 338 €
+- Dividendes : 600 × (1 − 40 %) × 28,2 % + 600 × 17,2 % × pas de 40 %
+  → ~163 €
+- Total : ~**501 €**.
+
+Économie : **39 €**. Coche la 2OP.
+
+### Pierre, 38 ans, cadre Lyon, TMI 30 %
+
+- 5 500 € d'intérêts (fonds euros AV retirés)
+- 3 200 € de dividendes (CTO)
+- 2 800 € de plus-values mobilières
+
+**PFU** : (5 500 + 3 200 + 2 800) × 30 % = **3 450 €**.
+**Barème** :
+- Intérêts : 5 500 × 47,2 % = 2 596 €
+- Dividendes : 3 200 × 60 % × 47,2 % + 3 200 × 17,2 % × 0,4 = ~1 457 €
+- Plus-values : 2 800 × 47,2 % = 1 322 €
+- Total : ~**5 375 €**.
+
+Le PFU gagne de **1 925 €**. Ne coche jamais la 2OP.
+
+### Sylvie, 62 ans, retraitée, TMI 0 %
+
+- 8 000 € d'intérêts (livrets fiscalisés)
+- 1 500 € de dividendes
+
+**PFU** : (8 000 + 1 500) × 30 % = **2 850 €**.
+**Barème** :
+- Intérêts : 8 000 × 17,2 % = 1 376 €
+- Dividendes : 1 500 × 17,2 % (pas d'IR à TMI 0) = 258 €
+- Total : **1 634 €**.
+
+Économie : **1 216 €**. Toujours cocher la 2OP à la retraite.
+
+## Les pièges à éviter
+
+- **Cocher la 2OP à TMI 30 %** par confusion. Erreur courante,
+  perte 5 à 30 % du revenu du capital.
+- **Oublier que le PEA et l'AV après abattements** ne sont pas
+  concernés — tes gains PEA après 5 ans restent à 17,2 % PS quoi qu'il
+  arrive.
+- **Décocher la 2OP une année avec gros dividendes**, l'oublier
+  l'année suivante avec gros intérêts. Refais la simulation chaque
+  année — ce n'est pas "set and forget".
+- **Confondre PFU et flat tax**. Identique. Vocabulaire variable
+  selon les sources.
+- **Croire que la CSG déductible ne sert à rien**. Si tu choisis le
+  barème, 6,8 % de la CSG sur les revenus du capital est déductible
+  de ton revenu imposable de l'année **suivante**. Ça réduit ta TMI
+  marginale future de quelques dizaines d'euros.
+
+## Le mot de la fin
+
+Une seule case, cochée ou non, peut faire bouger ta facture fiscale
+de **100 à 1 500 €** par an. C'est probablement la décision fiscale
+**la plus rentable par minute investie** que tu prendras dans l'année.
+
+Trois questions, dans l'ordre, pour décider :
+
+1. **Quelle est ma TMI cette année ?** Si 30 %+, fini, ne coche pas.
+2. **Si TMI 0 ou 11 %, ai-je des dividendes ou plus-values long
+   terme à abattement ?** Si oui, coche.
+3. **Si TMI 11 % avec uniquement intérêts, l'écart vaut-il les 5
+   minutes de simulation ?** Si tu as plus de 1 500 € d'intérêts,
+   oui. Sinon, le PFU par défaut suffit.
+
+Trois minutes en mai. Un gain potentiel de plusieurs centaines
+d'euros. Le ratio temps/euro est imbattable.`,
+  },
+  {
     slug: "or-vs-sp500-etf",
     title: "Or ou ETF S&P 500 ? La vraie question, c'est combien de chaque.",
     teaser:
