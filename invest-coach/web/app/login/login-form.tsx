@@ -33,48 +33,61 @@ export function LoginForm({ next }: { next: string }) {
 
   return (
     <form onSubmit={onSubmit} className="space-y-3">
+      <label
+        htmlFor="login-email"
+        className="block"
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: "11px",
+          fontWeight: 700,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          color: "var(--ink-700)",
+        }}
+      >
+        ↳ Ton e-mail
+      </label>
       <input
+        id="login-email"
         type="email"
         required
         autoFocus
         placeholder="ton@email.fr"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full rounded-full focus:outline-none"
+        className="w-full focus:outline-none"
         style={{
           fontFamily: "var(--font-display)",
           background: "var(--paper-0)",
           color: "var(--ink-700)",
-          border: "1px solid var(--paper-300)",
-          padding: "14px 20px",
-          fontSize: "15px",
-          boxShadow: "var(--sh-sm)",
+          border: "1px solid var(--ink-700)",
+          borderRadius: 0,
+          padding: "16px 20px",
+          fontSize: "16px",
         }}
       />
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-full font-semibold transition-all hover:translate-y-[-1px] hover:shadow-md disabled:opacity-60"
-        style={{
-          fontFamily: "var(--font-display)",
-          background: "var(--ink-700)",
-          color: "var(--paper-0)",
-          padding: "14px 20px",
-          fontSize: "15px",
-          letterSpacing: "-0.005em",
-        }}
+        className="ic-btn-block w-full"
+        style={{ padding: "16px 20px", fontSize: "12px" }}
       >
-        {pending ? "Envoi…" : "Recevoir le lien magique"}
+        {pending ? "↳ Envoi…" : "↳ Recevoir le lien magique"}
       </button>
       {error ? (
         <p
-          className="mt-2 text-[13px]"
+          className="mt-3 text-[12px]"
           style={{
-            fontFamily: "var(--font-display)",
-            color: "var(--terracotta-500)",
+            fontFamily: "var(--font-mono)",
+            color: "var(--ink-700)",
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            background: "var(--rose-100)",
+            border: "1px solid var(--ink-700)",
+            padding: "10px 14px",
           }}
         >
-          {error}
+          ↳ {error}
         </p>
       ) : null}
     </form>
