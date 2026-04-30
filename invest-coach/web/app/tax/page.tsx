@@ -354,6 +354,9 @@ export default function TaxLandingPage() {
             <Link href="/tax/levers" className="ic-btn-block">
               ↳ Voir les 14 leviers du catalogue
             </Link>
+            <Link href="/distributeurs" className="ic-btn-block-light">
+              ↳ Où souscrire
+            </Link>
             <p
               className="text-[11px]"
               style={{
