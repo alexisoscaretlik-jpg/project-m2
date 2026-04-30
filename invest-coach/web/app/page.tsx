@@ -176,7 +176,6 @@ function Landing() {
       <ProductPreviewGrid />
       <SavingsEqualsEarningsSection />
       <IntegrationsSection />
-      <PhilosophySection />
       <PricingTable />
       <TrustStatsBar />
       <Footer />
