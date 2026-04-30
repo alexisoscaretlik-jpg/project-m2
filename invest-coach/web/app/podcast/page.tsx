@@ -1,8 +1,7 @@
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
-import { SpotifyEpisodeList } from "@/components/spotify-episode-card";
-import { EpisodePlayer } from "@/components/episode-player";
 import { serviceClient } from "@/lib/supabase/service";
+import { SPOTIFY_EPISODES } from "@/lib/podcast/spotify-episodes";
 
 export const metadata = {
   title: "Argent · Podcast — Invest Coach",
@@ -12,12 +11,29 @@ export const metadata = {
 
 const BUCKET = "podcasts";
 
-// Cover photos rotated through episode cards. Both supplied by Oscar
-// (Unsplash, free commercial license — see plan/photo style guide).
-const COVER_BLUE_YELLOW =
-  "https://images.unsplash.com/photo-1618331833071-ce81bd50d300?auto=format&fit=crop&w=1200&q=80";
-const COVER_SMARTPHONE =
-  "https://images.unsplash.com/photo-1773332611514-238856b76198?auto=format&fit=crop&w=1200&q=80";
+// Cover photos curated by Oscar (Unsplash, free commercial license).
+// One per episode card — no repeats. Eight photos for up to eight cards.
+const COVERS: string[] = [
+  "https://images.unsplash.com/photo-1618331833071-ce81bd50d300?auto=format&fit=crop&w=1200&q=85", // abstract painting blue/yellow
+  "https://images.unsplash.com/photo-1773332611514-238856b76198?auto=format&fit=crop&w=1200&q=85", // smartphone
+  "https://images.unsplash.com/photo-1762760081003-28ae8d6adbbb?auto=format&fit=crop&w=1200&q=85", // balcony
+  "https://images.unsplash.com/photo-1776693836271-3c25955c90de?auto=format&fit=crop&w=1200&q=85", // sailboat
+  "https://images.unsplash.com/photo-1774618683913-b8262a72fa53?auto=format&fit=crop&w=1200&q=85", // staircase
+  "https://images.unsplash.com/photo-1764831685497-3095f33bada2?auto=format&fit=crop&w=1200&q=85", // orange tunnel
+  "https://images.unsplash.com/photo-1776066361430-dd62847db7c6?auto=format&fit=crop&w=1200&q=85", // autumn truck
+  "https://images.unsplash.com/photo-1777033481363-96640776ae62?auto=format&fit=crop&w=1200&q=85", // orange/black fluid
+];
+
+// Hero painting (lilac × photo split right pane).
+const HERO_PAINTING =
+  "https://images.unsplash.com/photo-1618331833071-ce81bd50d300?auto=format&fit=crop&w=1600&q=85";
+
+// Spotify show URL — the creator's show on Spotify. We use the first
+// episode URL as a stand-in until a true show URL is available.
+const SPOTIFY_SHOW_URL =
+  SPOTIFY_EPISODES.length > 0
+    ? `https://open.spotify.com/episode/${SPOTIFY_EPISODES[0].id}`
+    : "https://open.spotify.com";
 
 type EpisodeMeta = {
   title: string;
@@ -82,19 +98,58 @@ async function listEpisodes(): Promise<Episode[]> {
   }
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
 function formatDateMono(iso: string) {
   const d = new Date(iso);
   const months = ["JAN", "FÉV", "MAR", "AVR", "MAI", "JUI", "JUL", "AOÛ", "SEP", "OCT", "NOV", "DÉC"];
   return `${months[d.getMonth()]} ${d.getDate()} · ${d.getFullYear()}`;
 }
+
+// Match a Supabase episode slug to its Spotify ID, if published.
+function spotifyIdFor(slug: string): string | null {
+  const hit = SPOTIFY_EPISODES.find((s) => s.slug === slug);
+  return hit?.id ?? null;
+}
+
+// Mock episodes used as fallback when Supabase env isn't configured
+// (dev preview). Mirrors the real schema so the layout fills in.
+const MOCK_EPISODES: Episode[] = [
+  {
+    slug: "trois-regles-d-argent-qui-changent-tout",
+    date: "2026-04-28",
+    audioUrl: "",
+    meta: {
+      title: "Trois règles d'argent qui changent tout",
+      summary:
+        "Coach et Investisseur partent du moment où le RIB clignote rouge le 22 du mois pour démonter le piège de l'épargne sans méthode. Une seule action concrète à la fin pour reprendre la main sur ton revenu en 2026.",
+      law: "Pay yourself first",
+      character: { name: "Camille", age: 34, city: "Lyon", situation: "Salariée" },
+    },
+  },
+  {
+    slug: "le-vrai-levier-c-est-la-valeur",
+    date: "2026-04-21",
+    audioUrl: "",
+    meta: {
+      title: "Le vrai levier n'est pas d'épargner, c'est de monter en valeur",
+      summary:
+        "Pour un cadre français qui sent que son argent dort, l'épisode démonte le piège de la course à l'épargne sans valeur ajoutée. Camille et Thomas montent un plan 90 jours : avant de faire travailler ton argent, fais travailler ta valeur sur le marché.",
+      law: "Skill compounding",
+      character: { name: "Thomas", age: 38, city: "Paris", situation: "Cadre" },
+    },
+  },
+  {
+    slug: "arreter-de-disperser-chaque-euro",
+    date: "2026-04-14",
+    audioUrl: "",
+    meta: {
+      title: "Arrêter de disperser chaque euro",
+      summary:
+        "Thomas, marketing, coloc dans le 11e, a 4 200 € qui dorment sur son compte courant depuis deux ans. Camille lui montre que ces 4 200 € en valent déjà 3 700, et lui dépose trois règles à appliquer lundi matin.",
+      law: "Cash is melting ice",
+      character: { name: "Thomas", age: 29, city: "Paris", situation: "Marketing" },
+    },
+  },
+];
 
 export default async function PodcastIndexPage({
   searchParams,
@@ -103,10 +158,13 @@ export default async function PodcastIndexPage({
 }) {
   const params = (await searchParams) ?? {};
   const themeFilter = params.theme;
-  const all = await listEpisodes();
+  const live = await listEpisodes();
+  // Use real episodes if Supabase has data; otherwise fall back to
+  // mock copy so the page is never empty during a prototype review.
+  const sourceEpisodes = live.length > 0 ? live : MOCK_EPISODES;
   const episodes = themeFilter
-    ? all.filter((e) => (e.meta.theme ?? "money") === themeFilter)
-    : all;
+    ? sourceEpisodes.filter((e) => (e.meta.theme ?? "money") === themeFilter)
+    : sourceEpisodes;
 
   return (
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
@@ -165,12 +223,12 @@ export default async function PodcastIndexPage({
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <a
-              href="https://open.spotify.com/show/"
+              href={SPOTIFY_SHOW_URL}
               target="_blank"
               rel="noreferrer"
               className="ic-btn-block"
             >
-              ↳ S&apos;abonner sur Spotify
+              ↳ Écouter sur Spotify
             </a>
             <p
               className="text-[11px]"
@@ -188,7 +246,7 @@ export default async function PodcastIndexPage({
 
         <div className="relative min-h-[260px] md:min-h-[520px]">
           <img
-            src={COVER_BLUE_YELLOW}
+            src={HERO_PAINTING}
             alt=""
             aria-hidden="true"
             className="absolute inset-0 h-full w-full object-cover"
@@ -197,7 +255,9 @@ export default async function PodcastIndexPage({
         </div>
       </div>
 
-      {/* Row 4 — Spotify embeds (curated) + episode cards (.ic-edcard grid). */}
+      {/* Row 4 — episode cards (.ic-edcard grid) with Spotify embeds.
+          Each card has a unique cover photo and an embedded Spotify
+          player when an ID is available. */}
       <section className="px-6 py-16 sm:px-8" style={{ borderBottom: "1px solid var(--ink-700)" }}>
         <div className="mx-auto" style={{ maxWidth: "1280px" }}>
           <div className="mb-8 flex items-baseline justify-between gap-4">
@@ -213,11 +273,6 @@ export default async function PodcastIndexPage({
             >
               {episodes.length} {episodes.length > 1 ? "épisodes" : "épisode"}
             </span>
-          </div>
-
-          {/* Curated Spotify episodes (renders nothing if list is empty). */}
-          <div className="mb-12">
-            <SpotifyEpisodeList />
           </div>
 
           {episodes.length === 0 ? (
@@ -246,7 +301,11 @@ export default async function PodcastIndexPage({
             <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {episodes.map((ep, idx) => {
                 const epNumber = String(episodes.length - idx).padStart(2, "0");
-                const cover = idx % 2 === 0 ? COVER_BLUE_YELLOW : COVER_SMARTPHONE;
+                const cover = COVERS[idx % COVERS.length];
+                const sid = spotifyIdFor(ep.slug);
+                const episodeUrl = sid
+                  ? `https://open.spotify.com/episode/${sid}`
+                  : SPOTIFY_SHOW_URL;
                 return (
                   <li key={ep.slug}>
                     <article className="ic-edcard h-full">
@@ -275,6 +334,7 @@ export default async function PodcastIndexPage({
                             letterSpacing: "-0.02em",
                             lineHeight: 1.2,
                             color: "var(--ink-700)",
+                            textTransform: "uppercase",
                           }}
                         >
                           {ep.meta.title}
@@ -282,25 +342,39 @@ export default async function PodcastIndexPage({
                         <p
                           className="flex-1 text-[14px]"
                           style={{
-                            fontFamily: "var(--font-display)",
-                            color: "var(--fg-muted)",
+                            fontFamily: "var(--font-source-serif), Georgia, serif",
+                            fontStyle: "italic",
+                            color: "var(--ink-700)",
                             lineHeight: 1.55,
                           }}
                         >
-                          {ep.meta.summary}
+                          « {ep.meta.summary} »
                         </p>
-                        <EpisodePlayer src={ep.audioUrl} />
-                        <p
-                          className="text-[10px]"
-                          style={{
-                            fontFamily: "var(--font-mono)",
-                            color: "var(--fg-subtle)",
-                            letterSpacing: "0.08em",
-                            textTransform: "uppercase",
-                          }}
-                        >
-                          Coaching IA · pas un conseil personnalisé
-                        </p>
+                        {sid ? (
+                          <iframe
+                            title={ep.meta.title}
+                            src={`https://open.spotify.com/embed/episode/${sid}?utm_source=generator&theme=0`}
+                            width="100%"
+                            height="152"
+                            frameBorder="0"
+                            loading="lazy"
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            style={{
+                              borderRadius: "0",
+                              border: "1px solid var(--ink-700)",
+                              display: "block",
+                            }}
+                          />
+                        ) : (
+                          <a
+                            href={episodeUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="ic-btn-block w-full"
+                          >
+                            ↳ Bientôt sur Spotify
+                          </a>
+                        )}
                       </div>
                     </article>
                   </li>
