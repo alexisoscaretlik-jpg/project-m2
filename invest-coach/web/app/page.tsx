@@ -217,15 +217,8 @@ function HowItWorksSection() {
   return (
     <section className="mx-auto px-6 py-24 sm:px-8" style={{ maxWidth: "1080px" }}>
       <div className="mb-14 text-center">
-        <div
-          className="mb-3 text-[12px] font-semibold uppercase"
-          style={{
-            fontFamily: "var(--font-display)",
-            color: "var(--lavender-700)",
-            letterSpacing: "0.16em",
-          }}
-        >
-          Comment ça marche
+        <div className="mb-3 flex justify-center">
+          <span className="ic-eyebrow-mono">Comment ça marche</span>
         </div>
         <h2 className="ic-h1 mx-auto" style={{ maxWidth: "640px" }}>
           Trois étapes. <em>Quinze minutes au total.</em>
@@ -559,15 +552,8 @@ function IntegrationsSection() {
   return (
     <section className="mx-auto px-6 py-20 sm:px-8" style={{ maxWidth: "1080px" }}>
       <div className="mb-10 text-center">
-        <div
-          className="mb-3 text-[12px] font-semibold uppercase"
-          style={{
-            fontFamily: "var(--font-display)",
-            color: "var(--lavender-700)",
-            letterSpacing: "0.16em",
-          }}
-        >
-          Compatible avec ton écosystème
+        <div className="mb-3 flex justify-center">
+          <span className="ic-eyebrow-mono">Compatible avec ton écosystème</span>
         </div>
         <h2
           className="mx-auto text-[28px] font-bold sm:text-[32px]"
@@ -635,122 +621,82 @@ function IntegrationsSection() {
 }
 
 function HeroSection() {
-  // White & Case-style full-bleed atmospheric hero.
-  // Real photography (Unsplash CDN, free commercial use) layered behind a
-  // dark gradient that ensures headline contrast and fades to lavender at
-  // the bottom for a smooth transition into the next (light) section.
-  // Solid `--ink-700` is the ultimate fallback if the hotlink ever dies.
+  // Innostart-style brutalist hero: pink mega wordmark, mono tagline strip,
+  // lilac × photo split block. Replaces the prior atmospheric-mountain hero.
   return (
-    <section
-      className="relative overflow-hidden"
-      style={{
-        background: "var(--ink-700)",
-      }}
-    >
-      {/* Photo layer — calm misty mountains. */}
-      <img
-        src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2000&q=85"
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover"
-        style={{ display: "block" }}
-      />
-      {/* Dark + lavender-fade overlay for text contrast and bottom transition. */}
+    <section aria-labelledby="hero-mark">
+      {/* Row 1 — pink pastel block with mega wordmark stacked on two lines. */}
       <div
-        aria-hidden="true"
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(20,16,40,0.78) 0%, rgba(20,16,40,0.62) 55%, rgba(245,243,255,0.92) 92%, var(--paper-50) 100%)",
-        }}
-      />
-
-      <div
-        className="relative mx-auto px-6 pt-20 pb-32 text-center sm:px-8 sm:pt-32 sm:pb-44"
-        style={{ maxWidth: "880px" }}
+        className="ic-block-rose px-6 pt-10 pb-6 sm:px-8 sm:pt-14 sm:pb-10"
+        style={{ borderBottom: "1px solid var(--ink-700)" }}
       >
-        <div className="mb-6 flex justify-center">
+        <h1 id="hero-mark" className="text-center">
+          <span className="ic-mega">INVEST</span>
+          <span className="ic-mega">COACH</span>
+        </h1>
+      </div>
+
+      {/* Row 2 — mono tagline strip (between hard hairlines). */}
+      <p className="ic-strip">
+        Arrête de tâtonner. Pilote ton épargne en français · PEA · AV · PER · IR
+      </p>
+
+      {/* Row 3 — lilac column × photo column split, with newsletter CTA inside lilac. */}
+      <div className="grid md:grid-cols-2" style={{ borderBottom: "1px solid var(--ink-700)" }}>
+        <div
+          className="ic-block-lilac flex min-h-[460px] flex-col justify-between px-6 py-12 sm:px-10 sm:py-16 md:min-h-[560px]"
+          style={{ borderRight: "1px solid var(--ink-700)" }}
+        >
+          <div>
+            <span className="ic-eyebrow-mono mb-6 inline-flex">Prends le cap</span>
+            <h2 className="ic-bigsection mb-6">
+              Maîtrise<br />tes impôts.
+            </h2>
+            <p
+              className="max-w-[420px] text-[16px]"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--ink-700)",
+                lineHeight: 1.55,
+              }}
+            >
+              Tu paies un impôt français, mais tes ETF sont mondiaux. On
+              t&apos;apprend à voir les deux — et à les piloter ensemble.
+              Économiser de l&apos;impôt, c&apos;est gagner de l&apos;argent.
+            </p>
+          </div>
+
+          <div className="mt-10 flex flex-col gap-5">
+            <SubscribeForm source="landing-hero" />
+            <p
+              className="text-[11px]"
+              style={{
+                fontFamily: "var(--font-mono)",
+                color: "var(--ink-700)",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
+            >
+              Chaque dimanche depuis 2024 · Sans publicité · Désabo en un clic
+            </p>
+          </div>
+        </div>
+
+        <div className="relative min-h-[300px] md:min-h-[560px]">
+          <img
+            src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=85"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ display: "block" }}
+          />
           <Link
             href="/podcast"
-            className="group inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12px] backdrop-blur transition-colors"
-            style={{
-              fontFamily: "var(--font-display)",
-              background: "rgba(245,243,255,0.10)",
-              border: "1px solid rgba(245,243,255,0.25)",
-              color: "var(--paper-0)",
-            }}
+            className="absolute bottom-6 left-6 ic-btn-block backdrop-blur-sm"
+            style={{ background: "rgba(10,10,10,0.85)" }}
           >
-            <span
-              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase"
-              style={{
-                background: "var(--lavender-500)",
-                color: "var(--paper-0)",
-                letterSpacing: "0.06em",
-              }}
-            >
-              Nouveau
-            </span>
-            <span>Premier épisode du podcast est sorti</span>
-            <span
-              className="transition-transform group-hover:translate-x-0.5"
-              style={{ color: "var(--lavender-200)" }}
-              aria-hidden="true"
-            >
-              →
-            </span>
+            ↳ Premier épisode du podcast
           </Link>
-        </div>
-        <div className="mb-8 flex justify-center">
-          <span
-            className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12px] backdrop-blur"
-            style={{
-              fontFamily: "var(--font-display)",
-              background: "rgba(245,243,255,0.08)",
-              border: "1px solid rgba(245,243,255,0.20)",
-              color: "var(--paper-0)",
-            }}
-          >
-            <span
-              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase"
-              style={{
-                background: "var(--lavender-500)",
-                color: "var(--paper-0)",
-                letterSpacing: "0.06em",
-              }}
-            >
-              Pour épargnants français
-            </span>
-            <span>PEA · AV · PER · IR</span>
-          </span>
-        </div>
-        <h1
-          className="ic-display mb-6"
-          style={{ color: "var(--paper-0)" }}
-        >
-          Ton empreinte fiscale est unique.{" "}
-          <em style={{ color: "var(--lavender-200)" }}>La méthode, non.</em>
-        </h1>
-        <p
-          className="mx-auto mb-10 max-w-[600px] ic-lede"
-          style={{ color: "rgba(245,243,255,0.82)" }}
-        >
-          Tu paies un impôt français, mais tes ETF sont mondiaux. On t&apos;apprend
-          à voir les deux — et à les piloter ensemble. Économiser de l&apos;impôt,
-          c&apos;est gagner de l&apos;argent.
-        </p>
-
-        <div className="mx-auto flex flex-col items-center gap-5">
-          <SubscribeForm source="landing-hero" />
-          <p
-            className="text-[12px]"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "rgba(245,243,255,0.65)",
-              letterSpacing: "0.02em",
-            }}
-          >
-            Édité chaque dimanche depuis 2024 · Sans publicité · Désabonnement en un clic
-          </p>
         </div>
       </div>
     </section>
@@ -782,15 +728,8 @@ function WorldPlaygroundSection() {
     >
       <div className="mx-auto px-6 sm:px-8" style={{ maxWidth: "1080px" }}>
         <div className="mb-10 text-center">
-          <div
-            className="mb-3 text-[12px] font-semibold uppercase"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--lavender-700)",
-              letterSpacing: "0.16em",
-            }}
-          >
-            Le monde · ton terrain de jeu
+          <div className="mb-3 flex justify-center">
+            <span className="ic-eyebrow-mono">Le monde · ton terrain de jeu</span>
           </div>
           <h2 className="ic-h1 mx-auto" style={{ maxWidth: "640px" }}>
             Pendant que tu dors, ton argent voyage.
@@ -1041,15 +980,8 @@ function ProductPreviewGrid() {
   return (
     <section className="mx-auto px-6 py-24 sm:px-8" style={{ maxWidth: "1280px" }}>
       <div className="mb-14 text-center">
-        <div
-          className="mb-3 text-[12px] font-semibold uppercase"
-          style={{
-            fontFamily: "var(--font-display)",
-            color: "var(--lavender-700)",
-            letterSpacing: "0.16em",
-          }}
-        >
-          La même boîte à outils, pour chaque empreinte
+        <div className="mb-3 flex justify-center">
+          <span className="ic-eyebrow-mono">La même boîte à outils, pour chaque empreinte</span>
         </div>
         <h2 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
           Cinq surfaces. Une seule promesse&nbsp;: 1&nbsp;% mieux chaque jour.
@@ -1552,15 +1484,8 @@ function SavingsEqualsEarningsSection() {
       >
         <div className="grid gap-12 md:grid-cols-2 md:items-center">
           <div>
-            <div
-              className="mb-3 text-[12px] font-semibold uppercase"
-              style={{
-                fontFamily: "var(--font-display)",
-                color: "var(--lavender-700)",
-                letterSpacing: "0.16em",
-              }}
-            >
-              Le calcul que personne ne te fait
+            <div className="mb-3">
+              <span className="ic-eyebrow-mono">Le calcul que personne ne te fait</span>
             </div>
             <h2 className="ic-h1">
               Économiser 5 000 € d&apos;impôts à 35 ans = <em>+38 000 €</em> à 65 ans.

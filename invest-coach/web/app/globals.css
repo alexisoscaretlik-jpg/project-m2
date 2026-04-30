@@ -82,6 +82,18 @@
   --terracotta-800: #54251a;
   --terracotta-900: #361810;
 
+  /* ── Rose (Innostart-style pastel pink, completing palette C) ─────── */
+  --rose-50:  #fef5f7;
+  --rose-100: #fbd1d8;     /* hero pastel block — soft, warm */
+  --rose-200: #f7b3bf;
+  --rose-300: #f08e9e;
+  --rose-400: #e87280;
+  --rose-500: #d94d5d;
+  --rose-600: #b8384a;
+  --rose-700: #92293a;
+  --rose-800: #6f1f2c;
+  --rose-900: #4a141d;
+
   /* ── Forest (positive, kept for finance signaling) ────────────────── */
   --forest-50:  #ecf2e9;
   --forest-100: #d6e3d1;
@@ -651,4 +663,189 @@
 @media (prefers-reduced-motion: reduce) {
   * { transition-duration: 0ms !important; animation-duration: 0ms !important; }
   .ic-globe-pulse, .ic-globe-card, .ic-podcast-bar, .ic-arc-pulse { animation: none !important; }
+}
+
+/* ==========================================================================
+   Invest Coach — Innostart-inspired brutalist editorial set
+   Bold oversized typography on pastel color blocks (palette C). Used by
+   Landing/podcast/charts/newsletter/tax marketing pages. App-internal pages
+   keep the lavender utility system above.
+   ========================================================================== */
+
+/* Mega wordmark — fills the row width, used for hero "INVEST"/"COACH" */
+.ic-mega {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(72px, 18vw, 280px);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  color: var(--ink-700);
+  text-transform: uppercase;
+  text-wrap: nowrap;
+  display: block;
+}
+
+/* Tagline strip — thin centered band between brutalist blocks */
+.ic-strip {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-700);
+  background: var(--paper-0);
+  border-top: 1px solid var(--ink-700);
+  border-bottom: 1px solid var(--ink-700);
+  padding: 14px 24px;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Solid pastel color blocks for split layouts */
+.ic-block-rose    { background: var(--rose-100); }
+.ic-block-lilac   { background: var(--lavender-200); }
+.ic-block-peach   { background: var(--terracotta-100); }
+.ic-block-cream   { background: #fbf6ed; }
+.ic-block-mint    { background: var(--forest-100); }
+
+/* Mono section eyebrow with arrow — Innostart's `↳ STARTUPS` look */
+.ic-eyebrow-mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-700);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ic-eyebrow-mono::before { content: "↳"; opacity: 0.6; }
+
+/* Mono nav link with arrow prefix */
+.ic-nav-link {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-700);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  transition: opacity 200ms var(--ease-standard);
+}
+.ic-nav-link::before { content: "↳"; opacity: 0.5; }
+.ic-nav-link:hover { opacity: 0.6; }
+.ic-nav-link[aria-current="page"] { color: var(--rose-600); }
+.ic-nav-link[aria-current="page"]::before { opacity: 1; }
+
+/* Hard-edged dark CTA — the Innostart "REMIX TEMPLATE" button */
+.ic-btn-block {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--ink-700);
+  color: var(--paper-0);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 12px 22px;
+  border: 1px solid var(--ink-700);
+  border-radius: 0;
+  transition: all 200ms var(--ease-standard);
+  cursor: pointer;
+}
+.ic-btn-block:hover {
+  background: var(--paper-0);
+  color: var(--ink-700);
+}
+.ic-btn-block-light {
+  background: var(--paper-0);
+  color: var(--ink-700);
+  border: 1px solid var(--ink-700);
+}
+.ic-btn-block-light:hover {
+  background: var(--ink-700);
+  color: var(--paper-0);
+}
+
+/* Brand cell — the bordered "IN | NO" mark in nav corner */
+.ic-brand-cell {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  align-items: stretch;
+  border: 1px solid var(--ink-700);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.ic-brand-cell > span {
+  padding: 6px 10px;
+  display: grid;
+  place-items: center;
+}
+.ic-brand-cell > span:first-child {
+  border-right: 1px solid var(--ink-700);
+  background: var(--paper-0);
+}
+.ic-brand-cell > span:last-child {
+  background: transparent;
+}
+
+/* Editorial 3-col card grid — oversized image cells with caption rail */
+.ic-edcard {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--paper-0);
+  border: 1px solid var(--ink-700);
+}
+.ic-edcard-media {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-bottom: 1px solid var(--ink-700);
+  position: relative;
+}
+.ic-edcard-media > * {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.ic-edcard-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 16px 18px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-700);
+}
+.ic-edcard-foot span:last-child {
+  color: var(--fg-muted);
+  font-weight: 500;
+}
+
+/* Page-spanning hairline — Innostart uses these as section separators */
+.ic-hairline { border-top: 1px solid var(--ink-700); }
+
+/* Big section heading on pastel — left-aligned, near-mega scale */
+.ic-bigsection {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 7vw, 96px);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  color: var(--ink-700);
+  text-transform: uppercase;
 }
