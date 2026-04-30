@@ -261,143 +261,209 @@ export default async function ChartDetailPage({
     .limit(6);
   const history = (historyRows ?? []).filter((r) => r.tweet_id !== a.tweet_id);
 
+  // Tone → palette C pastel for the direction pill (no green/red).
+  const directionBg: Record<string, string> = {
+    bullish: "var(--lavender-200)",
+    bearish: "var(--rose-100)",
+    neutral: "transparent",
+  };
+
   return (
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/charts" />
 
-      <article className="mx-auto max-w-[760px] px-6 py-12">
-        <Link
-          href="/charts"
-          className="inline-block text-[13px] font-medium"
-          style={{
-            fontFamily: "var(--font-display)",
-            color: "var(--forest-600)",
-          }}
-        >
-          ← Toutes les vues techniques
-        </Link>
-
-        <header className="mt-6">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="cap-eyebrow">
+      {/* Row 1 — peach hero with back link, mega title, ticker + date + direction. */}
+      <section
+        className="ic-block-peach px-6 pt-10 pb-12 sm:px-8 sm:pt-14 sm:pb-16"
+        style={{ borderBottom: "1px solid var(--ink-700)" }}
+      >
+        <div className="mx-auto" style={{ maxWidth: "1280px" }}>
+          <Link
+            href="/charts"
+            className="ic-eyebrow-mono"
+            style={{ textDecoration: "none" }}
+          >
+            Retour aux vues techniques
+          </Link>
+          <div
+            aria-hidden="true"
+            className="mt-6 mb-8"
+            style={{ borderTop: "1px solid var(--ink-700)" }}
+          />
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            <span className="ic-eyebrow-mono">
               {CLASS_LABEL[a.asset_class] ?? a.asset_class}
             </span>
             <span
-              className="text-[11px]"
               style={{
                 fontFamily: "var(--font-mono)",
-                color: "var(--fg-subtle)",
+                fontSize: "11px",
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--ink-700)",
+                opacity: 0.7,
               }}
             >
               · {formatFrenchDate(a.tweet_created_at)}
             </span>
             <span
-              className="cap-pill"
               style={{
-                borderColor: DIRECTION_COLOR[a.direction],
-                color: DIRECTION_COLOR[a.direction],
+                fontFamily: "var(--font-mono)",
+                fontSize: "10px",
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "var(--ink-700)",
+                background: directionBg[a.direction] ?? "transparent",
+                border: "1px solid var(--ink-700)",
+                padding: "4px 10px",
               }}
             >
               {DIRECTION_LABEL[a.direction]}
             </span>
           </div>
-          <h1 className="cap-h1 mt-3 text-[40px] leading-[1.1]">
+          <h1
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(34px, 6vw, 96px)",
+              fontWeight: 800,
+              letterSpacing: "-0.035em",
+              lineHeight: 0.96,
+              color: "var(--ink-700)",
+              textTransform: "uppercase",
+              textWrap: "balance",
+            }}
+          >
             {a.asset_name}
           </h1>
           <p
-            className="mt-2 text-[12px]"
+            className="mt-4"
             style={{
               fontFamily: "var(--font-mono)",
-              color: "var(--fg-subtle)",
-              letterSpacing: "0.04em",
+              fontSize: "13px",
+              fontWeight: 700,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              color: "var(--ink-700)",
             }}
           >
-            {a.tv_symbol}
+            ↳ {a.tv_symbol}
           </p>
-        </header>
+        </div>
+      </section>
 
-        {heroImage ? (
-          <figure className="mt-8">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={heroImage}
-              alt={`Graphique annoté de ${a.asset_name} par @${tweetRow?.author_handle ?? "great_martis"}`}
-              className="w-full rounded-lg"
-              style={{
-                border: "1px solid var(--border)",
-                background: "var(--bg-elevated)",
-              }}
-            />
-            <figcaption
-              className="mt-2 text-[12px]"
-              style={{
-                fontFamily: "var(--font-mono)",
-                color: "var(--fg-subtle)",
-                letterSpacing: "0.02em",
-              }}
-            >
-              Graphique annoté par @{tweetRow?.author_handle ?? "great_martis"}{" "}
-              · {formatFrenchDate(a.tweet_created_at)}
-            </figcaption>
-          </figure>
-        ) : null}
-
-        {a.key_quote ? (
-          <blockquote
-            className="mt-10 mb-2"
+      {/* Row 2 — full-bleed annotated chart image (when available). */}
+      {heroImage ? (
+        <figure
+          className="m-0"
+          style={{
+            background: "var(--ink-700)",
+            borderBottom: "1px solid var(--ink-700)",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroImage}
+            alt={`Graphique annoté de ${a.asset_name} par @${tweetRow?.author_handle ?? "great_martis"}`}
+            className="block w-full"
             style={{
-              borderLeft: "3px solid var(--terracotta-500)",
-              paddingLeft: "24px",
-              paddingTop: "6px",
-              paddingBottom: "6px",
+              maxHeight: "720px",
+              objectFit: "contain",
+              background: "var(--paper-0)",
+            }}
+          />
+          <figcaption
+            className="px-6 py-3 sm:px-8"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "11px",
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "var(--paper-0)",
+              background: "var(--ink-700)",
             }}
           >
+            ↳ Graphique annoté par @{tweetRow?.author_handle ?? "great_martis"} · {formatFrenchDate(a.tweet_created_at)}
+          </figcaption>
+        </figure>
+      ) : null}
+
+      {/* Row 3 — lilac pull-quote block (the AI's one-line synthesis). */}
+      {a.key_quote ? (
+        <section
+          className="ic-block-lilac px-6 py-12 sm:px-8 sm:py-16"
+          style={{ borderBottom: "1px solid var(--ink-700)" }}
+        >
+          <div className="mx-auto" style={{ maxWidth: "1080px" }}>
+            <span className="ic-eyebrow-mono">La lecture du jour</span>
             <p
-              className="m-0 italic"
+              className="mt-6"
               style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "30px",
-                lineHeight: 1.25,
-                color: "var(--fg)",
+                fontFamily: "var(--font-source-serif), Georgia, serif",
+                fontStyle: "italic",
+                fontWeight: 500,
+                fontSize: "clamp(24px, 3.6vw, 44px)",
+                lineHeight: 1.2,
+                letterSpacing: "-0.015em",
+                color: "var(--ink-700)",
                 textWrap: "balance",
               }}
             >
               « {a.key_quote} »
             </p>
-          </blockquote>
-        ) : null}
+          </div>
+        </section>
+      ) : null}
+
+      <article className="mx-auto max-w-[760px] px-6 py-12 sm:px-8 sm:py-16">{/* end of header / start of body */}
 
         {parsed.takeaways.length > 0 ? (
-          <section className="mt-10">
-            <div className="cap-eyebrow">Ce qu&apos;il faut retenir</div>
+          <section>
+            <span className="ic-eyebrow-mono">Ce qu&apos;il faut retenir</span>
             <ul
-              className="mt-4 space-y-3"
-              style={{ listStyle: "none", padding: 0 }}
+              className="mt-6 space-y-4"
+              style={{
+                listStyle: "none",
+                padding: 0,
+                borderTop: "1px solid var(--ink-700)",
+                borderBottom: "1px solid var(--ink-700)",
+              }}
             >
               {parsed.takeaways.map((t, i) => (
                 <li
                   key={i}
-                  className="flex gap-3 text-[18px]"
+                  className="flex gap-4 py-4"
                   style={{
-                    fontFamily: "var(--font-serif)",
-                    lineHeight: 1.55,
-                    color: "var(--fg)",
+                    borderBottom:
+                      i < parsed.takeaways.length - 1
+                        ? "1px solid var(--ink-700)"
+                        : "none",
                   }}
                 >
                   <span
                     className="shrink-0"
                     style={{
-                      width: "20px",
-                      paddingTop: "2px",
-                      fontFamily: "var(--font-display)",
-                      fontWeight: 600,
-                      color: "var(--terracotta-500)",
-                      fontSize: "13px",
+                      width: "44px",
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      letterSpacing: "0.1em",
+                      color: "var(--ink-700)",
                     }}
                   >
-                    {String(i + 1).padStart(2, "0")}
+                    ↳ {String(i + 1).padStart(2, "0")}
                   </span>
-                  <span dangerouslySetInnerHTML={{ __html: renderInline(t) }} />
+                  <span
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontSize: "17px",
+                      lineHeight: 1.55,
+                      color: "var(--ink-700)",
+                    }}
+                    dangerouslySetInnerHTML={{ __html: renderInline(t) }}
+                  />
                 </li>
               ))}
             </ul>
@@ -405,14 +471,14 @@ export default async function ChartDetailPage({
         ) : null}
 
         {parsed.why ? (
-          <section className="mt-10">
-            <div className="cap-eyebrow">Pourquoi ça compte</div>
+          <section className="mt-12">
+            <span className="ic-eyebrow-mono">Pourquoi ça compte</span>
             <p
-              className="mt-4 text-[19px]"
+              className="mt-5 text-[18px]"
               style={{
-                fontFamily: "var(--font-serif)",
+                fontFamily: "var(--font-display)",
                 lineHeight: 1.65,
-                color: "var(--fg)",
+                color: "var(--ink-700)",
                 textWrap: "pretty",
               }}
               dangerouslySetInnerHTML={{ __html: renderInline(parsed.why) }}
@@ -685,41 +751,44 @@ export default async function ChartDetailPage({
             }
             target="_blank"
             rel="noreferrer noopener"
-            className="inline-flex items-center gap-2 rounded-md px-5 py-3 text-[14px] font-medium"
-            style={{
-              fontFamily: "var(--font-display)",
-              background: "var(--forest-600)",
-              color: "var(--paper-50)",
-            }}
+            className="ic-btn-block"
           >
-            Aller à la source · @
-            {tweetRow?.author_handle ?? "great_martis"} →
+            ↳ Aller à la source · @{tweetRow?.author_handle ?? "great_martis"}
           </a>
         </section>
 
         {history.length > 0 ? (
           <section className="mt-14">
-            <div className="cap-eyebrow">
+            <span className="ic-eyebrow-mono">
               Historique sur {a.asset_name}
-            </div>
+            </span>
             <ul
-              className="mt-4 space-y-2"
-              style={{ listStyle: "none", padding: 0 }}
+              className="mt-6"
+              style={{
+                listStyle: "none",
+                padding: 0,
+                border: "1px solid var(--ink-700)",
+              }}
             >
-              {history.map((h) => (
-                <li key={h.id}>
-                  <div
-                    className="flex items-baseline justify-between gap-3 rounded-md p-3 text-[13px]"
-                    style={{
-                      background: "var(--bg-elevated)",
-                      border: "1px solid var(--border)",
-                    }}
-                  >
+              {history.map((h, i) => (
+                <li
+                  key={h.id}
+                  style={{
+                    borderBottom:
+                      i < history.length - 1
+                        ? "1px solid var(--ink-700)"
+                        : "none",
+                  }}
+                >
+                  <div className="flex flex-wrap items-baseline justify-between gap-3 px-5 py-4">
                     <span
                       style={{
-                        fontFamily: "var(--font-serif)",
-                        color: "var(--fg)",
+                        fontFamily: "var(--font-source-serif), Georgia, serif",
                         fontStyle: "italic",
+                        color: "var(--ink-700)",
+                        fontSize: "14px",
+                        lineHeight: 1.5,
+                        flex: 1,
                       }}
                     >
                       « {h.key_quote.slice(0, 120)} »
@@ -728,7 +797,12 @@ export default async function ChartDetailPage({
                       className="shrink-0"
                       style={{
                         fontFamily: "var(--font-mono)",
-                        color: "var(--fg-subtle)",
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        letterSpacing: "0.1em",
+                        textTransform: "uppercase",
+                        color: "var(--ink-700)",
+                        opacity: 0.7,
                       }}
                     >
                       {formatFrenchDate(h.tweet_created_at)}
@@ -741,16 +815,17 @@ export default async function ChartDetailPage({
         ) : null}
 
         <p
-          className="mt-12 text-[12px] italic"
+          className="mt-12 text-[11px]"
           style={{
-            fontFamily: "var(--font-serif)",
-            color: "var(--fg-subtle)",
+            fontFamily: "var(--font-mono)",
+            color: "var(--ink-700)",
+            opacity: 0.65,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            lineHeight: 1.55,
           }}
         >
-          Lecture éducative. Pas un conseil en investissement personnalisé.
-          Le graphique annoté ci-dessus appartient à @
-          {tweetRow?.author_handle ?? "great_martis"} et reste accessible sur X.
-          Synthèse générée le {formatFrenchDate(a.generated_at)} avec {a.model}.
+          Lecture éducative · Pas un conseil en investissement personnalisé · Graphique annoté par @{tweetRow?.author_handle ?? "great_martis"} · Synthèse {formatFrenchDate(a.generated_at)} · {a.model}
         </p>
       </article>
 
