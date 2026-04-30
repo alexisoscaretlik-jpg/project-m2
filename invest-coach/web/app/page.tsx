@@ -215,82 +215,109 @@ const HOW_STEPS: {
 
 function HowItWorksSection() {
   return (
-    <section className="mx-auto px-6 py-24 sm:px-8" style={{ maxWidth: "1080px" }}>
-      <div className="mb-14 text-center">
-        <div className="mb-3 flex justify-center">
-          <span className="ic-eyebrow-mono">Comment ça marche</span>
-        </div>
-        <h2 className="ic-h1 mx-auto" style={{ maxWidth: "640px" }}>
-          Trois étapes. <em>Quinze minutes au total.</em>
-        </h2>
-        <p
-          className="mx-auto mt-5 text-[17px]"
-          style={{
-            maxWidth: "560px",
-            fontFamily: "var(--font-display)",
-            color: "var(--fg-muted)",
-            lineHeight: 1.55,
-          }}
-        >
-          Pas de rendez-vous, pas de jargon de conseiller, pas de revente
-          de ta data. Tu pilotes, on chiffre.
-        </p>
-      </div>
-
-      <ol className="grid gap-6 md:grid-cols-3">
-        {HOW_STEPS.map((s) => (
-          <li
-            key={s.index}
-            className="flex flex-col rounded-2xl p-6"
+    <section
+      className="px-6 py-20 sm:px-8 sm:py-24"
+      style={{
+        background: "var(--paper-0)",
+        borderBottom: "1px solid var(--ink-700)",
+      }}
+    >
+      <div className="mx-auto" style={{ maxWidth: "1280px" }}>
+        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <span className="ic-eyebrow-mono">Comment ça marche</span>
+            <h2
+              className="ic-bigsection mt-5"
+              style={{ fontSize: "clamp(34px, 5vw, 72px)" }}
+            >
+              Trois étapes.<br />Quinze minutes<br />au total.
+            </h2>
+          </div>
+          <p
+            className="max-w-[380px] text-[15px]"
             style={{
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border)",
+              fontFamily: "var(--font-source-serif), Georgia, serif",
+              fontStyle: "italic",
+              color: "var(--ink-700)",
+              lineHeight: 1.55,
             }}
           >
-            <div
-              className="mb-5 flex h-32 items-center justify-center rounded-xl"
+            « Pas de rendez-vous, pas de jargon de conseiller, pas de revente
+            de ta data. Tu pilotes, on chiffre. »
+          </p>
+        </div>
+
+        <ol
+          className="grid md:grid-cols-3"
+          style={{ border: "1px solid var(--ink-700)" }}
+        >
+          {HOW_STEPS.map((s, idx) => (
+            <li
+              key={s.index}
+              className="flex flex-col"
               style={{
-                background:
-                  "linear-gradient(160deg, var(--lavender-50) 0%, var(--paper-100) 100%)",
-                border: "1px solid var(--border)",
+                borderRight:
+                  idx < HOW_STEPS.length - 1
+                    ? "1px solid var(--ink-700)"
+                    : "none",
               }}
             >
-              <IsoIllustration kind={s.illustration} />
-            </div>
-            <div
-              className="mb-2 text-[11px] font-bold uppercase"
-              style={{
-                fontFamily: "var(--font-mono)",
-                color: "var(--lavender-700)",
-                letterSpacing: "0.12em",
-              }}
-            >
-              Étape {s.index}
-            </div>
-            <h3
-              className="text-[20px] font-bold"
-              style={{
-                fontFamily: "var(--font-display)",
-                letterSpacing: "-0.02em",
-                color: "var(--ink-700)",
-                lineHeight: 1.25,
-              }}
-            >
-              {s.title}
-            </h3>
-            <p
-              className="mt-3 text-[14px]"
-              style={{
-                fontFamily: "var(--font-display)",
-                color: "var(--fg-muted)",
-                lineHeight: 1.55,
-              }}
-            >
-              {s.body}
-            </p>
-          </li>
-        ))}
-      </ol>
+              <div
+                className="flex h-44 items-center justify-center"
+                style={{
+                  background:
+                    idx === 0
+                      ? "var(--rose-100)"
+                      : idx === 1
+                        ? "var(--lavender-200)"
+                        : "var(--terracotta-100)",
+                  borderBottom: "1px solid var(--ink-700)",
+                }}
+              >
+                <IsoIllustration kind={s.illustration} />
+              </div>
+              <div className="flex flex-1 flex-col gap-3 p-6 sm:p-8">
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-700)",
+                  }}
+                >
+                  ↳ Étape {s.index}
+                </span>
+                <h3
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "22px",
+                    fontWeight: 700,
+                    letterSpacing: "-0.02em",
+                    color: "var(--ink-700)",
+                    lineHeight: 1.2,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {s.title}
+                </h3>
+                <p
+                  className="text-[14px]"
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    color: "var(--ink-700)",
+                    lineHeight: 1.55,
+                    opacity: 0.78,
+                  }}
+                >
+                  {s.body}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
     </section>
   );
 }
@@ -477,145 +504,177 @@ function PhilosophySection() {
 // ─────────────────────── Trust Stats Bar (above footer) ───────────────────────
 
 function TrustStatsBar() {
+  const stats = [
+    { num: "Depuis 2024", label: "Newsletter du dimanche, sans interruption." },
+    { num: "9 articles", label: "Tous fact-checkés, mis à jour à chaque réforme." },
+    { num: "1 podcast", label: "Premier épisode sur Spotify · trois par mois à venir." },
+  ];
   return (
     <section
-      className="border-y"
-      style={{ background: "var(--paper-100)", borderColor: "var(--border)" }}
+      style={{
+        background: "var(--paper-0)",
+        borderBottom: "1px solid var(--ink-700)",
+      }}
     >
-      <div
-        className="mx-auto grid gap-6 px-6 py-12 sm:px-8 md:grid-cols-3"
-        style={{ maxWidth: "1080px" }}
+      <ul
+        className="grid md:grid-cols-3"
+        style={{ borderTop: "1px solid var(--ink-700)" }}
       >
-        {[
-          { num: "Depuis 2024", label: "Newsletter du dimanche, sans interruption." },
-          { num: "9 articles", label: "Tous fact-checkés, mis à jour à chaque réforme." },
-          { num: "1 podcast", label: "Premier épisode sur Spotify · trois par mois à venir." },
-        ].map((s) => (
-          <div key={s.label} className="text-center md:text-left">
+        {stats.map((s, i) => (
+          <li
+            key={s.label}
+            className="px-6 py-12 sm:px-8"
+            style={{
+              borderRight:
+                i < stats.length - 1
+                  ? "1px solid var(--ink-700)"
+                  : "none",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "11px",
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "var(--ink-700)",
+              }}
+            >
+              ↳ Repère 0{i + 1}
+            </span>
             <div
-              className="text-[28px] font-bold"
+              className="mt-4"
               style={{
                 fontFamily: "var(--font-display)",
+                fontSize: "clamp(28px, 3.4vw, 40px)",
+                fontWeight: 800,
                 color: "var(--ink-700)",
-                letterSpacing: "-0.02em",
-                lineHeight: 1.1,
+                letterSpacing: "-0.025em",
+                lineHeight: 1.05,
+                textTransform: "uppercase",
               }}
             >
               {s.num}
             </div>
             <p
-              className="mt-2 text-[13px]"
+              className="mt-3 text-[14px]"
               style={{
-                fontFamily: "var(--font-display)",
-                color: "var(--fg-muted)",
+                fontFamily: "var(--font-source-serif), Georgia, serif",
+                fontStyle: "italic",
+                color: "var(--ink-700)",
                 lineHeight: 1.55,
               }}
             >
-              {s.label}
+              « {s.label} »
             </p>
-          </div>
+          </li>
         ))}
-      </div>
-      <div
-        className="mx-auto px-6 pb-10 text-center sm:px-8"
-        style={{ maxWidth: "720px" }}
-      >
-        <p
-          className="text-[11px] uppercase"
-          style={{
-            fontFamily: "var(--font-mono)",
-            color: "var(--fg-subtle)",
-            letterSpacing: "0.12em",
-          }}
-        >
-          Données hébergées en France · Pas de revente · Désabonnement en un clic
-        </p>
-      </div>
+      </ul>
+      <p className="ic-strip">
+        Données hébergées en France · Pas de revente · Désabonnement en un clic
+      </p>
     </section>
   );
 }
 
 // ─────────────────────── Integrations Section ───────────────────────
 
-const INTEGRATIONS: { name: string; bg: string; fg: string }[] = [
-  { name: "Boursorama",     bg: "#fef2f2", fg: "#e11d48" },
-  { name: "Fortuneo",       bg: "#fff7ed", fg: "#ea580c" },
-  { name: "Trade Republic", bg: "#f5f5f4", fg: "#1c1917" },
-  { name: "Bourse Direct",  bg: "#eff6ff", fg: "#1d4ed8" },
-  { name: "Linxea",         bg: "#ecfeff", fg: "#0e7490" },
-  { name: "Saxo Bank",      bg: "#eff6ff", fg: "#1e3a8a" },
-  { name: "DEGIRO",         bg: "#fefce8", fg: "#a16207" },
-  { name: "BoursoBank",     bg: "#fdf2f8", fg: "#be185d" },
+const INTEGRATIONS: string[] = [
+  "Boursorama",
+  "Fortuneo",
+  "Trade Republic",
+  "Bourse Direct",
+  "Linxea",
+  "Saxo Bank",
+  "DEGIRO",
+  "BoursoBank",
 ];
 
 function IntegrationsSection() {
   return (
-    <section className="mx-auto px-6 py-20 sm:px-8" style={{ maxWidth: "1080px" }}>
-      <div className="mb-10 text-center">
-        <div className="mb-3 flex justify-center">
-          <span className="ic-eyebrow-mono">Compatible avec ton écosystème</span>
-        </div>
-        <h2
-          className="mx-auto text-[28px] font-bold sm:text-[32px]"
-          style={{
-            fontFamily: "var(--font-display)",
-            color: "var(--ink-700)",
-            letterSpacing: "-0.02em",
-            lineHeight: 1.2,
-            maxWidth: "560px",
-          }}
-        >
-          Tu changes de courtier ? On t&apos;y suit.
-        </h2>
-        <p
-          className="mx-auto mt-4 text-[15px]"
-          style={{
-            maxWidth: "520px",
-            fontFamily: "var(--font-display)",
-            color: "var(--fg-muted)",
-            lineHeight: 1.55,
-          }}
-        >
-          Que ton PEA soit chez Bourso, ton AV chez Linxea ou ton CTO chez
-          Trade Republic, on parle leur langue. Et on connaît leurs frais.
-        </p>
-      </div>
-
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {INTEGRATIONS.map((it) => (
-          <li
-            key={it.name}
-            className="flex h-16 items-center justify-center rounded-2xl px-4 transition-transform"
+    <section
+      className="px-6 py-20 sm:px-8 sm:py-24"
+      style={{
+        background: "var(--paper-0)",
+        borderTop: "1px solid var(--ink-700)",
+        borderBottom: "1px solid var(--ink-700)",
+      }}
+    >
+      <div className="mx-auto" style={{ maxWidth: "1280px" }}>
+        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <span className="ic-eyebrow-mono">Ton écosystème</span>
+            <h2
+              className="ic-bigsection mt-5"
+              style={{ fontSize: "clamp(34px, 5vw, 72px)" }}
+            >
+              Tu changes<br />de courtier ?<br />On t&apos;y suit.
+            </h2>
+          </div>
+          <p
+            className="max-w-[420px] text-[15px]"
             style={{
-              background: it.bg,
-              border: "1px solid var(--border)",
+              fontFamily: "var(--font-source-serif), Georgia, serif",
+              fontStyle: "italic",
+              color: "var(--ink-700)",
+              lineHeight: 1.55,
             }}
           >
-            <span
-              className="text-[15px] font-bold"
-              style={{
-                fontFamily: "var(--font-display)",
-                color: it.fg,
-                letterSpacing: "-0.01em",
-              }}
-            >
-              {it.name}
-            </span>
-          </li>
-        ))}
-      </ul>
+            « Que ton PEA soit chez Bourso, ton AV chez Linxea ou ton CTO chez
+            Trade Republic, on parle leur langue. Et on connaît leurs frais. »
+          </p>
+        </div>
 
-      <p
-        className="mx-auto mt-6 text-center text-[12px]"
-        style={{
-          fontFamily: "var(--font-mono)",
-          color: "var(--fg-subtle)",
-          maxWidth: "560px",
-        }}
-      >
-        Marques citées à titre informatif. Aucun partenariat commercial avec
-        ces établissements.
-      </p>
+        <ul
+          className="grid grid-cols-2 md:grid-cols-4"
+          style={{ border: "1px solid var(--ink-700)" }}
+        >
+          {INTEGRATIONS.map((name, idx) => {
+            const colCount = 4;
+            const col = idx % colCount;
+            const totalRows = Math.ceil(INTEGRATIONS.length / colCount);
+            const row = Math.floor(idx / colCount);
+            const isLastRow = row === totalRows - 1;
+            return (
+              <li
+                key={name}
+                className="flex h-20 items-center justify-center px-4 sm:h-24"
+                style={{
+                  borderRight:
+                    col < colCount - 1 ? "1px solid var(--ink-700)" : "none",
+                  borderBottom: !isLastRow ? "1px solid var(--ink-700)" : "none",
+                }}
+              >
+                <span
+                  className="text-[14px] sm:text-[15px]"
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontWeight: 700,
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-700)",
+                  }}
+                >
+                  {name}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+
+        <p
+          className="mt-6 text-[11px]"
+          style={{
+            fontFamily: "var(--font-mono)",
+            color: "var(--fg-muted)",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+          }}
+        >
+          Marques citées à titre informatif. Aucun partenariat commercial.
+        </p>
+      </div>
     </section>
   );
 }
