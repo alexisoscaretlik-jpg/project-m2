@@ -510,9 +510,10 @@ export default async function ChartDetailPage({
                 border: "1px solid var(--ink-700)",
               }}
             >
-              {a.key_levels.map((lvl, i) => {
+              {(a.key_levels ?? []).map((lvl, i) => {
+                const levels = a.key_levels ?? [];
                 const col = i % 2;
-                const totalRows = Math.ceil(a.key_levels.length / 2);
+                const totalRows = Math.ceil(levels.length / 2);
                 const row = Math.floor(i / 2);
                 const isLastRow = row === totalRows - 1;
                 return (
