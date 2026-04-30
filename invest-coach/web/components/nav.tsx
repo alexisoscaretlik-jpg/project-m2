@@ -18,40 +18,28 @@ export async function Nav({ active }: { active: string }) {
 
   return (
     <header
-      className="sticky top-0 z-50 backdrop-blur"
+      className="sticky top-0 z-50"
       style={{
-        background: "color-mix(in srgb, var(--paper-50) 85%, transparent)",
-        borderBottom: "1px solid var(--border)",
+        background: "var(--paper-0)",
+        borderBottom: "1px solid var(--ink-700)",
       }}
     >
-      <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-y-2 px-6 py-4 lg:px-8">
-        <Link href="/" className="flex items-baseline gap-2">
-          <span
-            className="text-[18px] font-bold tracking-tight"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--ink-700)",
-              letterSpacing: "-0.025em",
-            }}
-          >
-            Invest Coach
-          </span>
+      <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <Link href="/" className="ic-brand-cell shrink-0" aria-label="Invest Coach — accueil">
+          <span>IC</span>
+          <span>INVEST&nbsp;COACH</span>
         </Link>
 
-        <nav
-          className="hidden items-center gap-1 text-sm md:flex"
-          style={{ fontFamily: "var(--font-display)" }}
-        >
+        <nav className="hidden items-center gap-7 md:flex">
           {TABS.map((t) => {
-            const isActive = t.href === active || (active === "/" && t.href === "/");
+            const isActive =
+              t.href === active || (active === "/" && t.href === "/");
             return (
               <Link
                 key={t.href}
                 href={t.href}
-                className="whitespace-nowrap rounded-lg px-3 py-2 text-[14px] font-medium transition-colors duration-200 hover:bg-[var(--paper-100)]"
-                style={{
-                  color: isActive ? "var(--ink-700)" : "var(--fg-muted)",
-                }}
+                className="ic-nav-link"
+                aria-current={isActive ? "page" : undefined}
               >
                 {t.label}
               </Link>
@@ -59,33 +47,26 @@ export async function Nav({ active }: { active: string }) {
           })}
         </nav>
 
-        <div
-          className="flex items-center gap-2 text-sm"
-          style={{ fontFamily: "var(--font-display)" }}
-        >
+        <div className="flex items-center gap-3">
           {user ? (
-            <form action={signOut} className="flex items-center gap-3">
+            <form action={signOut} className="hidden items-center gap-3 md:flex">
               <span
-                className="hidden max-w-[160px] truncate text-[13px] sm:inline"
-                style={{ color: "var(--fg-muted)" }}
+                className="hidden max-w-[160px] truncate text-[12px] sm:inline"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  color: "var(--fg-muted)",
+                  letterSpacing: "0.04em",
+                }}
               >
                 {user.email}
               </span>
-              <button
-                type="submit"
-                className="rounded-lg px-3 py-2 text-[13px] font-medium transition-colors hover:bg-[var(--paper-100)]"
-                style={{ color: "var(--fg-muted)" }}
-              >
+              <button type="submit" className="ic-btn-block-light">
                 Déconnexion
               </button>
             </form>
           ) : (
-            <Link
-              href="/login"
-              className="hidden rounded-lg px-3 py-2 text-[14px] font-medium transition-colors hover:bg-[var(--paper-100)] md:inline-flex"
-              style={{ color: "var(--fg-muted)" }}
-            >
-              Connexion
+            <Link href="/login" className="ic-btn-block hidden md:inline-flex">
+              Démarrer
             </Link>
           )}
           <NavDrawer userEmail={user?.email ?? null} signOutAction={signOut} />
