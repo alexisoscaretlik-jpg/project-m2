@@ -434,7 +434,11 @@ function PhilosophySection() {
   return (
     <section
       className="relative overflow-hidden"
-      style={{ background: "var(--ink-700)" }}
+      style={{
+        background: "var(--ink-700)",
+        borderTop: "1px solid var(--ink-700)",
+        borderBottom: "1px solid var(--ink-700)",
+      }}
     >
       <img
         src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2000&q=85"
@@ -448,52 +452,56 @@ function PhilosophySection() {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, rgba(20,16,40,0.85) 0%, rgba(20,16,40,0.78) 100%)",
+            "linear-gradient(180deg, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.82) 100%)",
         }}
       />
 
       <div
-        className="relative mx-auto px-6 py-28 text-center sm:px-8 sm:py-36"
-        style={{ maxWidth: "880px" }}
+        className="relative mx-auto px-6 py-24 sm:px-8 sm:py-32"
+        style={{ maxWidth: "1080px" }}
       >
         <div
-          className="mb-6 text-[12px] font-bold uppercase"
           style={{
             fontFamily: "var(--font-mono)",
-            color: "var(--lavender-300)",
-            letterSpacing: "0.20em",
+            fontSize: "11px",
+            fontWeight: 700,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            color: "var(--paper-0)",
           }}
         >
-          La méthode
+          ↳ La méthode
         </div>
         <p
-          className="mx-auto"
+          className="mt-8"
           style={{
             fontFamily: "var(--font-source-serif), Georgia, serif",
             fontStyle: "italic",
             fontWeight: 500,
-            fontSize: "clamp(28px, 4.2vw, 48px)",
-            lineHeight: 1.2,
-            letterSpacing: "-0.015em",
+            fontSize: "clamp(32px, 5vw, 64px)",
+            lineHeight: 1.15,
+            letterSpacing: "-0.02em",
             color: "var(--paper-0)",
-            maxWidth: "720px",
+            maxWidth: "880px",
             textWrap: "balance",
           }}
         >
           Le temps est l&apos;allié de l&apos;épargnant patient.{" "}
-          <span style={{ color: "var(--lavender-200)" }}>
+          <span style={{ color: "var(--rose-200)" }}>
             Pas le marché. Pas le timing. Pas la chance.
           </span>
         </p>
         <p
-          className="mx-auto mt-8 text-[13px]"
+          className="mt-10 text-[12px]"
           style={{
-            fontFamily: "var(--font-display)",
-            color: "rgba(245,243,255,0.65)",
-            letterSpacing: "0.04em",
+            fontFamily: "var(--font-mono)",
+            color: "var(--paper-0)",
+            opacity: 0.6,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
           }}
         >
-          Une règle qu&apos;on rabâche · parce qu&apos;elle marche depuis 1900.
+          Une règle qu&apos;on rabâche · parce qu&apos;elle marche depuis 1900
         </p>
       </div>
     </section>

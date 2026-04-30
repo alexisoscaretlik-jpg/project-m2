@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 
-// Pricing table with monthly / annual toggle.
-// Annual billing applies a 20% discount on the per-month rate.
-// Inspired by Stripe's pricing toggle (annual = "−20%" badge).
+// Innostart-style brutalist pricing — bordered ink 3-col grid, mono
+// labels, mega prices, hard-edged ic-btn-block CTAs. Featured tier
+// gets a peach pastel block. Strict palette C (rose / lilac / peach
+// / ink). Annual billing applies a 20 % discount.
 
 type Tier = {
   id: string;
@@ -26,7 +27,7 @@ const TIERS: Tier[] = [
     tag: "Gratuit, pour toujours.",
     features: [
       "Le journal du dimanche",
-      "3 brèves par semaine",
+      "Trois brèves par semaine",
       "Glossaire complet",
       "Communauté de lecteurs",
     ],
@@ -59,7 +60,7 @@ const TIERS: Tier[] = [
       "Tout Investisseur",
       "Optimisation fiscale avancée",
       "Suivi multi-enveloppes",
-      "Rapports trimestriels en deux pages",
+      "Rapports trimestriels",
       "Coach IA prioritaire",
     ],
     cta: "Essayer 14 jours",
@@ -68,7 +69,7 @@ const TIERS: Tier[] = [
   },
 ];
 
-const ANNUAL_DISCOUNT = 0.2; // 20 % off when billed annually.
+const ANNUAL_DISCOUNT = 0.2;
 
 type Cadence = "monthly" | "annual";
 
@@ -85,229 +86,267 @@ export function PricingTable() {
   const [cadence, setCadence] = useState<Cadence>("monthly");
 
   return (
-    <section id="tarifs" className="py-24" style={{ background: "var(--paper-100)" }}>
-      <div className="mx-auto px-6 text-center sm:px-8" style={{ maxWidth: "720px" }}>
-        <h2 className="ic-h1 mx-auto">
-          Trois formules. <em>Annulable en un clic.</em>
-        </h2>
-        <p
-          className="mx-auto mt-5 text-[17px]"
-          style={{
-            maxWidth: "520px",
-            fontFamily: "var(--font-display)",
-            color: "var(--fg-muted)",
-            lineHeight: 1.55,
-          }}
-        >
-          Découverte est gratuite, pour toujours. Tu passes payant seulement quand tu en veux plus.
-        </p>
-
-        {/* Cadence toggle */}
-        <div
-          className="mx-auto mt-8 inline-flex items-center rounded-full p-1"
-          style={{
-            background: "var(--paper-0)",
-            border: "1px solid var(--border)",
-            fontFamily: "var(--font-display)",
-          }}
-          role="radiogroup"
-          aria-label="Cadence de facturation"
-        >
-          <button
-            type="button"
-            role="radio"
-            aria-checked={cadence === "monthly"}
-            onClick={() => setCadence("monthly")}
-            className="rounded-full px-4 py-1.5 text-[13px] font-semibold transition-colors"
-            style={{
-              background:
-                cadence === "monthly" ? "var(--ink-700)" : "transparent",
-              color:
-                cadence === "monthly" ? "var(--paper-0)" : "var(--fg-muted)",
-            }}
-          >
-            Mensuel
-          </button>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={cadence === "annual"}
-            onClick={() => setCadence("annual")}
-            className="ml-1 inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-semibold transition-colors"
-            style={{
-              background:
-                cadence === "annual" ? "var(--ink-700)" : "transparent",
-              color:
-                cadence === "annual" ? "var(--paper-0)" : "var(--fg-muted)",
-            }}
-          >
-            Annuel
-            <span
-              className="rounded-full px-1.5 py-px text-[10px] font-bold"
-              style={{
-                background:
-                  cadence === "annual"
-                    ? "var(--lavender-200)"
-                    : "var(--forest-50)",
-                color:
-                  cadence === "annual"
-                    ? "var(--lavender-800)"
-                    : "var(--forest-700)",
-                letterSpacing: "0.04em",
-              }}
-            >
-              −20 %
-            </span>
-          </button>
-        </div>
-      </div>
-
-      <div
-        className="mx-auto mt-14 grid gap-6 px-6 sm:px-8 md:grid-cols-3"
-        style={{ maxWidth: "1080px" }}
-      >
-        {TIERS.map((t) => {
-          const perMonth = effectivePerMonth(t.priceMonthly, cadence);
-          const saved = cadence === "annual" ? annualSaved(t.priceMonthly) : 0;
-          return (
-            <article
-              key={t.id}
-              className={`ic-tier ${t.featured ? "ic-tier-featured" : ""}`}
-              style={t.featured ? { transform: "translateY(-8px)" } : undefined}
-            >
-              {t.featured ? (
-                <div className="ic-tier-ribbon">La plus choisie</div>
-              ) : null}
-              <h3
-                className="m-0 text-[22px] font-bold"
-                style={{
-                  fontFamily: "var(--font-display)",
-                  letterSpacing: "-0.02em",
-                  color: "var(--ink-700)",
-                }}
-              >
-                {t.name}
-              </h3>
-              <p
-                className="m-0 text-[14px]"
-                style={{
-                  fontFamily: "var(--font-display)",
-                  color: "var(--fg-muted)",
-                }}
-              >
-                {t.tag}
-              </p>
-              <div
-                className="flex flex-col gap-1 py-3"
-                style={{
-                  borderTop: "1px solid var(--border)",
-                  borderBottom: "1px solid var(--border)",
-                }}
-              >
-                <div className="flex items-baseline gap-1.5">
-                  <span
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      fontSize: "56px",
-                      fontWeight: 700,
-                      letterSpacing: "-0.035em",
-                      lineHeight: 1,
-                      color: "var(--ink-700)",
-                    }}
-                  >
-                    {perMonth}
-                  </span>
-                  <span
-                    className="text-[13px]"
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      color: "var(--fg-muted)",
-                    }}
-                  >
-                    € / mois
-                  </span>
-                </div>
-                {cadence === "annual" && saved > 0 ? (
-                  <p
-                    className="text-[12px]"
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      color: "var(--forest-700)",
-                    }}
-                  >
-                    Soit {perMonth * 12} € facturés à l&apos;année · économise{" "}
-                    {saved} € / an
-                  </p>
-                ) : cadence === "monthly" && t.priceMonthly > 0 ? (
-                  <p
-                    className="text-[12px]"
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      color: "var(--fg-subtle)",
-                    }}
-                  >
-                    Sans engagement
-                  </p>
-                ) : null}
-              </div>
-              <ul className="m-0 flex flex-1 list-none flex-col gap-2.5 p-0">
-                {t.features.map((f) => (
-                  <li
-                    key={f}
-                    className="flex items-start gap-2.5 text-[14px]"
-                    style={{
-                      color: "var(--fg)",
-                      lineHeight: 1.45,
-                      fontFamily: "var(--font-display)",
-                    }}
-                  >
-                    <CheckIcon />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href={t.href}
-                className="mt-2 inline-flex items-center justify-center rounded-full px-5 py-3 text-[14px] font-semibold transition-all hover:translate-y-[-1px] hover:shadow-md"
-                style={{
-                  fontFamily: "var(--font-display)",
-                  background: t.featured
-                    ? "var(--ink-700)"
-                    : "var(--bg-elevated)",
-                  color: t.featured ? "var(--paper-0)" : "var(--ink-700)",
-                  border: t.featured
-                    ? "1px solid var(--ink-700)"
-                    : "1px solid var(--paper-300)",
-                }}
-              >
-                {t.cta}
-              </Link>
-            </article>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width="16"
-      height="16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+    <section
+      id="tarifs"
+      className="px-6 py-20 sm:px-8 sm:py-24"
       style={{
-        color: "var(--lavender-600)",
-        marginTop: "3px",
-        flexShrink: 0,
+        background: "var(--paper-0)",
+        borderTop: "1px solid var(--ink-700)",
+        borderBottom: "1px solid var(--ink-700)",
       }}
     >
-      <path d="M4 12 L10 18 L20 6" />
-    </svg>
+      <div className="mx-auto" style={{ maxWidth: "1280px" }}>
+        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <span className="ic-eyebrow-mono">Tarifs</span>
+            <h2
+              className="ic-bigsection mt-5"
+              style={{ fontSize: "clamp(34px, 5vw, 72px)" }}
+            >
+              Trois formules.<br />Annulable<br />en un clic.
+            </h2>
+          </div>
+          <div className="flex flex-col items-start gap-4 md:items-end">
+            <p
+              className="max-w-[380px] text-[15px]"
+              style={{
+                fontFamily: "var(--font-source-serif), Georgia, serif",
+                fontStyle: "italic",
+                color: "var(--ink-700)",
+                lineHeight: 1.55,
+              }}
+            >
+              « Découverte est gratuite, pour toujours. Tu passes payant
+              seulement quand tu en veux plus. »
+            </p>
+            <div
+              role="radiogroup"
+              aria-label="Cadence de facturation"
+              className="inline-flex"
+              style={{
+                border: "1px solid var(--ink-700)",
+                fontFamily: "var(--font-mono)",
+              }}
+            >
+              <button
+                type="button"
+                role="radio"
+                aria-checked={cadence === "monthly"}
+                onClick={() => setCadence("monthly")}
+                className="px-5 py-2.5 text-[12px] font-bold uppercase transition-colors"
+                style={{
+                  background:
+                    cadence === "monthly" ? "var(--ink-700)" : "transparent",
+                  color:
+                    cadence === "monthly" ? "var(--paper-0)" : "var(--ink-700)",
+                  letterSpacing: "0.1em",
+                }}
+              >
+                Mensuel
+              </button>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={cadence === "annual"}
+                onClick={() => setCadence("annual")}
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-[12px] font-bold uppercase transition-colors"
+                style={{
+                  background:
+                    cadence === "annual" ? "var(--ink-700)" : "transparent",
+                  color:
+                    cadence === "annual" ? "var(--paper-0)" : "var(--ink-700)",
+                  letterSpacing: "0.1em",
+                  borderLeft: "1px solid var(--ink-700)",
+                }}
+              >
+                Annuel
+                <span
+                  className="px-1.5 py-px text-[10px] font-bold"
+                  style={{
+                    background:
+                      cadence === "annual"
+                        ? "var(--rose-100)"
+                        : "var(--rose-100)",
+                    color: "var(--ink-700)",
+                    letterSpacing: "0.04em",
+                  }}
+                >
+                  −20 %
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <ul
+          className="grid md:grid-cols-3"
+          style={{ border: "1px solid var(--ink-700)" }}
+        >
+          {TIERS.map((t, idx) => {
+            const perMonth = effectivePerMonth(t.priceMonthly, cadence);
+            const saved = cadence === "annual" ? annualSaved(t.priceMonthly) : 0;
+            return (
+              <li
+                key={t.id}
+                style={{
+                  borderRight:
+                    idx < TIERS.length - 1
+                      ? "1px solid var(--ink-700)"
+                      : "none",
+                  background: t.featured
+                    ? "var(--terracotta-100)"
+                    : "var(--paper-0)",
+                }}
+              >
+                <article className="flex h-full flex-col">
+                  <div
+                    className="flex items-baseline justify-between gap-3 px-6 py-5 sm:px-8"
+                    style={{ borderBottom: "1px solid var(--ink-700)" }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase",
+                        color: "var(--ink-700)",
+                      }}
+                    >
+                      ↳ {t.name}
+                    </span>
+                    {t.featured ? (
+                      <span
+                        style={{
+                          fontFamily: "var(--font-mono)",
+                          fontSize: "10px",
+                          fontWeight: 700,
+                          letterSpacing: "0.14em",
+                          textTransform: "uppercase",
+                          color: "var(--paper-0)",
+                          background: "var(--ink-700)",
+                          padding: "3px 8px",
+                        }}
+                      >
+                        La plus choisie
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="px-6 py-8 sm:px-8">
+                    <p
+                      className="text-[14px]"
+                      style={{
+                        fontFamily: "var(--font-source-serif), Georgia, serif",
+                        fontStyle: "italic",
+                        color: "var(--ink-700)",
+                        lineHeight: 1.45,
+                      }}
+                    >
+                      « {t.tag} »
+                    </p>
+                    <div className="mt-6 flex items-baseline gap-2">
+                      <span
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          fontSize: "clamp(64px, 7vw, 96px)",
+                          fontWeight: 800,
+                          letterSpacing: "-0.045em",
+                          lineHeight: 0.95,
+                          color: "var(--ink-700)",
+                        }}
+                      >
+                        {perMonth}
+                      </span>
+                      <span
+                        style={{
+                          fontFamily: "var(--font-mono)",
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                          color: "var(--ink-700)",
+                        }}
+                      >
+                        € / mois
+                      </span>
+                    </div>
+                    <p
+                      className="mt-2 text-[11px]"
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        color: "var(--ink-700)",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                        opacity: 0.7,
+                        minHeight: "16px",
+                      }}
+                    >
+                      {cadence === "annual" && saved > 0
+                        ? `Soit ${perMonth * 12} € / an · économise ${saved} €`
+                        : cadence === "monthly" && t.priceMonthly > 0
+                          ? "Sans engagement"
+                          : t.priceMonthly === 0
+                            ? "Pour toujours"
+                            : ""}
+                    </p>
+                  </div>
+
+                  <ul
+                    className="flex flex-1 flex-col"
+                    style={{ borderTop: "1px solid var(--ink-700)" }}
+                  >
+                    {t.features.map((f) => (
+                      <li
+                        key={f}
+                        className="flex items-baseline gap-3 px-6 py-3 text-[14px] sm:px-8"
+                        style={{
+                          borderBottom: "1px solid var(--ink-700)",
+                          fontFamily: "var(--font-display)",
+                          color: "var(--ink-700)",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        <span
+                          aria-hidden="true"
+                          style={{
+                            fontFamily: "var(--font-mono)",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            color: "var(--ink-700)",
+                            opacity: 0.6,
+                          }}
+                        >
+                          ↳
+                        </span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="px-6 py-6 sm:px-8">
+                    <Link href={t.href} className="ic-btn-block w-full">
+                      {t.cta}
+                    </Link>
+                  </div>
+                </article>
+              </li>
+            );
+          })}
+        </ul>
+
+        <p
+          className="mt-6 text-[11px]"
+          style={{
+            fontFamily: "var(--font-mono)",
+            color: "var(--fg-muted)",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+          }}
+        >
+          Paiement sécurisé · Désabonnement en un clic · Données hébergées en France
+        </p>
+      </div>
+    </section>
   );
 }
