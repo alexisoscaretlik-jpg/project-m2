@@ -1,470 +1,380 @@
 import Link from "next/link";
 
 import { Nav } from "@/components/nav";
-import { DEV_USER_EMAIL, DEV_USER_ID, IS_DEV } from "@/lib/devUser";
-import { createClient } from "@/lib/supabase/server";
-import { serviceClient } from "@/lib/supabase/service";
+import { Footer } from "@/components/footer";
 
-import { deleteAvis } from "./actions";
-import { UploadForm } from "./upload-form";
+export const metadata = {
+  title: "Fiscalité — Invest Coach",
+  description:
+    "Optimise ton impôt sur le revenu, légalement. PEA, AV, PER, CTO, IR 2042, plus-values — trois étapes pour récupérer cinq à neuf cents euros par an.",
+};
 
-type Recommendation = {
+// White truck through colorful autumn forest — Unsplash HVRnH4TB54M.
+// Visual metaphor for the annual fiscal cycle: tu pars, tu traverses, tu arrives.
+const HERO_PHOTO =
+  "https://images.unsplash.com/photo-1776066361430-dd62847db7c6?auto=format&fit=crop&w=1600&q=85";
+
+const STEPS: {
+  number: string;
+  href: string;
+  eyebrow: string;
   title: string;
-  impact_eur: number | null;
-  why: string;
-  actions: string[];
-};
+  body: string;
+  pastel: string;
+}[] = [
+  {
+    number: "01",
+    href: "/tax/onboarding",
+    eyebrow: "Profil",
+    title: "Connecte ton avis d'imposition",
+    body: "PDF, photo, ou copie-colle. On lit ton TMI, tes revenus, tes parts. Aucune donnée ne quitte la France.",
+    pastel: "var(--rose-100)",
+  },
+  {
+    number: "02",
+    href: "/tax/levers",
+    eyebrow: "Leviers",
+    title: "On chiffre tes optimisations",
+    body: "PEA, AV, PER, dons, frais réels, déficit foncier. Trois à cinq leviers classés par euros gagnés, pas par buzz.",
+    pastel: "var(--lavender-200)",
+  },
+  {
+    number: "03",
+    href: "/tax/declaration",
+    eyebrow: "Déclaration",
+    title: "Tu signes ton 2042",
+    body: "On pré-remplit ton Cerfa 2042. Tu vérifies, tu signes, tu envoies à impots.gouv. Cinq minutes en mai.",
+    pastel: "var(--terracotta-100)",
+  },
+];
 
-type TaxProfile = {
-  id: number;
-  tax_year: number;
-  rfr: number | null;
-  revenu_imposable: number | null;
-  parts: number | null;
-  impot_revenu: number | null;
-  tmi: number | null;
-  situation: string | null;
-  nb_enfants: number | null;
-  recommendations: Recommendation[] | null;
-  created_at: string;
-};
+const LEVERS_LIST: { k: string; v: string }[] = [
+  { k: "PFU vs barème", v: "Case 2OP cochée ou non — un calcul, deux euros à la fin du mois." },
+  { k: "Plafond PER", v: "10 % de tes revenus déductibles, jusqu'à 32 909 € en 2026." },
+  { k: "PEA 5 ans", v: "Exonération d'IR sur les plus-values — 17,2 % de PS seulement." },
+  { k: "Donations", v: "100 000 € exonérés tous les 15 ans, par parent et par enfant." },
+  { k: "Déficit foncier", v: "Jusqu'à 10 700 € imputables sur le revenu global, sous conditions." },
+  { k: "Frais réels", v: "Repas, kilomètres, télétravail — la décote forfaitaire n'est pas toujours la meilleure." },
+];
 
-type Onboarding = {
-  profile_type: string;
-  income_types: string[] | null;
-  situation: string | null;
-  nb_enfants: number | null;
-  owns_real_estate: boolean | null;
-  has_investments: boolean | null;
-  has_crypto: boolean | null;
-  goals: string[] | null;
-};
-
-const PROFILE_LABEL: Record<string, string> = {
-  salarie: "Salarié",
-  freelance_micro: "Freelance micro",
-  freelance_reel: "Freelance réel (BNC/BIC)",
-  mixte: "Salaire + indépendant",
-  retraite: "Retraité",
-  etudiant: "Étudiant",
-  sans_emploi: "Sans emploi",
-  other: "Autre",
-};
-
-function fmtEur(n: number | null): string {
-  if (n == null) return "—";
-  return new Intl.NumberFormat("fr-FR", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 0,
-  }).format(n);
-}
-
-export default async function TaxPage() {
-  const sb = await createClient();
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
-
-  // Dev bypass: if no authenticated user and we're in dev, act as the
-  // hardcoded test user and use service client to bypass RLS.
-  const userId = user?.id ?? (IS_DEV ? DEV_USER_ID : null);
-  const userEmail = user?.email ?? (IS_DEV ? DEV_USER_EMAIL : null);
-  const db = user ? sb : IS_DEV ? serviceClient() : sb;
-
-  // Parallel fetch: subscription tier, onboarding, latest avis, wizard answers.
-  const [tierRes, onboardingRes, profilesRes, wizardRes] = await Promise.all([
-    db.from("profiles").select("tier").eq("user_id", userId ?? "").maybeSingle(),
-    db
-      .from("tax_onboarding")
-      .select(
-        "profile_type, income_types, situation, nb_enfants, owns_real_estate, has_investments, has_crypto, goals",
-      )
-      .eq("user_id", userId ?? "")
-      .maybeSingle(),
-    db
-      .from("tax_profiles")
-      .select(
-        "id, tax_year, rfr, revenu_imposable, parts, impot_revenu, tmi, situation, nb_enfants, recommendations, created_at",
-      )
-      .eq("user_id", userId ?? "")
-      .order("tax_year", { ascending: false }),
-    db
-      .from("typeform_responses")
-      .select("submitted_at")
-      .eq("user_id", userId ?? "")
-      .order("submitted_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-  ]);
-
-  const tier = (tierRes.data?.tier as string | undefined) ?? "free";
-  const isPaid = tier === "plus" || tier === "wealth";
-  const onboarding = (onboardingRes.data ?? null) as Onboarding | null;
-  const latest = ((profilesRes.data ?? []) as TaxProfile[])[0] ?? null;
-  const hasWizard = !!wizardRes.data;
-
+export default function TaxLandingPage() {
   return (
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/tax" />
 
+      {/* Row 1 — peach pastel hero with mega wordmark stack. */}
       <section
-        className="relative overflow-hidden"
-        style={{
-          background:
-            "radial-gradient(120% 60% at 50% 0%, var(--lavender-100) 0%, var(--paper-50) 60%, var(--paper-50) 100%)",
-        }}
+        className="ic-block-peach px-6 pt-12 pb-8 sm:px-8 sm:pt-16 sm:pb-12"
+        style={{ borderBottom: "1px solid var(--ink-700)" }}
+        aria-labelledby="tax-mark"
+      >
+        <span className="ic-eyebrow-mono">Fiscalité</span>
+        <h1 id="tax-mark" className="mt-5">
+          <span className="ic-mega" style={{ fontSize: "clamp(56px, 13vw, 200px)" }}>
+            OPTIMISE
+          </span>
+          <span className="ic-mega" style={{ fontSize: "clamp(56px, 13vw, 200px)" }}>
+            LÉGALEMENT
+          </span>
+        </h1>
+      </section>
+
+      {/* Row 2 — mono tagline strip. */}
+      <p className="ic-strip">
+        PEA · AV · PER · CTO · IR 2042 · Plus-values · Donations · Déficit foncier
+      </p>
+
+      {/* Row 3 — lilac × autumn forest truck split. */}
+      <div
+        className="grid md:grid-cols-2"
+        style={{ borderBottom: "1px solid var(--ink-700)" }}
       >
         <div
-          className="mx-auto px-6 pt-16 pb-8 text-center sm:px-8 sm:pt-20"
-          style={{ maxWidth: "880px" }}
+          className="ic-block-lilac flex min-h-[460px] flex-col justify-between px-6 py-12 sm:px-10 sm:py-16 md:min-h-[560px]"
+          style={{ borderRight: "1px solid var(--ink-700)" }}
         >
-          <div className="mb-6 flex justify-center">
-            <span className="ic-pill">
-              <span className="ic-pill-badge">Fiscalité</span>
-              IR · PEA · AV · PER · revenus fonciers
-            </span>
+          <div>
+            <span className="ic-eyebrow-mono mb-6 inline-flex">Le cycle fiscal</span>
+            <h2
+              className="ic-bigsection mb-6"
+              style={{ fontSize: "clamp(34px, 5vw, 72px)" }}
+            >
+              Tu pars.<br />Tu traverses.<br />Tu arrives.
+            </h2>
+            <p
+              className="max-w-[440px] text-[16px]"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--ink-700)",
+                lineHeight: 1.55,
+              }}
+            >
+              Chaque année, le même chemin — janvier à mai. On t&apos;y suit.
+              Profil, leviers, déclaration. Trois étapes, quinze minutes, et
+              entre 500 et 5 000 € de récupérés selon ta situation.
+            </p>
           </div>
-          <h1 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
-            Économiser de l&apos;impôt, <em>c&apos;est gagner de l&apos;argent.</em>
-          </h1>
-          <p
-            className="mx-auto mt-5 text-[17px]"
-            style={{
-              maxWidth: "560px",
-              fontFamily: "var(--font-display)",
-              color: "var(--fg-muted)",
-              lineHeight: 1.55,
-            }}
+
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            <Link href="/tax/onboarding" className="ic-btn-block">
+              ↳ Démarrer ma déclaration
+            </Link>
+            <p
+              className="text-[11px]"
+              style={{
+                fontFamily: "var(--font-mono)",
+                color: "var(--ink-700)",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
+            >
+              Données hébergées en France
+            </p>
+          </div>
+        </div>
+
+        <div
+          className="relative min-h-[300px] md:min-h-[560px]"
+          style={{ background: "var(--ink-700)" }}
+        >
+          <img
+            src={HERO_PHOTO}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ display: "block" }}
+          />
+        </div>
+      </div>
+
+      {/* Row 4 — three steps as bordered ink grid, each linking to a sub-page. */}
+      <section
+        className="px-6 py-20 sm:px-8 sm:py-24"
+        style={{
+          background: "var(--paper-0)",
+          borderBottom: "1px solid var(--ink-700)",
+        }}
+      >
+        <div className="mx-auto" style={{ maxWidth: "1280px" }}>
+          <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <span className="ic-eyebrow-mono">Trois étapes</span>
+              <h2
+                className="ic-bigsection mt-5"
+                style={{ fontSize: "clamp(34px, 5vw, 72px)" }}
+              >
+                Quinze minutes<br />pour récupérer<br />ton mois de mai.
+              </h2>
+            </div>
+            <p
+              className="max-w-[420px] text-[15px]"
+              style={{
+                fontFamily: "var(--font-source-serif), Georgia, serif",
+                fontStyle: "italic",
+                color: "var(--ink-700)",
+                lineHeight: 1.55,
+              }}
+            >
+              « Pas de rendez-vous, pas de jargon de conseiller, pas de revente
+              de ta data. Tu pilotes, on chiffre, l&apos;État encaisse moins. »
+            </p>
+          </div>
+
+          <ul
+            className="grid md:grid-cols-3"
+            style={{ border: "1px solid var(--ink-700)" }}
           >
-            Pour résidents fiscaux français. Salariés, freelances, retraités.
-            Trois à cinq leviers chiffrés en euros · pas de jargon · pas de
-            promesses.
-          </p>
+            {STEPS.map((s, idx) => (
+              <li
+                key={s.number}
+                style={{
+                  borderRight:
+                    idx < STEPS.length - 1
+                      ? "1px solid var(--ink-700)"
+                      : "none",
+                }}
+              >
+                <Link
+                  href={s.href}
+                  className="block h-full transition-colors hover:bg-[var(--paper-100)]"
+                >
+                  <article className="flex h-full flex-col">
+                    <div
+                      className="flex items-center justify-center"
+                      style={{
+                        background: s.pastel,
+                        borderBottom: "1px solid var(--ink-700)",
+                        padding: "32px 24px",
+                        minHeight: "200px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          fontSize: "clamp(72px, 9vw, 120px)",
+                          fontWeight: 800,
+                          letterSpacing: "-0.04em",
+                          color: "var(--ink-700)",
+                          lineHeight: 1,
+                        }}
+                      >
+                        {s.number}
+                      </span>
+                    </div>
+                    <div className="flex flex-1 flex-col gap-3 px-6 py-6 sm:px-8 sm:py-8">
+                      <div className="flex items-baseline justify-between gap-4">
+                        <span
+                          style={{
+                            fontFamily: "var(--font-mono)",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            letterSpacing: "0.14em",
+                            textTransform: "uppercase",
+                            color: "var(--ink-700)",
+                          }}
+                        >
+                          ↳ Étape {s.number} · {s.eyebrow}
+                        </span>
+                        <span
+                          aria-hidden="true"
+                          style={{
+                            fontFamily: "var(--font-mono)",
+                            fontSize: "16px",
+                            fontWeight: 700,
+                            color: "var(--ink-700)",
+                          }}
+                        >
+                          →
+                        </span>
+                      </div>
+                      <h3
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          fontSize: "20px",
+                          fontWeight: 700,
+                          letterSpacing: "-0.02em",
+                          lineHeight: 1.2,
+                          color: "var(--ink-700)",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {s.title}
+                      </h3>
+                      <p
+                        className="flex-1 text-[14px]"
+                        style={{
+                          fontFamily: "var(--font-source-serif), Georgia, serif",
+                          fontStyle: "italic",
+                          color: "var(--ink-700)",
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        « {s.body} »
+                      </p>
+                    </div>
+                  </article>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <div className="mx-auto max-w-2xl px-6 py-8 sm:px-8">
-        {/* Educational banner — links to the levers catalog */}
-        <Link
-          href="/tax/levers"
-          className="mt-4 flex items-center justify-between rounded-xl border border-[color:var(--forest-200)] bg-gradient-to-br from-blue-50 to-indigo-50 p-4 transition hover:border-primary"
-        >
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-wide text-primary">
-              Nouveau · Guide pédagogique
+      {/* Row 5 — rose block "Ce qu'on chiffre pour toi" with editorial drop-cap. */}
+      <section className="ic-block-rose px-6 py-20 sm:px-8 sm:py-24">
+        <div className="mx-auto" style={{ maxWidth: "1080px" }}>
+          <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <span className="ic-eyebrow-mono">Ce qu&apos;on chiffre</span>
+              <h2
+                className="ic-bigsection mt-5"
+                style={{ fontSize: "clamp(30px, 4.4vw, 60px)" }}
+              >
+                Six leviers<br />qu&apos;on connaît<br />par cœur.
+              </h2>
             </div>
-            <div className="mt-1 text-sm font-semibold text-foreground">
-              Comprendre tous les leviers fiscaux en 15 minutes
-            </div>
-            <div className="mt-0.5 text-xs text-muted-foreground">
-              4 tiers, du plus simple (PER, dons) au plus avancé
-              (Girardin, Malraux).
-            </div>
-          </div>
-          <span className="text-xl text-primary">→</span>
-        </Link>
-
-        {/* Step 1 — onboarding */}
-        {!onboarding ? (
-          <section className="mt-6 rounded-xl border border-[color:var(--forest-200)] bg-accent p-6 shadow-sm">
-            <div className="text-xs font-semibold uppercase tracking-wide text-primary">
-              Étape 1 · Profil
-            </div>
-            <h2 className="mt-1 text-lg font-semibold text-foreground">
-              Commencez par 5 questions
-            </h2>
-            <p className="mt-2 text-sm text-foreground">
-              Salarié, freelance, mixte&nbsp;? Propriétaire, investisseur, crypto&nbsp;?
-              Chaque situation ouvre des leviers fiscaux différents. Deux
-              minutes pour débloquer des recommandations personnalisées.
-            </p>
-            <Link
-              href="/tax/onboarding"
-              className="mt-4 inline-block rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary"
+            <p
+              className="max-w-[380px] text-[15px]"
+              style={{
+                fontFamily: "var(--font-display)",
+                color: "var(--ink-700)",
+                lineHeight: 1.55,
+              }}
             >
-              Remplir le questionnaire →
+              Pas de magie, pas de niche douteuse. Six décisions qui pèsent,
+              et qu&apos;on peut chiffrer sur ton vrai salaire.
+            </p>
+          </div>
+
+          <ul
+            style={{
+              borderTop: "1px solid var(--ink-700)",
+              borderBottom: "1px solid var(--ink-700)",
+            }}
+          >
+            {LEVERS_LIST.map((item, i) => (
+              <li
+                key={item.k}
+                className="grid grid-cols-1 gap-2 py-5 md:grid-cols-[200px_1fr] md:gap-8 md:py-6"
+                style={{
+                  borderBottom:
+                    i < LEVERS_LIST.length - 1
+                      ? "1px solid var(--ink-700)"
+                      : "none",
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-700)",
+                  }}
+                >
+                  ↳ {item.k}
+                </span>
+                <span
+                  className="text-[15px] md:text-[16px]"
+                  style={{
+                    fontFamily: "var(--font-source-serif), Georgia, serif",
+                    fontStyle: "italic",
+                    color: "var(--ink-700)",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  « {item.v} »
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            <Link href="/tax/levers" className="ic-btn-block">
+              ↳ Voir les 14 leviers du catalogue
             </Link>
-          </section>
-        ) : (
-          <section className="mt-6 rounded-xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex items-baseline justify-between">
-              <div>
-                <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--forest-700)]">
-                  Étape 1 · Profil ✓
-                </div>
-                <h2 className="mt-1 text-base font-semibold text-foreground">
-                  {PROFILE_LABEL[onboarding.profile_type] ?? onboarding.profile_type}
-                </h2>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {(onboarding.income_types ?? []).join(", ") || "Revenus non précisés"}
-                  {onboarding.owns_real_estate ? " · propriétaire" : ""}
-                  {onboarding.has_investments ? " · placements" : ""}
-                  {onboarding.has_crypto ? " · crypto" : ""}
-                </p>
-              </div>
-              <Link
-                href="/tax/onboarding"
-                className="text-xs text-muted-foreground hover:text-primary"
-              >
-                Modifier
-              </Link>
-            </div>
-          </section>
-        )}
-
-        {/* Step 2 — avis upload */}
-        {onboarding && !latest ? (
-          <section className="mt-4 rounded-xl border border-border bg-card p-6 shadow-sm">
-            <div className="text-xs font-semibold uppercase tracking-wide text-primary">
-              Étape 2 · Avis d&apos;imposition
-            </div>
-            <h2 className="mt-1 text-lg font-semibold text-foreground">
-              Chargez votre dernier avis
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Claude extrait RFR, TMI, parts et situation, puis croise ces
-              données avec votre profil pour générer 3-5 optimisations
-              chiffrées.
+            <p
+              className="text-[11px]"
+              style={{
+                fontFamily: "var(--font-mono)",
+                color: "var(--ink-700)",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
+            >
+              4 tiers · du PER aux Girardin / Malraux
             </p>
-            <div className="mt-4">
-              <UploadForm />
-            </div>
-          </section>
-        ) : null}
+          </div>
+        </div>
+      </section>
 
-        {/* Step 3 — tax profile summary */}
-        {latest ? (
-          <>
-            <section className="mt-4 rounded-xl border border-border bg-card p-6 shadow-sm">
-              <div className="flex items-baseline justify-between">
-                <div>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--forest-700)]">
-                    Étape 2 · Avis ✓
-                  </div>
-                  <h2 className="mt-1 text-lg font-semibold text-foreground">
-                    Votre profil {latest.tax_year}
-                  </h2>
-                </div>
-                <form action={deleteAvis}>
-                  <input type="hidden" name="tax_year" value={latest.tax_year} />
-                  <button
-                    type="submit"
-                    className="text-xs text-muted-foreground hover:text-[color:var(--terracotta-500)]"
-                  >
-                    Supprimer &amp; recharger
-                  </button>
-                </form>
-              </div>
-              <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <dt className="text-xs uppercase text-muted-foreground">RFR</dt>
-                  <dd className="font-medium text-foreground">
-                    {fmtEur(latest.rfr)}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase text-muted-foreground">
-                    Revenu imposable
-                  </dt>
-                  <dd className="font-medium text-foreground">
-                    {fmtEur(latest.revenu_imposable)}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase text-muted-foreground">
-                    Impôt sur le revenu
-                  </dt>
-                  <dd className="font-medium text-foreground">
-                    {fmtEur(latest.impot_revenu)}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase text-muted-foreground">TMI</dt>
-                  <dd className="font-medium text-foreground">
-                    {latest.tmi != null ? `${latest.tmi} %` : "—"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase text-muted-foreground">Parts</dt>
-                  <dd className="font-medium text-foreground">
-                    {latest.parts ?? "—"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase text-muted-foreground">
-                    Situation
-                  </dt>
-                  <dd className="font-medium text-foreground">
-                    {latest.situation ?? "—"}
-                    {latest.nb_enfants
-                      ? ` · ${latest.nb_enfants} enfant(s)`
-                      : ""}
-                  </dd>
-                </div>
-              </dl>
-            </section>
+      {/* Disclaimer strip. */}
+      <p className="ic-strip">
+        Informations éducatives · Pas un conseil fiscal personnalisé · Confirme avec un expert-comptable
+      </p>
 
-            {/* Step 4 — recommendations (paywalled) */}
-            <section className="mt-4">
-              <div className="mb-3 flex items-baseline justify-between">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                  Recommandations personnalisées
-                </h2>
-                {!isPaid ? (
-                  <span className="rounded-full bg-[color:var(--warning-soft)] px-2 py-0.5 text-[11px] font-medium text-[color:var(--warning)]">
-                    Plus requis
-                  </span>
-                ) : null}
-              </div>
-
-              {latest.recommendations && latest.recommendations.length > 0 ? (
-                isPaid ? (
-                  <ul className="space-y-3">
-                    {latest.recommendations.map((r, i) => (
-                      <li
-                        key={i}
-                        className="rounded-xl border border-border bg-card p-5 shadow-sm"
-                      >
-                        <div className="flex items-baseline justify-between gap-3">
-                          <h3 className="text-base font-semibold text-foreground">
-                            {r.title}
-                          </h3>
-                          {r.impact_eur != null ? (
-                            <span className="whitespace-nowrap rounded-full bg-[color:var(--forest-100)] px-2 py-0.5 text-xs font-medium text-[color:var(--forest-700)]">
-                              ~{fmtEur(r.impact_eur)}/an
-                            </span>
-                          ) : null}
-                        </div>
-                        <p className="mt-2 text-sm text-muted-foreground">{r.why}</p>
-                        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-foreground">
-                          {r.actions.map((a, j) => (
-                            <li key={j}>{a}</li>
-                          ))}
-                        </ul>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="rounded-xl border border-[color:var(--warning)] bg-card p-6 shadow-sm">
-                    <p className="text-sm text-foreground">
-                      Claude a identifié{" "}
-                      <strong>{latest.recommendations.length} leviers</strong>{" "}
-                      pour votre profil
-                      {latest.recommendations.some(
-                        (r) => r.impact_eur != null,
-                      ) ? (
-                        <>
-                          , avec un impact total estimé à{" "}
-                          <strong>
-                            {fmtEur(
-                              latest.recommendations.reduce(
-                                (s, r) => s + (r.impact_eur ?? 0),
-                                0,
-                              ),
-                            )}
-                          </strong>{" "}
-                          d&apos;économie annuelle potentielle.
-                        </>
-                      ) : (
-                        "."
-                      )}
-                    </p>
-                    <ul className="mt-4 space-y-2">
-                      {latest.recommendations.slice(0, 3).map((r, i) => (
-                        <li
-                          key={i}
-                          className="flex items-baseline gap-2 text-sm text-muted-foreground"
-                        >
-                          <span className="text-[color:var(--warning)]">●</span>
-                          <span className="select-none blur-sm">
-                            {r.title}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Link
-                      href="/subscription"
-                      className="mt-5 inline-block rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-white hover:bg-[color:var(--ink-500)]"
-                    >
-                      Débloquer le détail (Plus) →
-                    </Link>
-                  </div>
-                )
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  Aucune recommandation — essayez de recharger l&apos;avis.
-                </p>
-              )}
-
-              <p className="mt-4 text-xs text-muted-foreground">
-                Informations éducatives. Ne constitue pas un conseil fiscal
-                personnalisé au sens de la loi. Confirmez avec un
-                expert-comptable ou un notaire avant d&apos;agir.
-              </p>
-            </section>
-          </>
-        ) : null}
-
-        {/* Step 3 — declaration wizard + PDF download */}
-        {onboarding ? (
-          <section className="mt-4 rounded-xl border border-border bg-card p-6 shadow-sm">
-            <div className="text-xs font-semibold uppercase tracking-wide text-primary">
-              Étape 3 · Déclaration pré-remplie
-              {hasWizard ? " ✓" : ""}
-            </div>
-            <h2 className="mt-1 text-lg font-semibold text-foreground">
-              {hasWizard
-                ? "Votre questionnaire est complet"
-                : "Remplissez votre déclaration en 14 questions"}
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {hasWizard
-                ? "Téléchargez votre formulaire Cerfa 2042 pré-rempli. À vérifier et signer avant de soumettre sur impots.gouv.fr."
-                : "Un questionnaire rapide (salaires, dividendes, PER, dons…) puis Claude génère votre Cerfa 2042 pré-rempli, prêt à télécharger."}
-            </p>
-
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <Link
-                href="/tax/declaration"
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary"
-              >
-                {hasWizard
-                  ? "Modifier mes réponses"
-                  : "Commencer le questionnaire →"}
-              </Link>
-
-              {hasWizard ? (
-                isPaid ? (
-                  <a
-                    href="/api/tax/declaration"
-                    className="rounded-lg border border-[color:var(--forest-300)] bg-[color:var(--forest-50)] px-4 py-2 text-sm font-medium text-[color:var(--forest-700)] hover:bg-[color:var(--forest-100)]"
-                  >
-                    Télécharger la Cerfa 2042 (PDF)
-                  </a>
-                ) : (
-                  <Link
-                    href="/subscription"
-                    className="rounded-full px-5 py-2 text-sm font-semibold transition-all hover:translate-y-[-1px] hover:shadow-md"
-                    style={{
-                      background: "var(--lavender-50)",
-                      color: "var(--lavender-700)",
-                      border: "1px solid var(--lavender-300)",
-                    }}
-                  >
-                    Passer à Investisseur →
-                  </Link>
-                )
-              ) : null}
-            </div>
-          </section>
-        ) : null}
-
-        <p className="mt-6 text-xs text-muted-foreground">
-          Connecté en tant que {userEmail ?? "—"}.
-          {!user && IS_DEV ? " (DEV bypass actif)" : null}
-        </p>
-      </div>
+      <Footer />
     </main>
   );
 }
