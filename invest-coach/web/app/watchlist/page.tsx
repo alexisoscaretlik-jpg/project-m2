@@ -18,27 +18,24 @@ type FeedCard = {
   companies: Company | Company[] | null;
 };
 
-const toneStyles: Record<string, { bg: string; fg: string; label: string }> = {
-  bullish: {
-    bg: "var(--forest-50)",
-    fg: "var(--forest-700)",
-    label: "Solide",
-  },
-  cautious: {
-    bg: "var(--warning-soft)",
-    fg: "var(--warning)",
-    label: "À surveiller",
-  },
-  red_flag: {
-    bg: "var(--terracotta-50)",
-    fg: "var(--terracotta-700)",
-    label: "Signal rouge",
-  },
-  educational: {
-    bg: "var(--lavender-50)",
-    fg: "var(--lavender-700)",
-    label: "Pédagogique",
-  },
+// Smartphone (Unsplash qUJ8fgoaLTg) — modern, calm, mobile-first feel
+// fits the watchlist alert metaphor.
+const HERO_PHOTO =
+  "https://images.unsplash.com/photo-1773332611514-238856b76198?auto=format&fit=crop&w=1600&q=85";
+
+// Tone → palette C pastel. No greens / reds / yellows. Direction is
+// signalled through pastel background only; border + text stay ink.
+const TONE_BG: Record<string, string> = {
+  bullish: "var(--lavender-200)",      // solide → lilac
+  cautious: "var(--terracotta-100)",   // à surveiller → peach
+  red_flag: "var(--rose-100)",         // signal rouge → rose
+  educational: "var(--paper-100)",     // pédagogique → off-white
+};
+const TONE_LABEL: Record<string, string> = {
+  bullish: "solide",
+  cautious: "à surveiller",
+  red_flag: "signal rouge",
+  educational: "pédagogique",
 };
 
 function first<T>(v: T | T[] | null): T | null {
@@ -46,322 +43,442 @@ function first<T>(v: T | T[] | null): T | null {
   return Array.isArray(v) ? v[0] ?? null : v;
 }
 
-function formatFrenchDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+function formatDateMono(iso: string) {
+  const d = new Date(iso);
+  const months = [
+    "JAN", "FÉV", "MAR", "AVR", "MAI", "JUI",
+    "JUL", "AOÛ", "SEP", "OCT", "NOV", "DÉC",
+  ];
+  return `${months[d.getMonth()]} ${d.getDate()} · ${d.getFullYear()}`;
 }
 
 export default async function WatchlistPage() {
   const { supabase: sb } = await requireUser("/watchlist");
 
-  const { data: rows } = await sb
-    .from("watchlist")
-    .select("company_id, companies(id, ticker, name, country)")
-    .order("created_at", { ascending: false });
-
-  const watched = ((rows ?? []) as WatchlistRow[])
-    .map((r) => first(r.companies))
-    .filter((c): c is Company => !!c);
-
-  const { data: allCompanies } = await sb
-    .from("companies")
-    .select("id, ticker, name, country")
-    .order("ticker");
-
-  const watchedIds = new Set(watched.map((c) => c.id));
-  const addable = ((allCompanies ?? []) as Company[]).filter(
-    (c) => !watchedIds.has(c.id),
-  );
-
+  // All Supabase calls wrapped in try/catch so the page never crashes
+  // when env is missing in dev preview.
+  let watched: Company[] = [];
+  let addable: Company[] = [];
   let feed: FeedCard[] = [];
-  if (watched.length > 0) {
-    const { data: cards } = await sb
-      .from("cards")
-      .select(
-        "id, title, tone, published_at, company_id, companies(id, ticker, name, country)",
-      )
-      .in("company_id", Array.from(watchedIds))
-      .order("published_at", { ascending: false })
-      .limit(20);
-    feed = (cards ?? []) as FeedCard[];
+
+  try {
+    const { data: rows } = await sb
+      .from("watchlist")
+      .select("company_id, companies(id, ticker, name, country)")
+      .order("created_at", { ascending: false });
+
+    watched = ((rows ?? []) as WatchlistRow[])
+      .map((r) => first(r.companies))
+      .filter((c): c is Company => !!c);
+
+    const { data: allCompanies } = await sb
+      .from("companies")
+      .select("id, ticker, name, country")
+      .order("ticker");
+
+    const watchedIds = new Set(watched.map((c) => c.id));
+    addable = ((allCompanies ?? []) as Company[]).filter(
+      (c) => !watchedIds.has(c.id),
+    );
+
+    if (watched.length > 0) {
+      const { data: cards } = await sb
+        .from("cards")
+        .select(
+          "id, title, tone, published_at, company_id, companies(id, ticker, name, country)",
+        )
+        .in("company_id", Array.from(watchedIds))
+        .order("published_at", { ascending: false })
+        .limit(20);
+      feed = (cards ?? []) as FeedCard[];
+    }
+  } catch {
+    // Stay quiet — the empty-state UI handles "no data" gracefully.
   }
 
   return (
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/watchlist" />
 
+      {/* Row 1 — peach hero with mega wordmark stack. */}
       <section
-        className="relative overflow-hidden"
-        style={{
-          background:
-            "radial-gradient(120% 60% at 50% 0%, var(--lavender-100) 0%, var(--paper-50) 60%, var(--paper-50) 100%)",
-        }}
+        className="ic-block-peach px-6 pt-12 pb-8 sm:px-8 sm:pt-16 sm:pb-12"
+        style={{ borderBottom: "1px solid var(--ink-700)" }}
+        aria-labelledby="watchlist-mark"
       >
-        <div
-          className="mx-auto px-6 pt-16 pb-10 text-center sm:px-8 sm:pt-20"
-          style={{ maxWidth: "880px" }}
-        >
-          <div className="mb-6 flex justify-center">
-            <span className="ic-pill">
-              <span className="ic-pill-badge">Suivi</span>
-              {watched.length} entreprise{watched.length === 1 ? "" : "s"} suivie{watched.length === 1 ? "" : "s"}
-            </span>
-          </div>
-          <h1 className="ic-h1 mx-auto" style={{ maxWidth: "720px" }}>
-            Watchlist
-          </h1>
-          <p
-            className="mx-auto mt-5 text-[17px]"
-            style={{
-              maxWidth: "560px",
-              fontFamily: "var(--font-display)",
-              color: "var(--fg-muted)",
-              lineHeight: 1.55,
-            }}
-          >
-            Suis les entreprises qui te concernent. Pas de prix en temps réel —
-            on te ping quand une publication compte vraiment.
-          </p>
-        </div>
+        <span className="ic-eyebrow-mono">Watchlist</span>
+        <h1 id="watchlist-mark" className="mt-5">
+          <span className="ic-mega" style={{ fontSize: "clamp(56px, 13vw, 200px)" }}>
+            TES ENTREPRISES
+          </span>
+          <span className="ic-mega" style={{ fontSize: "clamp(56px, 13vw, 200px)" }}>
+            TON COACH
+          </span>
+        </h1>
       </section>
 
-      <div className="mx-auto max-w-3xl px-6 pt-4 pb-16 sm:px-8">
-        {watched.length > 0 ? (
-          <section>
-            <div
-              className="mb-3 text-[11px] font-semibold uppercase"
-              style={{
-                fontFamily: "var(--font-display)",
-                color: "var(--lavender-700)",
-                letterSpacing: "0.12em",
-              }}
-            >
-              Tu suis
-            </div>
-            <ul className="space-y-2">
-              {watched.map((c) => (
-                <li
-                  key={c.id}
-                  className="flex items-center justify-between rounded-2xl px-5 py-4"
-                  style={{
-                    background: "var(--bg-elevated)",
-                    border: "1px solid var(--border)",
-                  }}
-                >
-                  <Link
-                    href={`/ticker/${encodeURIComponent(c.ticker)}`}
-                    className="flex items-baseline gap-3"
-                  >
-                    <span
-                      className="text-[14px] font-semibold"
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        color: "var(--ink-700)",
-                        letterSpacing: "0.02em",
-                      }}
-                    >
-                      {c.ticker}
-                    </span>
-                    <span
-                      className="text-[14px]"
-                      style={{
-                        fontFamily: "var(--font-display)",
-                        color: "var(--fg)",
-                      }}
-                    >
-                      {c.name}
-                    </span>
-                  </Link>
-                  <form action={removeFromWatchlist}>
-                    <input type="hidden" name="company_id" value={c.id} />
-                    <button
-                      type="submit"
-                      className="text-[12px] transition-colors hover:text-[var(--terracotta-500)]"
-                      style={{
-                        fontFamily: "var(--font-display)",
-                        color: "var(--fg-muted)",
-                      }}
-                    >
-                      Retirer
-                    </button>
-                  </form>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : (
-          <section
-            className="ic-card-pastel-lavender"
-            style={{
-              borderRadius: "var(--r-2xl)",
-              padding: "32px 28px",
-              border: "1px solid rgba(124,91,250,0.14)",
-            }}
-          >
-            <div
-              className="text-[11px] font-semibold uppercase"
-              style={{
-                fontFamily: "var(--font-display)",
-                color: "var(--lavender-700)",
-                letterSpacing: "0.12em",
-              }}
-            >
-              Ta liste est vide
-            </div>
+      {/* Row 2 — mono tagline strip. */}
+      <p className="ic-strip">
+        Publications trimestrielles · Alertes AMF · Pas de prix temps réel · Pas de signal d&apos;achat
+      </p>
+
+      {/* Row 3 — lilac × smartphone photo split. */}
+      <div
+        className="grid md:grid-cols-2"
+        style={{ borderBottom: "1px solid var(--ink-700)" }}
+      >
+        <div
+          className="ic-block-lilac flex min-h-[420px] flex-col justify-between px-6 py-12 sm:px-10 sm:py-16 md:min-h-[520px]"
+          style={{ borderRight: "1px solid var(--ink-700)" }}
+        >
+          <div>
+            <span className="ic-eyebrow-mono mb-6 inline-flex">La méthode</span>
             <h2
-              className="mt-2 text-[22px] font-bold"
+              className="ic-bigsection mb-6"
+              style={{ fontSize: "clamp(34px, 5vw, 72px)" }}
+            >
+              Tu choisis.<br />On lit.<br />On t&apos;explique.
+            </h2>
+            <p
+              className="max-w-[440px] text-[16px]"
               style={{
                 fontFamily: "var(--font-display)",
                 color: "var(--ink-700)",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              Ajoute ta première action.
-            </h2>
-            <p
-              className="mt-2 text-[15px]"
-              style={{
-                fontFamily: "var(--font-display)",
-                color: "var(--fg-muted)",
                 lineHeight: 1.55,
               }}
             >
-              Choisis une entreprise dans la liste ci-dessous. On t&apos;enverra
-              les coachings dès qu&apos;elle publie un événement public —
-              rapport trimestriel, alerte AMF, changement de direction.
+              Suis les sociétés cotées qui te concernent vraiment. À chaque
+              publication trimestrielle ou alerte AMF, on t&apos;envoie une
+              lecture éducative en français : earnings, guidance, changements
+              de direction. Jamais de notification commerciale. Jamais de prix
+              en temps réel.
             </p>
-          </section>
-        )}
+          </div>
 
-        {addable.length > 0 ? (
-          <section className="mt-10">
-            <div
-              className="mb-3 text-[11px] font-semibold uppercase"
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            <span
+              className="text-[11px]"
               style={{
-                fontFamily: "var(--font-display)",
-                color: "var(--lavender-700)",
-                letterSpacing: "0.12em",
+                fontFamily: "var(--font-mono)",
+                color: "var(--ink-700)",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
               }}
             >
-              Ajouter une entreprise
-            </div>
-            <ul className="flex flex-wrap gap-2">
-              {addable.map((c) => (
-                <li key={c.id}>
-                  <form action={addToWatchlist}>
-                    <input type="hidden" name="ticker" value={c.ticker} />
-                    <button
-                      type="submit"
-                      className="rounded-full px-4 py-2 transition-all hover:translate-y-[-1px]"
-                      style={{
-                        background: "var(--bg-elevated)",
-                        border: "1px solid var(--paper-300)",
-                        fontFamily: "var(--font-display)",
-                      }}
+              {watched.length} {watched.length === 1 ? "entreprise suivie" : "entreprises suivies"}
+            </span>
+            {feed.length > 0 ? (
+              <span
+                className="text-[11px]"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  color: "var(--ink-700)",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                }}
+              >
+                · {feed.length} coachings récents
+              </span>
+            ) : null}
+          </div>
+        </div>
+
+        <div
+          className="relative min-h-[260px] md:min-h-[520px]"
+          style={{ background: "var(--ink-700)" }}
+        >
+          <img
+            src={HERO_PHOTO}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ display: "block" }}
+          />
+        </div>
+      </div>
+
+      {/* Row 4 — your watchlist (or empty state) + add-companies row. */}
+      <section
+        className="px-6 py-16 sm:px-8 sm:py-20"
+        style={{
+          background: "var(--paper-0)",
+          borderBottom: "1px solid var(--ink-700)",
+        }}
+      >
+        <div className="mx-auto" style={{ maxWidth: "1280px" }}>
+          {watched.length > 0 ? (
+            <>
+              <div className="mb-6 flex items-baseline justify-between gap-4">
+                <span className="ic-eyebrow-mono">Tu suis</span>
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "11px",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "var(--fg-muted)",
+                  }}
+                >
+                  {watched.length} {watched.length > 1 ? "actifs" : "actif"}
+                </span>
+              </div>
+              <ul
+                className="grid"
+                style={{ border: "1px solid var(--ink-700)" }}
+              >
+                {watched.map((c, i) => (
+                  <li
+                    key={c.id}
+                    className="flex flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8"
+                    style={{
+                      borderBottom:
+                        i < watched.length - 1
+                          ? "1px solid var(--ink-700)"
+                          : "none",
+                    }}
+                  >
+                    <Link
+                      href={`/ticker/${encodeURIComponent(c.ticker)}`}
+                      className="flex items-baseline gap-4 transition-opacity hover:opacity-70"
                     >
                       <span
-                        className="text-[13px] font-semibold"
                         style={{
                           fontFamily: "var(--font-mono)",
+                          fontSize: "13px",
+                          fontWeight: 700,
+                          letterSpacing: "0.06em",
+                          textTransform: "uppercase",
                           color: "var(--ink-700)",
+                          minWidth: "80px",
                         }}
                       >
-                        {c.ticker}
+                        ↳ {c.ticker}
                       </span>
                       <span
-                        className="ml-2 text-[13px]"
-                        style={{ color: "var(--fg-muted)" }}
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          fontSize: "16px",
+                          fontWeight: 600,
+                          color: "var(--ink-700)",
+                        }}
                       >
                         {c.name}
                       </span>
-                    </button>
-                  </form>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-
-        {feed.length > 0 ? (
-          <section className="mt-12">
+                    </Link>
+                    <form action={removeFromWatchlist}>
+                      <input type="hidden" name="company_id" value={c.id} />
+                      <button
+                        type="submit"
+                        className="ic-btn-block-light"
+                        style={{ padding: "8px 14px", fontSize: "11px" }}
+                      >
+                        ↳ Retirer
+                      </button>
+                    </form>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
             <div
-              className="mb-3 text-[11px] font-semibold uppercase"
+              className="ic-block-rose"
               style={{
-                fontFamily: "var(--font-display)",
-                color: "var(--lavender-700)",
-                letterSpacing: "0.12em",
+                border: "1px solid var(--ink-700)",
+                padding: "40px 32px",
+                maxWidth: "640px",
               }}
             >
-              Coachings récents
+              <span className="ic-eyebrow-mono">Ta liste est vide</span>
+              <h2
+                className="ic-bigsection mt-4"
+                style={{ fontSize: "clamp(28px, 4vw, 48px)" }}
+              >
+                Ajoute ta<br />première action.
+              </h2>
+              <p
+                className="mt-4 text-[15px]"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  color: "var(--ink-700)",
+                  lineHeight: 1.55,
+                  maxWidth: "480px",
+                }}
+              >
+                Choisis une entreprise dans la liste ci-dessous. À chaque
+                publication trimestrielle ou alerte AMF, tu reçois un coaching
+                éducatif rédigé en français.
+              </p>
             </div>
-            <ul className="space-y-3">
-              {feed.map((card) => {
-                const company = first(card.companies);
-                const tone = card.tone ?? "educational";
-                const toneStyle = toneStyles[tone] ?? toneStyles.educational;
-                return (
-                  <li key={card.id}>
-                    <Link
-                      href={`/ticker/${company ? encodeURIComponent(company.ticker) : ""}`}
-                      className="block rounded-2xl px-5 py-5 transition-all hover:translate-y-[-1px] hover:shadow-md"
+          )}
+
+          {addable.length > 0 ? (
+            <section className="mt-14">
+              <span className="ic-eyebrow-mono">Ajouter une entreprise</span>
+              <ul
+                className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+                style={{ border: "1px solid var(--ink-700)" }}
+              >
+                {addable.slice(0, 16).map((c, idx) => {
+                  const colCount = 4;
+                  const col = idx % colCount;
+                  const totalRows = Math.ceil(Math.min(addable.length, 16) / colCount);
+                  const row = Math.floor(idx / colCount);
+                  const isLastRow = row === totalRows - 1;
+                  return (
+                    <li
+                      key={c.id}
                       style={{
-                        background: "var(--bg-elevated)",
-                        border: "1px solid var(--border)",
+                        borderRight:
+                          col < colCount - 1
+                            ? "1px solid var(--ink-700)"
+                            : "none",
+                        borderBottom: !isLastRow ? "1px solid var(--ink-700)" : "none",
                       }}
                     >
-                      <div className="mb-2 flex items-center gap-3">
-                        <span
-                          className="text-[13px] font-semibold"
-                          style={{
-                            fontFamily: "var(--font-mono)",
-                            color: "var(--ink-700)",
-                          }}
+                      <form action={addToWatchlist} className="block h-full">
+                        <input type="hidden" name="ticker" value={c.ticker} />
+                        <button
+                          type="submit"
+                          className="block w-full px-5 py-5 text-left transition-colors hover:bg-[var(--paper-100)]"
                         >
-                          {company?.ticker ?? "?"}
-                        </span>
-                        <span
-                          className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
+                          <div
+                            style={{
+                              fontFamily: "var(--font-mono)",
+                              fontSize: "13px",
+                              fontWeight: 700,
+                              letterSpacing: "0.06em",
+                              textTransform: "uppercase",
+                              color: "var(--ink-700)",
+                            }}
+                          >
+                            ↳ {c.ticker}
+                          </div>
+                          <div
+                            className="mt-1.5"
+                            style={{
+                              fontFamily: "var(--font-display)",
+                              fontSize: "14px",
+                              color: "var(--ink-700)",
+                              lineHeight: 1.3,
+                              opacity: 0.75,
+                            }}
+                          >
+                            {c.name}
+                          </div>
+                        </button>
+                      </form>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ) : null}
+        </div>
+      </section>
+
+      {/* Row 5 — recent coachings feed (if any). */}
+      {feed.length > 0 ? (
+        <section
+          className="px-6 py-16 sm:px-8"
+          style={{
+            background: "var(--paper-0)",
+            borderBottom: "1px solid var(--ink-700)",
+          }}
+        >
+          <div className="mx-auto" style={{ maxWidth: "1280px" }}>
+            <span className="ic-eyebrow-mono">Coachings récents</span>
+            <ul
+              className="mt-8 grid gap-0 md:grid-cols-2 lg:grid-cols-3"
+              style={{ border: "1px solid var(--ink-700)" }}
+            >
+              {feed.map((card, idx) => {
+                const company = first(card.companies);
+                const tone = card.tone ?? "educational";
+                const col = idx % 3;
+                const isLastRow = idx >= feed.length - (feed.length % 3 || 3);
+                return (
+                  <li
+                    key={card.id}
+                    style={{
+                      borderRight:
+                        col < 2 ? "1px solid var(--ink-700)" : "none",
+                      borderBottom: !isLastRow ? "1px solid var(--ink-700)" : "none",
+                    }}
+                  >
+                    <Link
+                      href={`/ticker/${company ? encodeURIComponent(company.ticker) : ""}`}
+                      className="block h-full transition-colors hover:bg-[var(--paper-100)]"
+                    >
+                      <article className="flex h-full flex-col gap-3 p-6">
+                        <div className="flex items-baseline justify-between gap-3">
+                          <span
+                            style={{
+                              fontFamily: "var(--font-mono)",
+                              fontSize: "12px",
+                              fontWeight: 700,
+                              letterSpacing: "0.08em",
+                              textTransform: "uppercase",
+                              color: "var(--ink-700)",
+                            }}
+                          >
+                            ↳ {company?.ticker ?? "?"}
+                          </span>
+                          <span
+                            style={{
+                              fontFamily: "var(--font-mono)",
+                              fontSize: "10px",
+                              fontWeight: 700,
+                              letterSpacing: "0.12em",
+                              textTransform: "uppercase",
+                              color: "var(--ink-700)",
+                              border: "1px solid var(--ink-700)",
+                              padding: "3px 8px",
+                              background: TONE_BG[tone] ?? TONE_BG.educational,
+                            }}
+                          >
+                            {TONE_LABEL[tone] ?? "neutre"}
+                          </span>
+                        </div>
+                        <h3
+                          className="flex-1"
                           style={{
                             fontFamily: "var(--font-display)",
-                            background: toneStyle.bg,
-                            color: toneStyle.fg,
-                            letterSpacing: "0.06em",
+                            fontSize: "18px",
+                            fontWeight: 700,
+                            letterSpacing: "-0.02em",
+                            lineHeight: 1.25,
+                            color: "var(--ink-700)",
+                            textTransform: "uppercase",
                           }}
                         >
-                          {toneStyle.label}
+                          {card.title}
+                        </h3>
+                        <span
+                          style={{
+                            fontFamily: "var(--font-mono)",
+                            fontSize: "11px",
+                            letterSpacing: "0.1em",
+                            textTransform: "uppercase",
+                            color: "var(--fg-muted)",
+                          }}
+                        >
+                          {formatDateMono(card.published_at)}
                         </span>
-                      </div>
-                      <p
-                        className="text-[16px] font-semibold"
-                        style={{
-                          fontFamily: "var(--font-display)",
-                          color: "var(--ink-700)",
-                          lineHeight: 1.4,
-                          letterSpacing: "-0.015em",
-                        }}
-                      >
-                        {card.title}
-                      </p>
-                      <p
-                        className="mt-1.5 text-[12px]"
-                        style={{
-                          fontFamily: "var(--font-mono)",
-                          color: "var(--fg-subtle)",
-                        }}
-                      >
-                        {formatFrenchDate(card.published_at)}
-                      </p>
+                      </article>
                     </Link>
                   </li>
                 );
               })}
             </ul>
-          </section>
-        ) : null}
-      </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* Disclaimer strip. */}
+      <p className="ic-strip">
+        Lecture éducative · Pas de prix temps réel · Pas un conseil en investissement personnalisé
+      </p>
+
       <Footer />
     </main>
   );

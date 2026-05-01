@@ -24,12 +24,15 @@ export async function generateMetadata({
   };
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+// Default cover photo for the blog post template — pink/violet watercolor
+// (Unsplash TzWRjbPVTxY, palette-C-friendly). Articles can override later.
+const DEFAULT_COVER =
+  "https://images.unsplash.com/photo-1767321173860-52dea6b50337?auto=format&fit=crop&w=2000&q=85";
+
+function formatDateMono(iso: string) {
+  const d = new Date(iso);
+  const months = ["JAN", "FÉV", "MAR", "AVR", "MAI", "JUI", "JUL", "AOÛ", "SEP", "OCT", "NOV", "DÉC"];
+  return `${months[d.getMonth()]} ${d.getDate()} · ${d.getFullYear()}`;
 }
 
 function renderMarkdown(md: string, midSlot?: React.ReactNode) {
@@ -49,7 +52,7 @@ function renderMarkdown(md: string, midSlot?: React.ReactNode) {
       )
       .replace(
         /\[([^\]]+)\]\(([^)]+)\)/g,
-        '<a href="$2" class="text-primary underline">$1</a>',
+        '<a href="$2" class="underline" style="color:var(--ink-700);text-underline-offset:3px">$1</a>',
       );
 
   const flushList = () => {
@@ -61,7 +64,7 @@ function renderMarkdown(md: string, midSlot?: React.ReactNode) {
         style={{
           fontFamily: "var(--font-display)",
           lineHeight: 1.6,
-          color: "var(--fg)",
+          color: "var(--ink-700)",
         }}
       >
         {listBuffer.map((item, i) => (
@@ -85,7 +88,7 @@ function renderMarkdown(md: string, midSlot?: React.ReactNode) {
         style={{
           fontFamily: "var(--font-display)",
           lineHeight: 1.65,
-          color: "var(--fg)",
+          color: "var(--ink-700)",
           textWrap: "pretty",
         }}
         dangerouslySetInnerHTML={{ __html: inline(text) }}
@@ -107,7 +110,7 @@ function renderMarkdown(md: string, midSlot?: React.ReactNode) {
       // Inject mid-article CTA after the 2nd top-level heading (~30% through)
       if (midSlot && !midInjected && headingCount === 3) {
         out.push(
-          <div key={`mid-${out.length}`} className="my-10">
+          <div key={`mid-${out.length}`} className="my-12">
             {midSlot}
           </div>,
         );
@@ -116,12 +119,15 @@ function renderMarkdown(md: string, midSlot?: React.ReactNode) {
       out.push(
         <h2
           key={`h2-${out.length}`}
-          className="mt-12 mb-4 text-[30px] font-bold"
+          className="mt-14 mb-4"
           style={{
             fontFamily: "var(--font-display)",
+            fontSize: "clamp(26px, 3.4vw, 36px)",
+            fontWeight: 700,
             letterSpacing: "-0.025em",
             color: "var(--ink-700)",
-            lineHeight: 1.2,
+            lineHeight: 1.15,
+            textTransform: "uppercase",
           }}
         >
           {line.slice(3)}
@@ -146,22 +152,18 @@ function renderMarkdown(md: string, midSlot?: React.ReactNode) {
       flushPara();
       listBuffer.push(line.slice(2));
     } else if (line === "") {
-      // Blank line ends paragraph & list
       flushAll();
     } else if (listBuffer.length > 0 && paraBuffer.length === 0) {
-      // Soft-wrap continuation of the last list item (no blank line, not "- ")
       listBuffer[listBuffer.length - 1] += " " + line;
     } else {
-      // Accumulate consecutive non-empty lines into a single paragraph
       flushList();
       paraBuffer.push(line);
     }
   }
   flushAll();
-  // If article was too short to hit the trigger, append the CTA at the end
   if (midSlot && !midInjected) {
     out.push(
-      <div key={`mid-${out.length}`} className="my-10">
+      <div key={`mid-${out.length}`} className="my-12">
         {midSlot}
       </div>,
     );
@@ -171,28 +173,18 @@ function renderMarkdown(md: string, midSlot?: React.ReactNode) {
 
 function MidArticleCTA({ slug }: { slug: string }) {
   return (
-    <div
-      className="ic-card-pastel-lavender"
+    <aside
+      className="ic-block-lilac"
       style={{
-        borderRadius: "var(--r-2xl)",
+        border: "1px solid var(--ink-700)",
         padding: "28px",
-        border: "1px solid rgba(124,91,250,0.12)",
       }}
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
         <div className="flex-1">
-          <div
-            className="text-[11px] font-semibold uppercase"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--lavender-700)",
-              letterSpacing: "0.12em",
-            }}
-          >
-            Newsletter
-          </div>
+          <span className="ic-eyebrow-mono">Newsletter</span>
           <p
-            className="mt-1 text-[16px] font-semibold"
+            className="mt-2 text-[16px] font-semibold"
             style={{
               fontFamily: "var(--font-display)",
               color: "var(--ink-700)",
@@ -211,7 +203,7 @@ function MidArticleCTA({ slug }: { slug: string }) {
           />
         </div>
       </div>
-    </div>
+    </aside>
   );
 }
 
@@ -224,172 +216,284 @@ export default async function ArticlePage({
   const article = findArticle(slug);
   if (!article) notFound();
 
-  const others = ARTICLES.filter((a) => a.slug !== slug).slice(0, 3);
+  const others = ARTICLES.filter((a) => a.slug !== slug);
+  const nextArticle = others[0] ?? null;
 
   return (
     <main className="min-h-screen" style={{ background: "var(--paper-50)" }}>
       <Nav active="/articles" />
 
-      <div className="mx-auto max-w-[720px] px-6 py-12">
-        <Link
-          href="/articles"
-          className="inline-block text-[13px] font-medium"
-          style={{
-            fontFamily: "var(--font-display)",
-            color: "var(--lavender-600)",
-          }}
-        >
-          ← Tous les guides
-        </Link>
-
-        <article
-          className="mt-6 pb-8"
-          style={{ borderBottom: "1px solid var(--border)" }}
-        >
-          <div className="ic-eyebrow">
-            Guide · {article.readMinutes} min de lecture
-          </div>
+      {/* Row 1 — rose block with back link, hairline, mega title. */}
+      <section
+        className="ic-block-rose px-6 pt-10 pb-12 sm:px-8 sm:pt-14 sm:pb-16"
+        style={{ borderBottom: "1px solid var(--ink-700)" }}
+      >
+        <div className="mx-auto" style={{ maxWidth: "1280px" }}>
+          <Link
+            href="/articles"
+            className="ic-eyebrow-mono"
+            style={{ textDecoration: "none" }}
+          >
+            Retour aux guides
+          </Link>
+          <div
+            aria-hidden="true"
+            className="mt-6 mb-8"
+            style={{ borderTop: "1px solid var(--ink-700)" }}
+          />
           <h1
-            className="mt-3 text-[44px] font-bold"
             style={{
               fontFamily: "var(--font-display)",
-              letterSpacing: "-0.03em",
-              lineHeight: 1.05,
+              fontSize: "clamp(40px, 7.5vw, 120px)",
+              fontWeight: 800,
+              letterSpacing: "-0.035em",
+              lineHeight: 0.96,
               color: "var(--ink-700)",
+              textTransform: "uppercase",
+              textWrap: "balance",
             }}
           >
             {article.title}
           </h1>
           <p
-            className="mt-5 text-[20px]"
+            className="mt-6 max-w-[720px] text-[18px] sm:text-[20px]"
             style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--fg-muted)",
-              lineHeight: 1.5,
-              fontWeight: 400,
+              fontFamily: "var(--font-source-serif), Georgia, serif",
+              fontStyle: "italic",
+              color: "var(--ink-700)",
+              lineHeight: 1.45,
             }}
           >
             {article.teaser}
           </p>
-          <p
-            className="mt-6 text-[12px]"
+        </div>
+      </section>
+
+      {/* Row 2 — full-bleed cover photo. */}
+      <div
+        className="relative"
+        style={{
+          aspectRatio: "16 / 7",
+          borderBottom: "1px solid var(--ink-700)",
+          background: "var(--ink-700)",
+        }}
+      >
+        <img
+          src={DEFAULT_COVER}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ display: "block" }}
+        />
+      </div>
+
+      {/* Row 3 — mono date row right-aligned + read time on the left. */}
+      <div
+        className="px-6 py-5 sm:px-8"
+        style={{
+          background: "var(--paper-0)",
+          borderBottom: "1px solid var(--ink-700)",
+        }}
+      >
+        <div
+          className="mx-auto flex items-center justify-between gap-4"
+          style={{ maxWidth: "1280px" }}
+        >
+          <span
             style={{
               fontFamily: "var(--font-mono)",
-              color: "var(--fg-subtle)",
-              letterSpacing: "0.04em",
-            }}
-          >
-            Mis à jour le {formatDate(article.updated)}
-          </p>
-        </article>
-
-        <div className="mt-10 reader-body">
-          {renderMarkdown(
-            article.body,
-            <MidArticleCTA slug={slug} />,
-          )}
-        </div>
-
-        <section
-          className="mt-14 ic-card-pastel-lavender"
-          style={{
-            borderRadius: "var(--r-2xl)",
-            padding: "32px 28px",
-          }}
-        >
-          <div
-            className="text-[12px] font-semibold uppercase"
-            style={{
-              fontFamily: "var(--font-display)",
-              color: "var(--lavender-700)",
+              fontSize: "11px",
+              fontWeight: 700,
               letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--ink-700)",
             }}
           >
-            La lettre du dimanche
-          </div>
+            {article.readMinutes} min de lecture
+          </span>
+          <span
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "11px",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--fg-muted)",
+            }}
+          >
+            Mis à jour {formatDateMono(article.updated)}
+          </span>
+        </div>
+      </div>
+
+      {/* Row 4 — body container. */}
+      <article className="mx-auto px-6 py-16 sm:px-8" style={{ maxWidth: "720px" }}>
+        <div className="reader-body">
+          {renderMarkdown(article.body, <MidArticleCTA slug={slug} />)}
+        </div>
+      </article>
+
+      {/* Row 5 — bottom newsletter CTA in lilac block. */}
+      <section
+        className="ic-block-lilac px-6 py-16 sm:px-8"
+        style={{
+          borderTop: "1px solid var(--ink-700)",
+          borderBottom: "1px solid var(--ink-700)",
+        }}
+      >
+        <div className="mx-auto" style={{ maxWidth: "720px" }}>
+          <span className="ic-eyebrow-mono">La lettre du dimanche</span>
           <h3
-            className="mt-2 text-[22px] font-bold"
+            className="mt-4 mb-3"
             style={{
               fontFamily: "var(--font-display)",
+              fontSize: "clamp(26px, 3.4vw, 36px)",
+              fontWeight: 700,
+              letterSpacing: "-0.025em",
+              lineHeight: 1.15,
               color: "var(--ink-700)",
-              letterSpacing: "-0.02em",
-              lineHeight: 1.2,
+              textTransform: "uppercase",
             }}
           >
             Reçois un guide comme celui-ci, chaque dimanche.
           </h3>
           <p
-            className="mt-2 text-[15px]"
+            className="mb-5 text-[15px]"
             style={{
               fontFamily: "var(--font-display)",
-              color: "var(--fg-muted)",
+              color: "var(--ink-700)",
               lineHeight: 1.55,
             }}
           >
             Pas de spam, pas de pub déguisée. Désabonnement en un clic.
           </p>
-          <div className="mt-5">
-            <SubscribeForm variant="hero" source={`article-bottom:${slug}`} />
-          </div>
-        </section>
+          <SubscribeForm variant="hero" source={`article-bottom:${slug}`} />
+        </div>
+      </section>
 
-        {others.length > 0 ? (
-          <section className="mt-12">
-            <div className="cap-eyebrow">À lire ensuite</div>
-            <ul className="mt-4 space-y-3">
-              {others.map((a) => (
-                <li key={a.slug}>
-                  <Link href={`/articles/${a.slug}`} className="block">
-                    <article className="cap-card">
-                      <div className="flex items-baseline justify-between gap-3">
+      {/* Row 6 — bottom hairline + "next article" link, Innostart-style. */}
+      {nextArticle ? (
+        <section style={{ borderBottom: "1px solid var(--ink-700)" }}>
+          <Link
+            href={`/articles/${nextArticle.slug}`}
+            className="block transition-colors hover:bg-[var(--paper-100)]"
+          >
+            <div
+              className="mx-auto flex items-baseline justify-between gap-4 px-6 py-8 sm:px-8 sm:py-10"
+              style={{ maxWidth: "1280px" }}
+            >
+              <div>
+                <span className="ic-eyebrow-mono">Article suivant</span>
+                <h4
+                  className="mt-3"
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "clamp(20px, 2.4vw, 28px)",
+                    fontWeight: 700,
+                    letterSpacing: "-0.02em",
+                    color: "var(--ink-700)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {nextArticle.title}
+                </h4>
+              </div>
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: "var(--ink-700)",
+                }}
+                aria-hidden="true"
+              >
+                ↳
+              </span>
+            </div>
+          </Link>
+        </section>
+      ) : null}
+
+      {/* Other guides list — Innostart-flat 3-col. */}
+      {others.length > 0 ? (
+        <section className="px-6 py-16 sm:px-8" style={{ borderBottom: "1px solid var(--ink-700)" }}>
+          <div className="mx-auto" style={{ maxWidth: "1280px" }}>
+            <span className="ic-eyebrow-mono">Autres guides</span>
+            <ul
+              className="mt-8 grid gap-0 md:grid-cols-2 lg:grid-cols-3"
+              style={{ border: "1px solid var(--ink-700)" }}
+            >
+              {others.slice(0, 6).map((a, idx) => {
+                const col = idx % 3;
+                return (
+                  <li
+                    key={a.slug}
+                    style={{
+                      borderRight:
+                        col < 2 ? "1px solid var(--ink-700)" : "none",
+                      borderBottom:
+                        idx < others.slice(0, 6).length - (others.slice(0, 6).length % 3 || 3)
+                          ? "1px solid var(--ink-700)"
+                          : "none",
+                    }}
+                  >
+                    <Link
+                      href={`/articles/${a.slug}`}
+                      className="block h-full transition-colors hover:bg-[var(--paper-100)]"
+                    >
+                      <article className="flex h-full flex-col gap-3 p-6">
                         <span
-                          className="text-[18px] font-medium"
+                          style={{
+                            fontFamily: "var(--font-mono)",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            letterSpacing: "0.12em",
+                            textTransform: "uppercase",
+                            color: "var(--fg-muted)",
+                          }}
+                        >
+                          {a.readMinutes} min · Guide
+                        </span>
+                        <h5
                           style={{
                             fontFamily: "var(--font-display)",
-                            color: "var(--fg)",
+                            fontSize: "20px",
+                            fontWeight: 700,
+                            letterSpacing: "-0.02em",
+                            lineHeight: 1.2,
+                            color: "var(--ink-700)",
+                            textTransform: "uppercase",
                           }}
                         >
                           {a.title}
-                        </span>
-                        <span
-                          className="shrink-0 text-[11px]"
+                        </h5>
+                        <p
+                          className="flex-1 text-[14px]"
                           style={{
-                            fontFamily: "var(--font-mono)",
-                            color: "var(--fg-subtle)",
+                            fontFamily: "var(--font-source-serif), Georgia, serif",
+                            fontStyle: "italic",
+                            color: "var(--ink-700)",
+                            lineHeight: 1.55,
                           }}
                         >
-                          {a.readMinutes} min
-                        </span>
-                      </div>
-                      <p
-                        className="mt-1.5 text-[14px]"
-                        style={{
-                          fontFamily: "var(--font-serif)",
-                          color: "var(--fg-muted)",
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        {a.teaser}
-                      </p>
-                    </article>
-                  </Link>
-                </li>
-              ))}
+                          « {a.teaser} »
+                        </p>
+                      </article>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
-          </section>
-        ) : null}
+          </div>
+        </section>
+      ) : null}
 
-        <p
-          className="mt-12 text-[12px] italic"
-          style={{
-            fontFamily: "var(--font-serif)",
-            color: "var(--fg-subtle)",
-          }}
-        >
-          Contenu éducatif. Rien de ce qui est écrit ici ne constitue un conseil
-          en investissement personnalisé.
-        </p>
-      </div>
+      {/* Disclaimer strip. */}
+      <p className="ic-strip">
+        Contenu éducatif · Pas un conseil en investissement personnalisé
+      </p>
+
       <Footer />
     </main>
   );

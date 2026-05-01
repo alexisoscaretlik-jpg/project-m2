@@ -12,7 +12,9 @@ export function SpotifyEpisodeList() {
 
   return (
     <section className="mb-12">
-      <div className="cap-eyebrow mb-3">Sur Spotify</div>
+      <div className="mb-4">
+        <span className="ic-eyebrow-mono">Sur Spotify</span>
+      </div>
       <div className="space-y-3">
         {SPOTIFY_EPISODES.map((ep) => (
           <iframe
